@@ -1,6 +1,6 @@
 # AitiA
 
-AitiA is a project focused on [brief project description].
+Detecting starling swarms.
 
 ## To-Do List
 
