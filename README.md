@@ -11,3 +11,8 @@ Detecting starling swarms.
 - [ ] **Explore network folder and MQTT options**
   - Investigate network folder integration
   - Evaluate MQTT possibilities for messaging
+    
+- [ ] **Write python code**
+  - Unit tests
+  - Workflow, setup.py files
+  - CI/CD?
