@@ -16,3 +16,6 @@ Detecting starling swarms.
   - Unit tests
   - Workflow, setup.py files
   - CI/CD?
+- [ ] **Optimizing**
+  - Power consumption: https://raspberrypi.stackexchange.com/questions/92138/power-rpi-from-a-battery-on-off-via-ui-or-sleep
+  - Boot: https://forums.raspberrypi.com/viewtopic.php?t=241455
