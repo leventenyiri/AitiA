@@ -19,3 +19,4 @@ Detecting starling swarms.
 - [ ] **Optimizing**
   - Power consumption: https://raspberrypi.stackexchange.com/questions/92138/power-rpi-from-a-battery-on-off-via-ui-or-sleep
   - Boot: https://forums.raspberrypi.com/viewtopic.php?t=241455
+  - UnMount needed???
