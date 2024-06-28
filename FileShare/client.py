@@ -60,6 +60,7 @@ def save_image(image_data):
         logging.critical(e)
         exit(1)
         
+counter = 0
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG, filename='NFS_client.log', filemode='w',
@@ -79,10 +80,12 @@ if __name__ == "__main__":
             #picam2.capture_file(image_stream, format='jpeg')
             #image_data = image_stream.getvalue()
             #save_image(image_data)
-            picam2.capture_file('/mnt/nfs_share/picture.jpg')
+            image_filename = f'/mnt/nfs_share/picture_{counter:04d}.jpg'
+            picam2.capture_file(image_filename)
             logging.info("Image saving time: " + str(time.time() - start_time) + " seconds") 
             print(f"Image saved")
             #else:
                 #logging.error("Couldn't focus!")
+            counter += 1
                 
             time.sleep(10)
