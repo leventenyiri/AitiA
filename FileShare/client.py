@@ -1,7 +1,23 @@
 import subprocess
-import requests
 import time
+import io
 import logging
+from picamera2 import Picamera2
+from libcamera import controls
+
+picam2 = Picamera2()
+
+def configure_camera():
+    config = picam2.create_still_configuration()
+    picam2.configure(config)
+    # JPEG quality level: 0 - 95
+    picam2.options["quality"] = 95
+    # Use NULL preview
+    picam2.start(show_preview = False)
+    time.sleep(2)
+    #picam2.set_controls({"AfMode": controls.AfModeEnum.Continuos}) #Auto
+    # Start the focusing asynchronously
+    #focusing = picam2.autofocus_cycle(wait=False)
 
 def mount_nfs():
     while True:
@@ -29,20 +45,7 @@ def mount_nfs():
         
         time.sleep(1)    
         logging.info("Retrying...")
-
-def emulated_camera():
-    url = "http://192.168.0.108/capture"
-    try:
-        response = requests.get(url, stream = True, timeout = 1)
-        response.raise_for_status()
-        if response.status_code == 200:
-            return response.content
         
-    except requests.exceptions.RequestException as e:
-        logging.error(e)
-        exit(1)
-        
-
 def save_image(image_data):
     path = '/mnt/nfs_share/picture.jpg'
     
@@ -59,15 +62,27 @@ def save_image(image_data):
         
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG, filename='client.log', filemode='w',
+    logging.basicConfig(level=logging.DEBUG, filename='NFS_client.log', filemode='w',
                         format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
     logging.info("Start of the log")
+    #configure_camera()
     start_time = time.time()
     mount_nfs()
     logging.info("Mount time: " + str(time.time() - start_time) + " seconds")
     while(True):
-            save_image(emulated_camera())
+            #focusing = picam2.autofocus_cycle(wait=False)
+            #image_stream = io.BytesIO()
+            #metadata = picam2.capture_metadata()
+            #logging.info(metadata["ExposureTime"], metadata["AnalogueGain"])
+            
+            #if(picam2.wait(focusing)):
+            #picam2.capture_file(image_stream, format='jpeg')
+            #image_data = image_stream.getvalue()
+            #save_image(image_data)
+            picam2.capture_file('/mnt/nfs_share/picture.jpg')
             logging.info("Image saving time: " + str(time.time() - start_time) + " seconds") 
+            print(f"Image saved")
+            #else:
+                #logging.error("Couldn't focus!")
+                
             time.sleep(10)
-
-        
