@@ -10,7 +10,7 @@ class Log:
         self.level = level
         
     def start(self):
-        # Configure costum logging
+        # Configure costum logginggg
         
         file_handler = logging.FileHandler(self.path)
         log.addHandler(file_handler)
