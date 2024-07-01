@@ -1,11 +1,13 @@
 import subprocess
 import time
-import io
+import json
 import logging
 from picamera2 import Picamera2
 from libcamera import controls
 
 ########## Config file data ###########
+config_path = 'config.json'
+
 path = '/mnt/nfs_share/picture.jpg'
 log_level = logging.DEBUG
 log_path = 'Test.log'
@@ -23,27 +25,38 @@ class Log:
         logging.info("Start of the log")
 
 class Camera:
-    def __init__(self, quality, path):
+    def __init__(self, quality, save_path):
         self.quality = quality
-        self.path = path
+        self.save_path = save_path
         self.cam = Picamera2()  
     
     def start(self, quality):
-        config = picam2.create_still_configuration()
-        picam2.configure(config)
+        config = self.cam.create_still_configuration()
+        self.cam.configure(config)
         # JPEG quality level: 0 - 95
-        picam2.options["quality"] = quality
+        self.cam.options['quality'] = quality
         # Use NULL preview
-        picam2.start(show_preview = False)
+        self.cam.start(show_preview = False)
         time.sleep(2)
         
     def capture(self):
-        picam2.capture_file(self.path)
+        self.cam.capture_file(self.path)
         
 class App:
-    def __init__(self):
-        self.log = Log(log_path, log_level)
-        self.camera = Camera(quality, path)
+    def __init__(self, config_path):
+        # Read the config data to dictionaries
+        camera_config = App.read_json_to_dict(config_path, ['Camera'])
+        log_config = App.read_json_to_dict(config_path, ['Log'])
+        
+        # Pass the config data 
+        self.log = Log(log_config['path'], log_config['level'])
+        self.camera = Camera(camera_config['quality'], camera_config['path'])
+    
+    @staticmethod
+    def read_json_to_dict(test, keys):
+        with open(test, 'r') as file:
+            data = json.load(file)
+        return {key: data[key] for key in keys if key in data}
         
     def mount_nfs(self):
         while True:
@@ -75,10 +88,8 @@ class App:
 if __name__ == "__main__":
     start_time = time.time()
     
-    picam2 = Picamera2()
-    
     # Need to replace to a deserialazable class/object
-    app = App(log_path, log_level, quality, path)
+    app = App(config_path)
     
     app.log.start()
     app.mount_nfs()
