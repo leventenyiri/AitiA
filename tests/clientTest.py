@@ -1,16 +1,17 @@
 import pytest
 from unittest.mock import patch, Mock
 import subprocess
-import os
 from client import App
 
 # Define a path for a test configuration file
 TEST_CONFIG_PATH = '/home/levente/AITIA/AitiA/config.json'
 
+
 @pytest.fixture(autouse=True)
 def mock_picamera():
     with patch('client.Picamera2', Mock()) as mock:
         yield mock
+
 
 def test_mount_nfs_success(mocker):
     app = App(TEST_CONFIG_PATH)
@@ -42,6 +43,7 @@ def test_mount_nfs_success(mocker):
 
     # Ensure critical logging is not called
     mock_logging_critical.assert_not_called()
+
 
 def test_mount_nfs_failure(mocker):
     app = App(TEST_CONFIG_PATH)
