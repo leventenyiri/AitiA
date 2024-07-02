@@ -1,28 +1,13 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
-    name='my_project',
-    version='0.1',
-    packages=find_packages(),
-    install_requires=[
-        'requests',
-        'pytest'
-    ],
-    entry_points={
-        'console_scripts': [
-            'my_script=my_script:main',
-        ],
-    },
-    author='Your Name',
-    author_email='your.email@example.com',
-    description='A project to mount NFS and save images from an emulated camera.',
-    long_description=open('README.md').read(),
-    long_description_content_type='text/markdown',
-    url='https://github.com/yourusername/my_project',  # Update with your project's URL
-    classifiers=[
-        'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: MIT License',
-        'Operating System :: OS Independent',
-    ],
-    python_requires='>=3.6',
+    name='example-python',
+    version='1.0.0',
+    description='Example showcasing the dev tooling for Python based development',
+    author='Ferenc Nandor Janky & Attila Gombos',
+    author_email='info@effective-range.com',
+    packages=['example'],
+    scripts=['bin/example-python.py'],
+    install_requires=['netifaces',
+                      'python-context-logger@git+https://github.com/EffectiveRange/python-context-logger.git@latest']
 )
