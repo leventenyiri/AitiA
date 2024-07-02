@@ -28,16 +28,21 @@ class Log:
 
 
 class Camera:
-    def __init__(self, quality, save_path):
+    def __init__(self, quality, save_path, gain, exposure, width, height):
         self.quality = quality
         self.save_path = save_path
+        self.gain = gain
+        self.exposure = exposure
+        self.width = width
+        self.height = height
         self.cam = Picamera2()
 
-    def start(self, quality):
-        config = self.cam.create_still_configuration()
+    def start(self):
+        config = self.cam.create_still_configuration({"size": (self.width, self.height)})
         self.cam.configure(config)
         # JPEG quality level: 0 - 95
-        self.cam.options['quality'] = quality
+        self.cam.options['quality'] = self.quality
+        self.cam.set_controls({"ExposureTime": self.exposure, "AnalogueGain": self.gain})
         # Use NULL preview
         self.cam.start(show_preview=False)
         time.sleep(2)
@@ -51,7 +56,9 @@ class App:
         # Read the config data to dictionaries
         camera_config = App.read_json_to_dict(config_path, ['Camera'])
         # Pass the config data
-        self.camera = Camera(camera_config['quality'], camera_config['path'])
+        self.camera = Camera(camera_config['quality'], camera_config['path'],
+                             camera_config['gain'], camera_config['exposure'],
+                             camera_config['width'], camera_config['height'])
 
     @staticmethod
     def read_json_to_dict(path, keys):
