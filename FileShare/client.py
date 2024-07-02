@@ -7,10 +7,11 @@ import yaml
 import os
 from picamera2 import Picamera2
 
-# Config file data
+# ----------------- Config file data ------------------
 script_dir = os.path.dirname(os.path.abspath(__file__))
 log_path = os.path.join(script_dir, 'log_config.yaml')
 config_path = os.path.join(script_dir, 'config.json')
+# ------------------------------------------------------
 
 
 class Log:
