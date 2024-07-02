@@ -4,14 +4,13 @@ import json
 import logging
 from picamera2 import Picamera2
 
-########## Config file data ############
+# Config file data
 config_path = 'config.json'
 
 path = '/mnt/nfs_share/picture.jpg'
 log_level = logging.DEBUG
 log_path = 'Test.log'
 quality = 95
-#####################################
 
 class Log:
     def __init__(self, path, level):
@@ -22,6 +21,7 @@ class Log:
         logging.basicConfig(level=self.level, filename=self.path, filemode='w',
                             format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         logging.info("Start of the log")
+
 
 class Camera:
     def __init__(self, quality, save_path):
@@ -40,7 +40,8 @@ class Camera:
         
     def capture(self):
         self.cam.capture_file(self.path)
-        
+
+
 class App:
     def __init__(self, config_path):
         # Read the config data to dictionaries
@@ -81,9 +82,9 @@ class App:
                 logging.critical(f"An error occurred while mounting: {e}")
                 exit(1)
             
-            time.sleep(1)    
+            time.sleep(1)
             logging.info("Retrying...")
-            
+
 if __name__ == "__main__":
     start_time = time.time()
     
