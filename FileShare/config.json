@@ -2,9 +2,5 @@
     "Camera": {
         "quality": 95,
         "path": "picture.jpg"
-    },
-    "Log": {
-        "level": "ERROR",
-        "path": "teszt.log"
     }
 }
