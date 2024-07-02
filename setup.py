@@ -9,5 +9,6 @@ setup(
     packages=['example'],
     scripts=['pc_client.py'],
     install_requires=['netifaces',
+                      'PyYAML>=6.0',
                       'python-context-logger@git+https://github.com/EffectiveRange/python-context-logger.git@latest']
 )

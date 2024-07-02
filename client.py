@@ -5,7 +5,10 @@ import logging
 import logging.config
 import yaml
 import os
-from picamera2 import Picamera2
+try:
+    from picamera2 import Picamera2
+except ImportError:
+    Picamera2 = None
 
 # ----------------- Config file data ------------------
 script_dir = os.path.dirname(os.path.abspath(__file__))

@@ -1,4 +1,4 @@
 pytest
 libcamera
 picamera2
-pyyaml
+PyYAML==6.0

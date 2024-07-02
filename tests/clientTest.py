@@ -1,11 +1,19 @@
 import pytest
-from unittest.mock import Mock
+from unittest.mock import patch, Mock
 import subprocess
+import os
+from client import App
 
-from client import mount_nfs
+# Define a path for a test configuration file
+TEST_CONFIG_PATH = '/home/levente/AITIA/AitiA/config.json'
 
+@pytest.fixture(autouse=True)
+def mock_picamera():
+    with patch('client.Picamera2', Mock()) as mock:
+        yield mock
 
 def test_mount_nfs_success(mocker):
+    app = App(TEST_CONFIG_PATH)
     # Mock the subprocess.run to simulate a successful mount command
     mock_run = mocker.patch('subprocess.run')
     mock_run.return_value = Mock(returncode=0)
@@ -18,7 +26,7 @@ def test_mount_nfs_success(mocker):
     mocker.patch('time.sleep')
 
     # Call the function
-    mount_nfs()
+    app.mount_nfs()
 
     # Check if subprocess.run was called once
     mock_run.assert_called_once_with(
@@ -35,8 +43,8 @@ def test_mount_nfs_success(mocker):
     # Ensure critical logging is not called
     mock_logging_critical.assert_not_called()
 
-
 def test_mount_nfs_failure(mocker):
+    app = App(TEST_CONFIG_PATH)
     # Mock the subprocess.run to simulate a failing mount command
     mock_run = mocker.patch('subprocess.run', side_effect=subprocess.CalledProcessError(1, 'cmd', stderr='error'))
 
@@ -51,7 +59,7 @@ def test_mount_nfs_failure(mocker):
     mock_exit = mocker.patch('builtins.exit')
 
     # Call the function
-    mount_nfs()
+    app.mount_nfs()
 
     # Check if subprocess.run was called once
     mock_run.assert_called_once_with(
@@ -73,8 +81,3 @@ def test_mount_nfs_failure(mocker):
 
     # Ensure logging.info was not called with "Mount successful."
     mock_logging_info.assert_not_called()
-
-
-# Example usage with pytest
-if __name__ == '__main__':
-    pytest.main()
