@@ -10,12 +10,12 @@ class Log:
         self.level = level
         
     def start(self):
-        # Configure costum logginggg
+        # Configure costume logging
         
         file_handler = logging.FileHandler(self.path)
         log.addHandler(file_handler)
         log.setLevel(self.level)
-        logging.info("Costum logging rules have been added")
+        logging.info("Costume logging rules have been added")
 
 class Camera:
     def __init__(self, quality, path):
