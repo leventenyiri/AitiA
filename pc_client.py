@@ -24,9 +24,13 @@ class Log:
 
 
 class Camera:
-    def __init__(self, quality, path):
+     def __init__(self, quality, save_path, gain, exposure, width, height):
         self.quality = quality
-        self.path = path
+        self.save_path = save_path
+        self.gain = gain
+        self.exposure = exposure
+        self.width = width
+        self.height = height
 
 
 class App:
@@ -34,7 +38,9 @@ class App:
         # Read the config data to dictionaries
         camera_config = App.read_json_to_dict(config_path, ["Camera"])
         # Pass the config data
-        self.camera = Camera(camera_config['quality'], camera_config['path'])
+        self.camera = Camera(camera_config['quality'], camera_config['path'],
+                             camera_config['gain'], camera_config['exposure'],
+                             camera_config['width'], camera_config['height'])
 
     @staticmethod
     def read_json_to_dict(path, keys):
