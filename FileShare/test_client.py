@@ -1,10 +1,9 @@
 import pytest
 from unittest.mock import patch, Mock
 import subprocess
-import logging
 import time
 
-from client import mount_nfs 
+from client import mount_nfs
 
 def test_mount_nfs_success(mocker):
     # Mock the subprocess.run to simulate a successful mount command
@@ -41,11 +40,11 @@ def test_mount_nfs_failure(mocker):
     mock_run = mocker.patch('subprocess.run', side_effect=subprocess.CalledProcessError(1, 'cmd', stderr='error'))
 
     # Mock logging to prevent actual logging
-    mock_logging = mocker.patch('logging.info')
     mock_logging_critical = mocker.patch('logging.critical')
+    mock_logging_info = mocker.patch('logging.info')
 
     # Mock time.sleep to avoid actual sleep
-    mock_sleep = mocker.patch('time.sleep')
+    mocker.patch('time.sleep')
 
     # Mock exit to prevent actual exit
     mock_exit = mocker.patch('builtins.exit')
@@ -70,7 +69,7 @@ def test_mount_nfs_failure(mocker):
     mock_exit.assert_called_once_with(1)
 
     # Ensure logging.info was not called with "Mount successful."
-    mock_logging.assert_not_called()
+    mock_logging_info.assert_not_called()
 
 # Example usage with pytest
 if __name__ == '__main__':

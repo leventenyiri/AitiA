@@ -3,7 +3,6 @@ import time
 import json
 import logging
 from picamera2 import Picamera2
-from libcamera import controls
 
 ########## Config file data ############
 config_path = 'config.json'
@@ -21,7 +20,7 @@ class Log:
         
     def start(self):
         logging.basicConfig(level=self.level, filename=self.path, filemode='w',
-                        format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+                            format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         logging.info("Start of the log")
 
 class Camera:
@@ -36,7 +35,7 @@ class Camera:
         # JPEG quality level: 0 - 95
         self.cam.options['quality'] = quality
         # Use NULL preview
-        self.cam.start(show_preview = False)
+        self.cam.start(show_preview=False)
         time.sleep(2)
         
     def capture(self):
@@ -88,13 +87,12 @@ class App:
 if __name__ == "__main__":
     start_time = time.time()
     
-    # Need to replace to a deserialazable class/object
     app = App(config_path)
     
     app.log.start()
     app.mount_nfs()
-    app.camera.start()
+    app.camera.start(quality)
     app.camera.capture()
     
     logging.info("Image saving time: " + str(time.time() - start_time) + " seconds")
-    print(f"Image saved")
+    print("Image saved")
