@@ -24,7 +24,7 @@ class Camera:
 
 class App:
     def __init__(self, config_path):
-        # Read the config data to dictionaries
+        # Read the config data to dictionariess
         camera_config = App.read_json_to_dict(config_path, ["Camera"])
         logging_config = App.read_json_to_dict(config_path, ["Log"])
         
