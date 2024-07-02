@@ -5,7 +5,7 @@ import logging
 from picamera2 import Picamera2
 from libcamera import controls
 
-########## Config file data ###########
+########## Config file data ############
 config_path = 'config.json'
 
 path = '/mnt/nfs_share/picture.jpg'
