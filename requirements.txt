@@ -1,3 +1,4 @@
 pytest
 libcamera
 picamera2
+pyyaml
