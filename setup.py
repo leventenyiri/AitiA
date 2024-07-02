@@ -7,7 +7,7 @@ setup(
     author='Ferenc Nandor Janky & Attila Gombos',
     author_email='info@effective-range.com',
     packages=['example'],
-    scripts=['FileShare/pc_client.py'],
+    scripts=['pc_client.py'],
     install_requires=['netifaces',
                       'python-context-logger@git+https://github.com/EffectiveRange/python-context-logger.git@latest']
 )
