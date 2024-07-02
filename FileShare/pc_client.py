@@ -9,10 +9,11 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 log_path = os.path.join(script_dir, 'log_config.yaml')
 config_path = os.path.join(script_dir, 'config.json')
 
+
 class Log:
     def __init__(self, filepath):
         self.path = filepath
-        
+
     def start(self):
         if not os.path.exists(log_path):
             raise FileNotFoundError(f"Log configuration file not found: {log_path}")
@@ -21,19 +22,20 @@ class Log:
         logging.config.dictConfig(config)
         logging.info("Start of the log")
 
+
 class Camera:
     def __init__(self, quality, path):
         self.quality = quality
         self.path = path
 
+
 class App:
     def __init__(self, config_path):
         # Read the config data to dictionaries
         camera_config = App.read_json_to_dict(config_path, ["Camera"])
-        
-        # Pass the config data 
+        # Pass the config data
         self.camera = Camera(camera_config['quality'], camera_config['path'])
-        
+
     @staticmethod
     def read_json_to_dict(path, keys):
         try:
@@ -55,9 +57,10 @@ class App:
             logging.error(f"Config file not found: {path}")
             raise FileNotFoundError(f"Config file not found: {path}")
 
+
 if __name__ == "__main__":
     log = Log(log_path)
     log.start()
     start_time = time.time()
-    
+
     app = App(config_path)

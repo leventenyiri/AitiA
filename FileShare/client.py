@@ -6,19 +6,17 @@ import logging.config
 import yaml
 import os
 from picamera2 import Picamera2
-from libcamera import controls
 
-################# Config file data #####################
+# Config file data
 script_dir = os.path.dirname(os.path.abspath(__file__))
 log_path = os.path.join(script_dir, 'log_config.yaml')
 config_path = os.path.join(script_dir, 'config.json')
-########################################################
 
 
 class Log:
     def __init__(self, filepath):
         self.path = filepath
-        
+
     def start(self):
         if not os.path.exists(log_path):
             raise FileNotFoundError(f"Log configuration file not found: {log_path}")
@@ -32,28 +30,28 @@ class Camera:
     def __init__(self, quality, save_path):
         self.quality = quality
         self.save_path = save_path
-        self.cam = Picamera2()  
-    
+        self.cam = Picamera2()
+
     def start(self, quality):
         config = self.cam.create_still_configuration()
         self.cam.configure(config)
         # JPEG quality level: 0 - 95
         self.cam.options['quality'] = quality
         # Use NULL preview
-        self.cam.start(show_preview = False)
+        self.cam.start(show_preview=False)
         time.sleep(2)
-        
+
     def capture(self):
         self.cam.capture_file(self.path)
-        
+
+
 class App:
     def __init__(self, config_path):
         # Read the config data to dictionaries
         camera_config = App.read_json_to_dict(config_path, ['Camera'])
-        
-        # Pass the config data 
+        # Pass the config data
         self.camera = Camera(camera_config['quality'], camera_config['path'])
-    
+
     @staticmethod
     def read_json_to_dict(path, keys):
         try:
@@ -74,7 +72,7 @@ class App:
         except FileNotFoundError:
             logging.error(f"Config file not found: {path}")
             raise FileNotFoundError(f"Config file not found: {path}")
-        
+
     def mount_nfs(self):
         while True:
             try:
@@ -84,7 +82,7 @@ class App:
                                         stderr=subprocess.PIPE,
                                         text=True,
                                         check=True)
-                
+
                 # If mount was successful, break the loop
                 if result.returncode == 0:
                     logging.info("Mount successful.")
@@ -94,24 +92,25 @@ class App:
                 logging.critical(f"An error occurred while mounting: {e}")
                 logging.critical(f"Error Output: {e.stderr}")
                 exit(1)
-            
+
             except Exception as e:
                 logging.critical(f"An error occurred while mounting: {e}")
                 exit(1)
-            
-            time.sleep(1)    
+
+            time.sleep(1)
             logging.info("Retrying...")
-            
+
+
 if __name__ == "__main__":
     start_time = time.time()
     log = Log(log_path)
     log.start()
-    
+
     app = App(config_path)
-    
+
     app.mount_nfs()
     app.camera.start()
     app.camera.capture()
-    
+
     logging.info("Image saving time: " + str(time.time() - start_time) + " seconds")
-    print(f"Image saved")
+    print("Image saved")
