@@ -24,7 +24,7 @@ class Log:
 
 
 class Camera:
-     def __init__(self, quality, save_path, gain, exposure, width, height):
+    def __init__(self, quality, save_path, gain, exposure, width, height):
         self.quality = quality
         self.save_path = save_path
         self.gain = gain
