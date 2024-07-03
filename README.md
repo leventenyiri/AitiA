@@ -14,7 +14,7 @@ Detecting starling swarms.
   - Unit tests
   - Workflow, setup.py files
   - CI/CD?
-  - Use a config file received through NFS to configure the code 
+  - MQTT tutorial: https://www.emqx.com/en/blog/how-to-use-mqtt-in-python
     
 - [ ] **Optimizing**
   - Power consumption: https://raspberrypi.stackexchange.com/questions/92138/power-rpi-from-a-battery-on-off-via-ui-or-sleep
