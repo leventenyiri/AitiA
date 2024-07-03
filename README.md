@@ -15,6 +15,7 @@ Detecting starling swarms.
   - Workflow, setup.py files
   - CI/CD?
   - MQTT tutorial: https://www.emqx.com/en/blog/how-to-use-mqtt-in-python
+  - MQTT clients: https://www.emqx.com/en/mqtt-client-sdk?language=Python
     
 - [ ] **Optimizing**
   - Power consumption: https://raspberrypi.stackexchange.com/questions/92138/power-rpi-from-a-battery-on-off-via-ui-or-sleep
