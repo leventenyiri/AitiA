@@ -7,6 +7,7 @@ Detecting starling swarms.
 - [ ] **Camera used for testing**
   - Arducam 16 mpx Autofocus Camera
   - Camera setup: https://docs.arducam.com/Raspberry-Pi-Camera/Native-camera/16MP-IMX519/#hardware-connection
+  - Libcamera documentation: https://datasheets.raspberrypi.com/camera/picamera2-manual.pdf
 
 - [ ] **Network folder sharing for communication with server**
     
