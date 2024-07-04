@@ -1,0 +1,51 @@
+Raspberry Pi High Quality Camera - HQ kamera - Sony IMX477 - 12 MP szenzor: https://hu.farnell.com/raspberry-pi/rpi-hq-camera/rpi-high-quality-camera-12-3-mp/dp/3381605?MER=sy-me-pd-mi-acce
+Lencse: https://hu.farnell.com/raspberry-pi/rpi-16mm-lens/rpi-16mm-telephoto-lens/dp/3381606  // lehet kicsi a fov
+ARDU CAM: https://www.arducam.com/product/imx519-autofocus-camera-module-for-raspberry-pi-arducam-b0371/
+
+def emulated_camera():
+    url = "http://192.168.0.108/capture"
+    try:
+        response = requests.get(url, stream = True, timeout = 1)
+        response.raise_for_status()
+        if response.status_code == 200:
+            return response.content
+        
+    except requests.exceptions.RequestException as e:
+        logging.error(e)
+        exit(1)
+
+[{'bit_depth': 10,
+  'crop_limits': (1048, 1042, 2560, 1440),
+  'exposure_limits': (287, None),
+  'format': SRGGB10_CSI2P,
+  'fps': 80.01,
+  'size': (1280, 720),
+  'unpacked': 'SRGGB10'},
+ {'bit_depth': 10,
+  'crop_limits': (408, 674, 3840, 2160),
+  'exposure_limits': (282, 118428825, None),
+  'format': SRGGB10_CSI2P,
+  'fps': 60.05,
+  'size': (1920, 1080),
+  'unpacked': 'SRGGB10'},
+ {'bit_depth': 10,
+  'crop_limits': (0, 0, 4656, 3496),
+  'exposure_limits': (305, 118430097, None),
+  'format': SRGGB10_CSI2P,
+  'fps': 30.0,
+  'size': (2328, 1748),
+  'unpacked': 'SRGGB10'},
+ {'bit_depth': 10,
+  'crop_limits': (408, 672, 3840, 2160),
+  'exposure_limits': (491, 127960311, None),
+  'format': SRGGB10_CSI2P,
+  'fps': 18.0,
+  'size': (3840, 2160),
+  'unpacked': 'SRGGB10'},
+ {'bit_depth': 10,
+  'crop_limits': (0, 0, 4656, 3496),
+  'exposure_limits': (592, 206049113, None),
+  'format': SRGGB10_CSI2P,
+  'fps': 9.0,
+  'size': (4656, 3496),
+  'unpacked': 'SRGGB10'}]

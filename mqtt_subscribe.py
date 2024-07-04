@@ -50,8 +50,7 @@ def subscribe(client: mqtt_client.Client):
 
     client.subscribe(topic)
     client.on_message = on_message
-    print("Subscribed to topic!")
-
+    
 def run():
     global start_time
     client = connect_mqtt()
