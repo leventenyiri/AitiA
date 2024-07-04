@@ -18,13 +18,21 @@ def connect_mqtt():
     client.connect(broker, port)
     return client
 
+def convert_image():
+    with open("gep.jpg",'rb') as file:
+        filecontent = file.read()
+        return bytearray(filecontent) 
+
 def publish(client):
-    image_path = "gep.jpg"
     start_time = time.time()
-    client.publish(topic, image_path, qos=1).wait_for_publish()
+    result = client.publish(topic, convert_image(), qos=1).wait_for_publish()
     end_time = time.time()
     time_taken = end_time - start_time
     print(f"Time taken to publish: {time_taken:.2f} seconds")
+    if result[0] == 0:
+        print(f"message sent to topic {topic}")
+    else:
+        print(f"Failed to send message to topic {topic}")
 
 def run():
     client = connect_mqtt()
