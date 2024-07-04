@@ -84,33 +84,6 @@ class App:
             logging.error(f"Config file not found: {path}")
             raise FileNotFoundError(f"Config file not found: {path}")
 
-    def mount_nfs(self):
-        while True:
-            try:
-                # Run the mount command
-                result = subprocess.run(['sudo', 'mount', '/mnt/nfs_share'],
-                                        stdout=subprocess.PIPE,
-                                        stderr=subprocess.PIPE,
-                                        text=True,
-                                        check=True)
-
-                # If mount was successful, break the loop
-                if result.returncode == 0:
-                    logging.info("Mount successful.")
-                    break
-
-            except subprocess.CalledProcessError as e:
-                logging.critical(f"An error occurred while mounting: {e}")
-                logging.critical(f"Error Output: {e.stderr}")
-                exit(1)
-
-            except Exception as e:
-                logging.critical(f"An error occurred while mounting: {e}")
-                exit(1)
-
-            time.sleep(1)
-            logging.info("Retrying...")
-
 
 if __name__ == "__main__":
     start_time = time.time()
