@@ -1,0 +1,17 @@
+https://linuxize.com/post/how-to-mount-an-nfs-share-in-linux/
+
+KLIENS
+1. sudo mkdir /var/backups
+2. sudo nano /etc/fstab
+3. # <file system>     <dir>       <type>   <options>   <dump>	<pass>
+     10.10.0.10:/host_folder /var/backups  nfs      defaults    0       0
+4. sudo mount /var/backups
+   sudo umount 10.10.0.10:/host_folder 
+
+SZERVER
+1. sudo service rpcbind start
+2. sudo service nfs-kernel-server start
+3. tűzfalon keresztül a portok engedélyezése: WSL NFS rule (Inbound és Outbound)
+
+SETUP nélküli mount:
+sudo mount -t nfs 192.168.0.108:/nfshost /mnt/nfs_share

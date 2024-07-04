@@ -1,0 +1,4 @@
+os info: sudo apt install lshw inxi
+         sudo inxi -Fxz
+
+boot time: systemd analyze
