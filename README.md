@@ -27,3 +27,8 @@ Detecting starling swarms.
   - 3D printed
   - Lens shouldnt get foggy, account for weather
     
+
+
+Used often:
+
+sudo mount -t nfs 192.168.0.108:/nfshost /mnt/nfs_share
