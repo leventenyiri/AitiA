@@ -6,6 +6,7 @@ Detecting starling swarms.
 
 - [ ] **Camera used for testing**
   - Arducam 16 mpx Autofocus Camera
+  - Camera setup: https://docs.arducam.com/Raspberry-Pi-Camera/Native-camera/16MP-IMX519/#hardware-connection
 
 - [ ] **Network folder sharing for communication with server**
     
@@ -13,7 +14,8 @@ Detecting starling swarms.
   - Unit tests
   - Workflow, setup.py files
   - CI/CD?
-  - Use a config file received through NFS to configure the code 
+  - MQTT tutorial: https://www.emqx.com/en/blog/how-to-use-mqtt-in-python
+  - MQTT clients: https://www.emqx.com/en/mqtt-client-sdk?language=Python
     
 - [ ] **Optimizing**
   - Power consumption: https://raspberrypi.stackexchange.com/questions/92138/power-rpi-from-a-battery-on-off-via-ui-or-sleep
@@ -25,3 +27,8 @@ Detecting starling swarms.
   - 3D printed
   - Lens shouldnt get foggy, account for weather
     
+
+
+Used often:
+
+sudo mount -t nfs 192.168.0.108:/nfshost /mnt/nfs_share
