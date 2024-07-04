@@ -36,15 +36,15 @@ class Camera:
         self.exposure = config['exposure']
         self.width = config['width']
         self.height = config['height']
+        self.contrast = config['contrast']
         self.cam = Picamera2()
 
     def start(self):
         config = self.cam.create_still_configuration({"size": (self.width, self.height)})
         self.cam.configure(config)
         self.cam.options['quality'] = self.quality
-        self.cam.set_controls({"ExposureTime": self.exposure, "AnalogueGain": self.gain})
+        self.cam.set_controls({"ExposureTime": self.exposure, "AnalogueGain": self.gain, "Contrast": self.contrast})
         self.cam.start(show_preview=False)
-        time.sleep(2)
 
     def capture(self):
         self.cam.capture_file(self.save_path)
