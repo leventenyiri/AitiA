@@ -27,7 +27,9 @@ Detecting starling swarms.
 - [ ] **Case**
   - 3D printed
   - Lens shouldnt get foggy, account for weather
-    
+
+Roadmap:
+https://github.com/users/borditamas/projects/2/views/4
 
 
 Used often:
