@@ -12,7 +12,6 @@ except ImportError:
     Picamera2 = None
     controls = None
 
-
 # ----------------- Config file data ------------------
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 LOG_CONFIG_PATH = os.path.join(SCRIPT_DIR, 'log_config.yaml')
@@ -34,28 +33,34 @@ class Logger:
 class Camera:
     def __init__(self, config):
         self.quality = config['quality']
-        self.save_path = config['path']
+        self.save_dir = os.path.dirname(config['path']) or '.'
         self.gain = config['gain']
         self.exposure = config['exposure']
         self.width = config['width']
         self.height = config['height']
         self.contrast = config['contrast']
         self.cam = Picamera2()
+        self.counter = 0
 
     def start(self):
         config = self.cam.create_still_configuration({"size": (self.width, self.height)})
         self.cam.configure(config)
-        
+
         # Set up continuous autofocus
         self.cam.set_controls({"AfMode": controls.AfModeEnum.Continuous})
-        
+
         self.cam.start(show_preview=False)
-        
+
         # Allow some time for autofocus to settle
         time.sleep(2)
 
     def capture(self):
-        self.cam.capture_file(self.save_path)
+        os.makedirs(self.save_dir, exist_ok=True)
+        filename = f"image_{self.counter:04d}.jpg"
+        full_path = os.path.join(self.save_dir, filename)
+        self.cam.capture_file(full_path)
+        self.counter += 1
+        return full_path
 
 class App:
     def __init__(self, config_path):
@@ -78,15 +83,25 @@ class App:
             logging.error(f"Config file not found: {path} - {str(e)}")
             raise
 
+    def run(self, duration):
+        self.camera.start()
+        end_time = time.time() + duration
+        while time.time() < end_time:
+            start_capture = time.time()
+            image_path = self.camera.capture()
+            capture_time = time.time() - start_capture
+            logging.info(f"Image saved: {image_path}")
+            logging.info(f"Image saving time: {capture_time:.2f} seconds")
+            sleep_time = max(0, 1 - capture_time)
+            time.sleep(sleep_time)
+
 if __name__ == "__main__":
-    start_time = time.time()
-    
     logger = Logger(LOG_CONFIG_PATH)
     logger.start()
-    
+
     app = App(CONFIG_PATH)
-    app.camera.start()
-    app.camera.capture()
-    
-    logging.info(f"Image saving time: {time.time() - start_time} seconds")
-    print("Image saved")
+
+    # Run for 60 seconds (1 minute)
+    app.run(duration=60)
+
+    print("Image capture sequence completed")
