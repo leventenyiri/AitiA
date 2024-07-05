@@ -5,8 +5,12 @@ import logging
 import logging.config
 import yaml
 from subprocess import CalledProcessError
-from picamera2 import Picamera2
-from libcamera import controls
+try:
+    from libcamera import controls
+    from picamera2 import Picamera2
+except ImportError:
+    Picamera2 = None
+    controls = None
 
 
 # ----------------- Config file data ------------------
