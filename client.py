@@ -5,10 +5,9 @@ import logging
 import logging.config
 import yaml
 from subprocess import CalledProcessError
-try:
-    from picamera2 import Picamera2
-except ImportError:
-    Picamera2 = None
+from picamera2 import Picamera2
+from libcamera import controls
+
 
 # ----------------- Config file data ------------------
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -42,9 +41,14 @@ class Camera:
     def start(self):
         config = self.cam.create_still_configuration({"size": (self.width, self.height)})
         self.cam.configure(config)
-        self.cam.options['quality'] = self.quality
-        self.cam.set_controls({"ExposureTime": self.exposure, "AnalogueGain": self.gain, "Contrast": self.contrast})
+        
+        # Set up continuous autofocus
+        self.cam.set_controls({"AfMode": controls.AfModeEnum.Continuous})
+        
         self.cam.start(show_preview=False)
+        
+        # Allow some time for autofocus to settle
+        time.sleep(2)
 
     def capture(self):
         self.cam.capture_file(self.save_path)
