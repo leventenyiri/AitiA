@@ -64,7 +64,7 @@ def subscribe(client: mqtt_client.Client):
             time_string = timestamp.strftime("%Y%m%d_%H%M%S")
         
             # Save directly to a file
-            output_image_path = f"image_{time_string}.jpg"
+            output_image_path = f"images/image_{time_string}.jpg"
             with open(output_image_path, "wb") as f:
                 f.write(image_data)
             logging.info(f"Received and saved image as {output_image_path}")

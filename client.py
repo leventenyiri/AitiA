@@ -160,12 +160,6 @@ class App:
             logging.info(f"Image captured")
             logging.info(f"Image capture time: {capture_time:.2f} seconds")
 
-        # Convert numpy array to PIL Image and then to bytes
-            image = Image.fromarray(image_array)
-            image_bytes = io.BytesIO()
-            image.save(image_bytes, format='JPEG')
-            image_data = image_bytes.getvalue()
-
             timestamp = datetime.now(pytz.utc)
             message = self.create_message(image_raw, timestamp)
             start_publish = time.time()
