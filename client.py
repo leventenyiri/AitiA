@@ -43,9 +43,18 @@ class MQTT:
         client.connect(self.broker, self.port)
         return client
     
-    
-    
-    
+    def publish(self, picture):
+        start_time = time.time()
+        msg_info = self.client.publish(self.topic, picture, qos=1)
+        msg_info.wait_for_publish()
+        time_taken = time.time() - start_time
+        logging.info(f"Time taken to publish: {time_taken:.2f} seconds")
+        if msg_info.is_published():
+            logging.info(f"Message sent to topic {self.topic}")
+        else:
+            logging.error(f"Failed to send message to topic {self.topic}")
+
+
 
 
 class Logger:
