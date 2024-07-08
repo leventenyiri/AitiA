@@ -26,13 +26,15 @@ LOG_CONFIG_PATH = os.path.join(SCRIPT_DIR, 'log_config.yaml')
 CONFIG_PATH = os.path.join(SCRIPT_DIR, 'config.json')
 BROKER = "192.168.0.103"
 PORT = 1883
-TOPIC = "mqtt/rpi/image"
+PUBTOPIC = "mqtt/rpi/image"
+SUBTOPIC = "settings/"
 # ------------------------------------------------------
 
 class MQTT:
     def __init__(self):
         self.broker = BROKER
-        self.topic = TOPIC
+        self.pubtopic = PUBTOPIC
+        self.subtopic = SUBTOPIC
         self.port = PORT
         self.client = None
 
@@ -49,35 +51,24 @@ class MQTT:
         self.client.loop_start()
         return self.client
 
-    def publish(self, image_data, timestamp):
+    def publish(self, message):
         if not self.client:
             logging.error("MQTT client not connected")
             return
 
         try:
-        # Encode image data as base64
-            image_base64 = base64.b64encode(image_data).decode('utf-8')
-
-        # Convert timestamp to ISO format string
-            timestamp_str = timestamp.isoformat()
-
-        # Create a JSON object with image data and timestamp
-            message = {
-                "timestamp": timestamp_str,
-                "image": image_base64
-            }
-            message_json = json.dumps(message)
+            
 
             start_time = time.time()
-            msg_info = self.client.publish(self.topic, message_json, qos=1)
+            msg_info = self.client.publish(self.pubtopic, message, qos=1)
             msg_info.wait_for_publish()
             end_time = time.time()
             time_taken = end_time - start_time
             logging.info(f"Time taken to publish: {time_taken:.2f} seconds")
             if msg_info.is_published():
-                logging.info(f"Image and timestamp sent to topic {self.topic}")
+                logging.info(f"Image and timestamp sent to topic {self.pubtopic}")
             else:
-                logging.error(f"Failed to send image and timestamp to topic {self.topic}")
+                logging.error(f"Failed to send image and timestamp to topic {self.pubtopic}")
         except Exception as e:
             logging.error(f"Error publishing image and timestamp: {str(e)}")
 
@@ -138,6 +129,25 @@ class App:
         except FileNotFoundError as e:
             logging.error(f"Config file not found: {path} - {str(e)}")
             raise
+        
+    def create_message(self, image_array, timestamp):
+        # Convert numpy array to bytes
+        image = Image.fromarray(image_array)
+        image_bytes = io.BytesIO()
+        image.save(image_bytes, format='JPEG')
+        image_data = image_bytes.getvalue()
+        
+        # Encode image data as base64
+        image_base64 = base64.b64encode(image_data).decode('utf-8')
+
+        # Create a JSON object with image data and timestamp
+        message = {
+            "timestamp": timestamp,
+            "image": image_base64
+        }
+        
+        return json.dumps(message) 
+        
 
     def run(self, duration):
         self.camera.start()
@@ -145,7 +155,7 @@ class App:
         end_time = time.time() + duration
         while time.time() < end_time:
             start_capture = time.time()
-            image_array = self.camera.capture()
+            image_raw = self.camera.capture()
             capture_time = time.time() - start_capture
             logging.info(f"Image captured")
             logging.info(f"Image capture time: {capture_time:.2f} seconds")
@@ -156,18 +166,13 @@ class App:
             image.save(image_bytes, format='JPEG')
             image_data = image_bytes.getvalue()
 
-        # Get current timestamp
-            #timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
             timestamp = datetime.now(pytz.utc)
-        # Publish the image that was just captured along with the timestamp
+            message = self.create_message(image_raw, timestamp)
             start_publish = time.time()
-            self.mqtt.publish(image_data, timestamp)
+            self.mqtt.publish(message)
             publish_time = time.time() - start_publish
             logging.info(f"Image publish time: {publish_time:.2f} seconds")
 
-            total_time = time.time() - start_capture
-            sleep_time = max(0, 1 - total_time)
-            time.sleep(sleep_time)
 
         self.mqtt.disconnect()
 
