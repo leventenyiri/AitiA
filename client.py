@@ -153,8 +153,8 @@ class App:
             image_data = image_bytes.getvalue()
 
         # Get current timestamp
-            timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-
+            #timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            timestamp = datetime.now(timezone.utc).isoformat()
         # Publish the image that was just captured along with the timestamp
             start_publish = time.time()
             self.mqtt.publish(image_data, timestamp)
