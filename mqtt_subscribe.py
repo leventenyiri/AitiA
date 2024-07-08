@@ -5,7 +5,7 @@ import base64
 import time
 import logging
 
-broker = '192.168.0.108'
+broker = '192.168.0.103'
 port = 1883
 topic = "mqtt/rpi/image"
 logging.basicConfig(level=logging.DEBUG,
@@ -37,18 +37,18 @@ def subscribe(client: mqtt_client.Client):
         # Print the time taken to receive the image
         print(f"Time taken to receive: {received_time - start_time:.2f} seconds")
         
-        # try:
-        #     with open(output_image_path, 'wb') as f:
-        #         f.write(msg.payload)
-        #     print(f"Received and saved image as {output_image_path}")
+        try:
+             with open(output_image_path, 'wb') as f:
+                 f.write(msg.payload)
+             print(f"Received and saved image as {output_image_path}")
 
-        #     received_time = time.time()
-        #     print(f"Time taken to receive: {received_time - start_time:.2f} seconds")
-        # except Exception as e:
-        #     print(f"Failed to write image: {e}")
+             received_time = time.time()
+             print(f"Time taken to receive: {received_time - start_time:.2f} seconds")
+        except Exception as e:
+             print(f"Failed to write image: {e}")
             
-        # # Print the time taken to receive the image
-        # print(f"Time taken to receive: {received_time - start_time:.2f} seconds")
+         # Print the time taken to receive the image
+        print(f"Time taken to receive: {received_time - start_time:.2f} seconds")
 
     client.subscribe(topic)
     client.on_message = on_message

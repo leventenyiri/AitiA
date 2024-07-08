@@ -2,7 +2,7 @@
 import time
 from paho.mqtt import client as mqtt_client
 
-broker = "192.168.0.108"
+broker = "192.168.0.103"
 port = 1883
 topic = "mqtt/rpi/image"
 
@@ -21,16 +21,17 @@ def connect_mqtt():
 def convert_image():
     with open("gep.jpg",'rb') as file:
         filecontent = file.read()
-        return bytearray(filecontent) 
+        return bytearray(filecontent)
 
 def publish(client):
     start_time = time.time()
-    result = client.publish(topic, convert_image(), qos=1).wait_for_publish()
+    msg_info = client.publish(topic, convert_image(), qos=1)
+    msg_info.wait_for_publish()
     end_time = time.time()
     time_taken = end_time - start_time
     print(f"Time taken to publish: {time_taken:.2f} seconds")
-    if result[0] == 0:
-        print(f"message sent to topic {topic}")
+    if msg_info.is_published():
+        print(f"Message sent to topic {topic}")
     else:
         print(f"Failed to send message to topic {topic}")
 
