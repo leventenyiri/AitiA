@@ -27,7 +27,7 @@ CONFIG_PATH = os.path.join(SCRIPT_DIR, 'config.json')
 BROKER = "192.168.0.103"
 PORT = 1883
 PUBTOPIC = "mqtt/rpi/image"
-SUBTOPIC = "settings/"
+SUBTOPIC = "settings/er-edge"
 # ------------------------------------------------------
 
 class MQTT:
@@ -37,7 +37,19 @@ class MQTT:
         self.subtopic = SUBTOPIC
         self.port = PORT
         self.client = None
-
+        
+    def init_receive(self):
+        def on_message(client, userdata, msg):
+            try:
+                with open(CONFIG_PATH, "wb") as config:
+                    config.write(msg)
+                logging.info(f"Received and saved config to {CONFIG_PATH}")
+            except Exception as e:
+                logging.error(e)
+                
+        self.client.on_message = on_message
+        self.client.subscribe(self.subtopic)      
+        
     def connect(self):
         def on_connect(client, userdata, flags, rc, properties=None):
             if rc == 0:
@@ -47,9 +59,9 @@ class MQTT:
 
         self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
         self.client.on_connect = on_connect
+        
         self.client.connect(self.broker, self.port)
         self.client.loop_start()
-        return self.client
 
     def publish(self, message):
         if not self.client:
@@ -57,8 +69,6 @@ class MQTT:
             return
 
         try:
-            
-
             start_time = time.time()
             msg_info = self.client.publish(self.pubtopic, message, qos=1)
             msg_info.wait_for_publish()
@@ -71,7 +81,7 @@ class MQTT:
                 logging.error(f"Failed to send image and timestamp to topic {self.pubtopic}")
         except Exception as e:
             logging.error(f"Error publishing image and timestamp: {str(e)}")
-
+    
     def disconnect(self):
         if self.client:
             self.client.loop_stop()
@@ -150,8 +160,13 @@ class App:
         
 
     def run(self, duration):
+        
         self.camera.start()
+
+        self.mqtt.client.enable_logger()
+        self.mqtt.init_receive()
         self.mqtt.connect()
+        
         end_time = time.time() + duration
         while time.time() < end_time:
             start_capture = time.time()
@@ -159,20 +174,16 @@ class App:
             capture_time = time.time() - start_capture
             logging.info(f"Image captured")
             logging.info(f"Image capture time: {capture_time:.2f} seconds")
-
-        # Convert numpy array to PIL Image and then to bytes
-            image = Image.fromarray(image_array)
-            image_bytes = io.BytesIO()
-            image.save(image_bytes, format='JPEG')
-            image_data = image_bytes.getvalue()
-
+            
+            # Create the message
             timestamp = datetime.now(pytz.utc)
             message = self.create_message(image_raw, timestamp)
+            
+            # Publish the message
             start_publish = time.time()
             self.mqtt.publish(message)
             publish_time = time.time() - start_publish
             logging.info(f"Image publish time: {publish_time:.2f} seconds")
-
 
         self.mqtt.disconnect()
 
