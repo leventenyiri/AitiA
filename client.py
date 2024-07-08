@@ -10,6 +10,7 @@ from PIL import Image
 from subprocess import CalledProcessError
 from datetime import datetime, timezone
 import base64
+import pytz
 try:
     from libcamera import controls
     from picamera2 import Picamera2
@@ -54,12 +55,15 @@ class MQTT:
             return
 
         try:
-            # Encode image data as base64
+        # Encode image data as base64
             image_base64 = base64.b64encode(image_data).decode('utf-8')
 
-            # Create a JSON object with image data and timestamp
+        # Convert timestamp to ISO format string
+            timestamp_str = timestamp.isoformat()
+
+        # Create a JSON object with image data and timestamp
             message = {
-                "timestamp": timestamp,
+                "timestamp": timestamp_str,
                 "image": image_base64
             }
             message_json = json.dumps(message)
@@ -154,7 +158,7 @@ class App:
 
         # Get current timestamp
             #timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-            timestamp = datetime.now(timezone.utc).isoformat()
+            timestamp = datetime.now(pytz.utc)
         # Publish the image that was just captured along with the timestamp
             start_publish = time.time()
             self.mqtt.publish(image_data, timestamp)
