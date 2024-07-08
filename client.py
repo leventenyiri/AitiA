@@ -4,7 +4,12 @@ import json
 import logging
 import logging.config
 import yaml
+import io
+import numpy as np
+from PIL import Image
 from subprocess import CalledProcessError
+from datetime import datetime, timezone
+import base64
 try:
     from libcamera import controls
     from picamera2 import Picamera2
@@ -23,14 +28,13 @@ PORT = 1883
 TOPIC = "mqtt/rpi/image"
 # ------------------------------------------------------
 
-
 class MQTT:
     def __init__(self):
         self.broker = BROKER
         self.topic = TOPIC
         self.port = PORT
         self.client = None
-        
+
     def connect(self):
         def on_connect(client, userdata, flags, rc, properties=None):
             if rc == 0:
@@ -44,46 +48,39 @@ class MQTT:
         self.client.loop_start()
         return self.client
 
-    def publish(self, image_path):
+    def publish(self, image_data, timestamp):
         if not self.client:
             logging.error("MQTT client not connected")
             return
 
         try:
-            with open(image_path, 'rb') as file:
-                image_data = file.read()
-            
+            # Encode image data as base64
+            image_base64 = base64.b64encode(image_data).decode('utf-8')
+
+            # Create a JSON object with image data and timestamp
+            message = {
+                "timestamp": timestamp,
+                "image": image_base64
+            }
+            message_json = json.dumps(message)
+
             start_time = time.time()
-            msg_info = self.client.publish(self.topic, image_data, qos=1)
+            msg_info = self.client.publish(self.topic, message_json, qos=1)
             msg_info.wait_for_publish()
             end_time = time.time()
             time_taken = end_time - start_time
             logging.info(f"Time taken to publish: {time_taken:.2f} seconds")
             if msg_info.is_published():
-                logging.info(f"Image sent to topic {self.topic}")
+                logging.info(f"Image and timestamp sent to topic {self.topic}")
             else:
-                logging.error(f"Failed to send image to topic {self.topic}")
+                logging.error(f"Failed to send image and timestamp to topic {self.topic}")
         except Exception as e:
-            logging.error(f"Error publishing image: {str(e)}")
+            logging.error(f"Error publishing image and timestamp: {str(e)}")
 
     def disconnect(self):
         if self.client:
             self.client.loop_stop()
             self.client.disconnect()
-    
-    def publish(self, picture):
-        start_time = time.time()
-        msg_info = self.client.publish(self.topic, picture, qos=1)
-        msg_info.wait_for_publish()
-        time_taken = time.time() - start_time
-        logging.info(f"Time taken to publish: {time_taken:.2f} seconds")
-        if msg_info.is_published():
-            logging.info(f"Message sent to topic {self.topic}")
-        else:
-            logging.error(f"Failed to send message to topic {self.topic}")
-
-
-
 
 class Logger:
     def __init__(self, filepath):
@@ -99,41 +96,28 @@ class Logger:
 
 class Camera:
     def __init__(self, config):
-        self.quality = config['quality']
-        self.save_dir = os.path.dirname(config['path']) or '.'
-        self.gain = config['gain']
-        self.exposure = config['exposure']
         self.width = config['width']
         self.height = config['height']
-        self.contrast = config['contrast']
         self.cam = Picamera2()
         self.counter = 0
 
     def start(self):
         config = self.cam.create_still_configuration({"size": (self.width, self.height)})
         self.cam.configure(config)
-
-        # Set up continuous autofocus
         self.cam.set_controls({"AfMode": controls.AfModeEnum.Continuous})
-
         self.cam.start(show_preview=False)
-
-        # Allow some time for autofocus to settle
-        time.sleep(2)
+        #time.sleep(2)
 
     def capture(self):
-        os.makedirs(self.save_dir, exist_ok=True)
-        filename = f"image_{self.counter:04d}.jpg"
-        full_path = os.path.join(self.save_dir, filename)
-        self.cam.capture_file(full_path)
+        image = self.cam.capture_array()
         self.counter += 1
-        return full_path
+        return image
 
 class App:
     def __init__(self, config_path):
         self.camera_config = self._load_camera_config(config_path)
         self.camera = Camera(self.camera_config)
-        self.sub = MQTT()
+        self.mqtt = MQTT()
 
     @staticmethod
     def _load_camera_config(path):
@@ -157,21 +141,30 @@ class App:
         end_time = time.time() + duration
         while time.time() < end_time:
             start_capture = time.time()
-            image_path = self.camera.capture()
+            image_array = self.camera.capture()
             capture_time = time.time() - start_capture
-            logging.info(f"Image saved: {image_path}")
+            logging.info(f"Image captured")
             logging.info(f"Image capture time: {capture_time:.2f} seconds")
-            
-            # Publish the image that was just captured
+
+        # Convert numpy array to PIL Image and then to bytes
+            image = Image.fromarray(image_array)
+            image_bytes = io.BytesIO()
+            image.save(image_bytes, format='JPEG')
+            image_data = image_bytes.getvalue()
+
+        # Get current timestamp
+            timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+        # Publish the image that was just captured along with the timestamp
             start_publish = time.time()
-            self.mqtt.publish(image_path)
+            self.mqtt.publish(image_data, timestamp)
             publish_time = time.time() - start_publish
             logging.info(f"Image publish time: {publish_time:.2f} seconds")
-            
+
             total_time = time.time() - start_capture
             sleep_time = max(0, 1 - total_time)
             time.sleep(sleep_time)
-        
+
         self.mqtt.disconnect()
 
 if __name__ == "__main__":
@@ -183,4 +176,4 @@ if __name__ == "__main__":
     # Run for 60 seconds (1 minute)
     app.run(duration=60)
 
-    print("Image capture sequence completed")
+    print("Image capture and publish sequence completed")
