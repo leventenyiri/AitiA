@@ -18,7 +18,7 @@ except ImportError:
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 LOG_CONFIG_PATH = os.path.join(SCRIPT_DIR, 'log_config.yaml')
 CONFIG_PATH = os.path.join(SCRIPT_DIR, 'config.json')
-BROKER = "192.168.0.108"
+BROKER = "192.168.0.103"
 PORT = 1883
 TOPIC = "mqtt/rpi/image"
 # ------------------------------------------------------
@@ -29,19 +29,47 @@ class MQTT:
         self.broker = BROKER
         self.topic = TOPIC
         self.port = PORT
-        self.client
+        self.client = None
         
     def connect(self):
         def on_connect(client, userdata, flags, rc, properties=None):
             if rc == 0:
                 logging.info("Connected to MQTT Broker!")
             else:
-                print(f"Failed to connect, return code {rc}")
+                logging.error(f"Failed to connect, return code {rc}")
 
-        client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
-        client.on_connect = on_connect
-        client.connect(self.broker, self.port)
-        return client
+        self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
+        self.client.on_connect = on_connect
+        self.client.connect(self.broker, self.port)
+        self.client.loop_start()
+        return self.client
+
+    def publish(self, image_path):
+        if not self.client:
+            logging.error("MQTT client not connected")
+            return
+
+        try:
+            with open(image_path, 'rb') as file:
+                image_data = file.read()
+            
+            start_time = time.time()
+            msg_info = self.client.publish(self.topic, image_data, qos=1)
+            msg_info.wait_for_publish()
+            end_time = time.time()
+            time_taken = end_time - start_time
+            logging.info(f"Time taken to publish: {time_taken:.2f} seconds")
+            if msg_info.is_published():
+                logging.info(f"Image sent to topic {self.topic}")
+            else:
+                logging.error(f"Failed to send image to topic {self.topic}")
+        except Exception as e:
+            logging.error(f"Error publishing image: {str(e)}")
+
+    def disconnect(self):
+        if self.client:
+            self.client.loop_stop()
+            self.client.disconnect()
     
     def publish(self, picture):
         start_time = time.time()
@@ -125,15 +153,26 @@ class App:
 
     def run(self, duration):
         self.camera.start()
+        self.mqtt.connect()
         end_time = time.time() + duration
         while time.time() < end_time:
             start_capture = time.time()
             image_path = self.camera.capture()
             capture_time = time.time() - start_capture
             logging.info(f"Image saved: {image_path}")
-            logging.info(f"Image saving time: {capture_time:.2f} seconds")
-            sleep_time = max(0, 1 - capture_time)
+            logging.info(f"Image capture time: {capture_time:.2f} seconds")
+            
+            # Publish the image that was just captured
+            start_publish = time.time()
+            self.mqtt.publish(image_path)
+            publish_time = time.time() - start_publish
+            logging.info(f"Image publish time: {publish_time:.2f} seconds")
+            
+            total_time = time.time() - start_capture
+            sleep_time = max(0, 1 - total_time)
             time.sleep(sleep_time)
+        
+        self.mqtt.disconnect()
 
 if __name__ == "__main__":
     logger = Logger(LOG_CONFIG_PATH)
