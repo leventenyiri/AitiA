@@ -8,15 +8,45 @@ from subprocess import CalledProcessError
 try:
     from libcamera import controls
     from picamera2 import Picamera2
+    from paho.mqtt import client as mqtt_client
 except ImportError:
     Picamera2 = None
     controls = None
+    mqtt_client = None
 
 # ----------------- Config file data ------------------
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 LOG_CONFIG_PATH = os.path.join(SCRIPT_DIR, 'log_config.yaml')
 CONFIG_PATH = os.path.join(SCRIPT_DIR, 'config.json')
+BROKER = "192.168.0.108"
+PORT = 1883
+TOPIC = "mqtt/rpi/image"
 # ------------------------------------------------------
+
+
+class MQTT:
+    def __init__(self):
+        self.broker = BROKER
+        self.topic = TOPIC
+        self.port = PORT
+        self.client
+        
+    def connect(self):
+        def on_connect(client, userdata, flags, rc, properties=None):
+            if rc == 0:
+                logging.info("Connected to MQTT Broker!")
+            else:
+                print(f"Failed to connect, return code {rc}")
+
+        client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
+        client.on_connect = on_connect
+        client.connect(self.broker, self.port)
+        return client
+    
+    
+    
+    
+
 
 class Logger:
     def __init__(self, filepath):
@@ -66,6 +96,7 @@ class App:
     def __init__(self, config_path):
         self.camera_config = self._load_camera_config(config_path)
         self.camera = Camera(self.camera_config)
+        self.sub = MQTT()
 
     @staticmethod
     def _load_camera_config(path):
