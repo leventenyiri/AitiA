@@ -19,7 +19,7 @@ def connect_mqtt():
     return client
 
 def convert_image():
-    with open("gep.jpg",'rb') as file:
+    with open("file.jpg",'rb') as file:
         filecontent = file.read()
         return bytearray(filecontent)
 
