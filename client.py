@@ -154,9 +154,8 @@ class Camera:
             self.height = 1080
 
     def start(self):
-        config = self.cam.create_still_configuration({"size": (self.width, self.height)})
+        config = self.cam.create_still_configuration({"size": (self.width, self.height), "quality": self.quality})
         self.cam.configure(config)
-        self.cam.options["quality"] = self.quality
         self.cam.set_controls({"AfMode": controls.AfModeEnum.Continuous})
         self.cam.start(show_preview=False)
 
@@ -168,7 +167,7 @@ class Camera:
 class App:
     def __init__(self, config_path):
         self.camera_config, self.basic_config = self.load_config(config_path)
-        self.camera = Camera(self.camera_config, self.basic_config)
+        self.camera = Camera(self.load_config(config_path))
         self.mqtt = MQTT()
 
     @staticmethod
@@ -180,7 +179,7 @@ class App:
             camera_config = data.get('Camera')
             basic_config = data.get('Basic')
 
-            if camera_config is None or basic_config is None:
+            if camera_config or basic_config is None:
                 raise KeyError("Key not found in the config file")
 
             return camera_config, basic_config
