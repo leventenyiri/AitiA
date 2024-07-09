@@ -2,7 +2,7 @@
     "Basic":{
         "quality": "4K",
         "mode": "always_on",
-        "restart_time": 0,
+        "period": 100,
         "camera_settings_on": false
     },
     "Camera": {

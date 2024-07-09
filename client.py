@@ -136,11 +136,13 @@ class Camera:
         self.quality = 95
         self.cam = Picamera2()
 
+        # Set the costum camera settings from the config file
         if basic_config['camera_settings_on']:
             self.width = cam_config['width']
             self.height = cam_config['height']
             self.quality = cam_config['quality']
 
+        # Set the premade settings
         elif basic_config['quality'] == "4K":
             self.width = 3840
             self.height = 2160
@@ -221,14 +223,34 @@ class App:
         image.thumbnail(max_size, Image.LANCZOS)
         return image
 
-    def run(self, duration):
-
+    def start(self):
+        # Start the camera
         self.camera.start()
 
+        # Start the MQTT
         mqtt_client = self.mqtt.connect()
         mqtt_client.enable_logger()
         self.mqtt.init_receive()
 
+    def run(self):
+        # Capture the image
+        start_capture = time.time()
+        image_raw = self.camera.capture()
+        capture_time = time.time() - start_capture
+        logging.info(f"Image captured")
+        logging.info(f"Image capture time: {capture_time:.2f} seconds")
+
+        # Create the message
+        timestamp = datetime.now(pytz.utc).isoformat()
+        message = self.create_message(image_raw, timestamp)
+
+        # Publish the message
+        start_publish = time.time()
+        self.mqtt.publish(message)
+        publish_time = time.time() - start_publish
+        logging.info(f"Image publish time: {publish_time:.2f} seconds")
+
+    def run_old(self, duration):
         end_time = time.time() + duration
         while time.time() < end_time:
             start_capture = time.time()
@@ -249,15 +271,34 @@ class App:
 
         self.mqtt.disconnect()
 
+    def run_always(self):
+        while True:
+            self.run()
+
+    # Need RTC API for the implementation
+    def run_periodically(self, period):
+        return NotImplementedError
+
 
 if __name__ == "__main__":
+
     logger = Logger(LOG_CONFIG_PATH)
     logger.start()
 
     app = App(CONFIG_PATH)
+    app.start()
+
+    # The app is taking pictures nonstop
+    if app.basic_config['mode'] == "always_on":
+        app.run_always()
+    # The app is sending the images periodically and shuts down in between
+    elif app.basic_config['mode'] == "periodic":
+        app.run_periodically(app.basic_config['period'])
+    # The app takes one picture then shuts down
+    elif app.basic_config['mode'] == "single-shot":
+        app.run()
+        app.mqtt.disconnect()
 
     # Run for 60 seconds
     # TODO get the run time from config
-    app.run(duration=60)
-
-    print("Image capture and publish sequence completed")
+    # app.run_old(duration=60)
