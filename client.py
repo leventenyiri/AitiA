@@ -38,12 +38,9 @@ class MQTT:
         self.subtopic = SUBTOPIC
         self.port = PORT
         self.client = None
+        self.reconnect_counter = 0
 
     def init_receive(self):
-        if not self.client:
-            logging.error("MQTT client not connected")
-            return
-
         def on_message(client, userdata, msg):
             try:
                 with open(CONFIG_PATH, "wb") as config:
@@ -62,10 +59,26 @@ class MQTT:
             else:
                 logging.error(f"Failed to connect, return code {rc}")
 
+        def on_disconnect(client, userdata, reason_code, properties):
+            match self.reconnect_counter:
+                case 0:
+                    self.client.connect(self.broker, self.port)
+                case 1 | 2 | 3 | 4:
+                    time.sleep(2)  # Note: changed 'time.wait(2)' to 'time.sleep(2)'
+                    self.client.connect(self.broker, self.port)
+                case 5:
+                    logging.critical("Couldn't reconnect 5 times, rebooting...")
+                case _:
+                    logging.critical("Exceeded maximum reconnection attempts, rebooting...")
+
+            self.reconnect_counter += 1
+
         self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
         self.client.on_connect = on_connect
+        self.client.on_connect_fail = on_disconnect
 
         self.client.connect(self.broker, self.port)
+        # TODO retry a few times, if it cannot, then reboot the device (Exit code: 2)
         self.client.loop_start()
         return self.client
 
@@ -124,11 +137,9 @@ class Camera:
         self.cam.configure(config)
         self.cam.set_controls({"AfMode": controls.AfModeEnum.Continuous})
         self.cam.start(show_preview=False)
-        # time.sleep(2)
 
     def capture(self):
         image = self.cam.capture_array()
-        self.counter += 1
         return image
 
 
