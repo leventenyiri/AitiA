@@ -48,6 +48,7 @@ class MQTT:
                 logging.info(f"Received and saved config to {CONFIG_PATH}")
             except Exception as e:
                 logging.error(e)
+                # TODO: ask for config resend
 
         self.client.on_message = on_message
         self.client.subscribe(self.subtopic)
@@ -60,6 +61,7 @@ class MQTT:
                 self.reconnect_counter = 0
             else:
                 logging.error(f"Failed to connect, return code {rc}")
+                # TODO: trying to reconnect a few number of times
 
         def on_disconnect(client, userdata, reason_code, properties):
             if reason_code == 0:
@@ -83,9 +85,9 @@ class MQTT:
         self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
         self.client.on_connect = on_connect
         self.client.on_disconnect = on_disconnect
+        self.client.on_disconnect = on_disconnect
 
         self.client.connect(self.broker, self.port)
-        # TODO retry a few times, if it cannot, then reboot the device (Exit code: 2)
         self.client.loop_start()
         return self.client
 
@@ -135,7 +137,6 @@ class Camera:
         self.width = config['width']
         self.height = config['height']
         self.cam = Picamera2()
-        self.counter = 0
 
     def start(self):
         config = self.cam.create_still_configuration({"size": (self.width, self.height)})
