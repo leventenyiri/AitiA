@@ -108,7 +108,8 @@ class Logger:
             logging.config.dictConfig(config)
             logging.info("Logging started")
         except Exception as e:
-            logging.error("szia")
+            logging.error(e)
+            exit(1)
 
 
 class Camera:
