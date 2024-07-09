@@ -11,13 +11,13 @@ config_path = "config.json"
 
 
 def connect_mqtt():
-    def on_connect(client, userdata, flags, rc):
+    def on_connect(client, userdata, flags, rc, properties=None):
         if rc == 0:
             print("Connected to MQTT Broker!")
         else:
             print(f"Failed to connect, return code {rc}")
 
-    client = mqtt_client.Client()
+    client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
     client.on_connect = on_connect
     client.connect(broker, port)
     return client

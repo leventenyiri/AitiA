@@ -1,7 +1,7 @@
 {
     "Basic":{
         "quality": "4K",
-        "mode": "always_on",
+        "mode": "single-shot",
         "period": 100,
         "manual_camera_settings_on": false
     },
