@@ -3,7 +3,7 @@
         "quality": "4K",
         "mode": "always_on",
         "period": 100,
-        "camera_settings_on": false
+        "manual_camera_settings_on": false
     },
     "Camera": {
         "quality": 95,

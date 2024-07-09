@@ -69,15 +69,15 @@ class MQTT:
 
             logging.error(f"Involuntary disconnect. Reason code: {reason_code}")
 
-            match self.reconnect_counter:
-                case 0:
-                    self.client.connect(self.broker, self.port)
-                case 1 | 2 | 3 | 4:
-                    time.sleep(2)
-                    self.client.connect(self.broker, self.port)
-                case 5:
-                    logging.critical("Couldn't reconnect 5 times, rebooting...")
-                    exit(2)
+            if self.reconnect_counter == 0:
+                self.client.connect(self.broker, self.port)
+            elif 1 <= self.reconnect_counter <= 4:
+                time.sleep(2)
+                logging.info(f"Trying to reconnect: {self.reconnect_counter} out of 5")
+                self.client.connect(self.broker, self.port)
+            elif self.reconnect_counter == 5:
+                logging.critical("Couldn't reconnect 5 times, rebooting...")
+                exit(2)
 
             self.reconnect_counter += 1
 
@@ -137,7 +137,7 @@ class Camera:
         self.cam = Picamera2()
 
         # Set the costum camera settings from the config file
-        if basic_config['camera_settings_on']:
+        if basic_config['manual_camera_settings_on']:
             self.width = cam_config['width']
             self.height = cam_config['height']
             self.quality = cam_config['quality']
