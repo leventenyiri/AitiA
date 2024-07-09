@@ -62,7 +62,7 @@ class MQTT:
             else:
                 logging.error(f"Failed to connect, return code {rc}")
 
-        def on_disconnect(client, userdata, reason_code, properties):
+        def on_disconnect(client, userdata, reason_code, properties=None):
             if reason_code == 0:
                 logging.info("Disconnected voluntarily.")
                 return
