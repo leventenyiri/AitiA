@@ -120,12 +120,12 @@ class Camera:
 
 class App:
     def __init__(self, config_path):
-        self.camera_config = self._load_camera_config(config_path)
+        self.camera_config = self.load_camera_config(config_path)
         self.camera = Camera(self.camera_config)
         self.mqtt = MQTT()
 
     @staticmethod
-    def _load_camera_config(path):
+    def load_camera_config(path):
         try:
             with open(path, 'r') as file:
                 data = json.load(file)
