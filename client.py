@@ -30,6 +30,7 @@ PUBTOPIC = "mqtt/rpi/image"
 SUBTOPIC = "settings/er-edge"
 # ------------------------------------------------------
 
+
 class MQTT:
     def __init__(self):
         self.broker = BROKER
@@ -37,12 +38,12 @@ class MQTT:
         self.subtopic = SUBTOPIC
         self.port = PORT
         self.client = None
-        
+
     def init_receive(self):
         if not self.client:
             logging.error("MQTT client not connected")
             return
-    
+
         def on_message(client, userdata, msg):
             try:
                 with open(CONFIG_PATH, "wb") as config:
@@ -50,10 +51,10 @@ class MQTT:
                 logging.info(f"Received and saved config to {CONFIG_PATH}")
             except Exception as e:
                 logging.error(e)
-                
+
         self.client.on_message = on_message
-        self.client.subscribe(self.subtopic)      
-        
+        self.client.subscribe(self.subtopic)
+
     def connect(self):
         def on_connect(client, userdata, flags, rc, properties=None):
             if rc == 0:
@@ -63,7 +64,7 @@ class MQTT:
 
         self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
         self.client.on_connect = on_connect
-        
+
         self.client.connect(self.broker, self.port)
         self.client.loop_start()
         return self.client
@@ -86,23 +87,29 @@ class MQTT:
                 logging.error(f"Failed to send image and timestamp to topic {self.pubtopic}")
         except Exception as e:
             logging.error(f"Error publishing image and timestamp: {str(e)}")
-    
+
     def disconnect(self):
         if self.client:
             self.client.loop_stop()
             self.client.disconnect()
+
 
 class Logger:
     def __init__(self, filepath):
         self.filepath = filepath
 
     def start(self):
-        if not os.path.exists(self.filepath):
-            raise FileNotFoundError(f"Log configuration file not found: {self.filepath}")
-        with open(self.filepath, 'r') as f:
-            config = yaml.safe_load(f)
-        logging.config.dictConfig(config)
-        logging.info("Logging started")
+        try:
+            if not os.path.exists(self.filepath):
+                # Error code: 1 (light)
+                raise FileNotFoundError(f"Log configuration file not found: {self.filepath}")
+            with open(self.filepath, 'r') as f:
+                config = yaml.safe_load(f)
+            logging.config.dictConfig(config)
+            logging.info("Logging started")
+        except Exception as e:
+            logging.error("szia")
+
 
 class Camera:
     def __init__(self, config):
@@ -116,21 +123,22 @@ class Camera:
         self.cam.configure(config)
         self.cam.set_controls({"AfMode": controls.AfModeEnum.Continuous})
         self.cam.start(show_preview=False)
-        #time.sleep(2)
+        # time.sleep(2)
 
     def capture(self):
         image = self.cam.capture_array()
         self.counter += 1
         return image
 
+
 class App:
     def __init__(self, config_path):
-        self.camera_config = self._load_camera_config(config_path)
+        self.camera_config = self.load_camera_config(config_path)
         self.camera = Camera(self.camera_config)
         self.mqtt = MQTT()
 
     @staticmethod
-    def _load_camera_config(path):
+    def load_camera_config(path):
         try:
             with open(path, 'r') as file:
                 data = json.load(file)
@@ -144,15 +152,14 @@ class App:
         except FileNotFoundError as e:
             logging.error(f"Config file not found: {path} - {str(e)}")
             raise
-        
+
     def create_message(self, image_array, timestamp):
         # Convert numpy array to bytes
-        image = Image.fromarray(image_array)        
+        image = Image.fromarray(image_array)
         image_bytes = io.BytesIO()
         image.save(image_bytes, format='JPEG', quality=75)
         image_data = image_bytes.getvalue()
-        
-        # Encode image data as base64
+
         image_base64 = pybase64.b64encode(image_data).decode('utf-8')
 
         # Create a JSON object with image data and timestamp
@@ -160,22 +167,21 @@ class App:
             "timestamp": timestamp,
             "image": image_base64
         }
-        
-        return json.dumps(message) 
-    
+
+        return json.dumps(message)
+
     def resize_image(self, image, max_size=(800, 600)):
         image.thumbnail(max_size, Image.LANCZOS)
         return image
-        
 
     def run(self, duration):
-        
+
         self.camera.start()
 
-        mqtt_client = self.mqtt.connect() 
-        mqtt_client.enable_logger()  
+        mqtt_client = self.mqtt.connect()
+        mqtt_client.enable_logger()
         self.mqtt.init_receive()
-        
+
         end_time = time.time() + duration
         while time.time() < end_time:
             start_capture = time.time()
@@ -183,11 +189,11 @@ class App:
             capture_time = time.time() - start_capture
             logging.info(f"Image captured")
             logging.info(f"Image capture time: {capture_time:.2f} seconds")
-            
+
             # Create the message
             timestamp = datetime.now(pytz.utc).isoformat()
             message = self.create_message(image_raw, timestamp)
-            
+
             # Publish the message
             start_publish = time.time()
             self.mqtt.publish(message)
@@ -196,13 +202,14 @@ class App:
 
         self.mqtt.disconnect()
 
+
 if __name__ == "__main__":
     logger = Logger(LOG_CONFIG_PATH)
     logger.start()
 
     app = App(CONFIG_PATH)
 
-    # Run for 60 seconds (1 minute)
+    # Run for 60 seconds
     app.run(duration=60)
 
     print("Image capture and publish sequence completed")
