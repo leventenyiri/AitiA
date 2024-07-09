@@ -1,7 +1,12 @@
 {
+    "Basic":{
+        "quality": "4K",
+        "mode": "always_on",
+        "restart_time": 0,
+        "camera_settings": false
+    },
     "Camera": {
         "quality": 95,
-        "path": "picture.jpg",
         "gain": 1.0,
         "exposure": 500,
         "height": 2160,

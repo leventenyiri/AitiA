@@ -1,0 +1,6 @@
+ Basic:
+        "quality": "4K", "3K", "HD"
+        "mode": "always_on", "restart", "one_shot"
+        "restart_time": 0...max(int32)
+        "manual_settings": true, false
+    
