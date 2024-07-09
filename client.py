@@ -9,7 +9,7 @@ import numpy as np
 from PIL import Image
 from subprocess import CalledProcessError
 from datetime import datetime, timezone
-import base64
+import pybase64
 import pytz
 try:
     from libcamera import controls
@@ -39,10 +39,14 @@ class MQTT:
         self.client = None
         
     def init_receive(self):
+        if not self.client:
+            logging.error("MQTT client not connected")
+            return
+    
         def on_message(client, userdata, msg):
             try:
                 with open(CONFIG_PATH, "wb") as config:
-                    config.write(msg)
+                    config.write(msg.payload)
                 logging.info(f"Received and saved config to {CONFIG_PATH}")
             except Exception as e:
                 logging.error(e)
@@ -62,6 +66,7 @@ class MQTT:
         
         self.client.connect(self.broker, self.port)
         self.client.loop_start()
+        return self.client
 
     def publish(self, message):
         if not self.client:
@@ -142,13 +147,13 @@ class App:
         
     def create_message(self, image_array, timestamp):
         # Convert numpy array to bytes
-        image = Image.fromarray(image_array)
+        image = Image.fromarray(image_array)        
         image_bytes = io.BytesIO()
-        image.save(image_bytes, format='JPEG')
+        image.save(image_bytes, format='JPEG', quality=75)
         image_data = image_bytes.getvalue()
         
         # Encode image data as base64
-        image_base64 = base64.b64encode(image_data).decode('utf-8')
+        image_base64 = pybase64.b64encode(image_data).decode('utf-8')
 
         # Create a JSON object with image data and timestamp
         message = {
@@ -157,15 +162,19 @@ class App:
         }
         
         return json.dumps(message) 
+    
+    def resize_image(self, image, max_size=(800, 600)):
+        image.thumbnail(max_size, Image.LANCZOS)
+        return image
         
 
     def run(self, duration):
         
         self.camera.start()
 
-        self.mqtt.client.enable_logger()
+        mqtt_client = self.mqtt.connect() 
+        mqtt_client.enable_logger()  
         self.mqtt.init_receive()
-        self.mqtt.connect()
         
         end_time = time.time() + duration
         while time.time() < end_time:
@@ -176,7 +185,7 @@ class App:
             logging.info(f"Image capture time: {capture_time:.2f} seconds")
             
             # Create the message
-            timestamp = datetime.now(pytz.utc)
+            timestamp = datetime.now(pytz.utc).isoformat()
             message = self.create_message(image_raw, timestamp)
             
             # Publish the message
