@@ -3,14 +3,11 @@
         "quality": "4K",
         "mode": "always_on",
         "restart_time": 0,
-        "camera_settings": false
+        "camera_settings_on": false
     },
     "Camera": {
         "quality": 95,
-        "gain": 1.0,
-        "exposure": 500,
-        "height": 2160,
         "width": 3840,
-        "contrast": 1
+        "height": 2160
     }
 }

@@ -61,7 +61,6 @@ class MQTT:
                 self.reconnect_counter = 0
             else:
                 logging.error(f"Failed to connect, return code {rc}")
-                # TODO: trying to reconnect a few number of times
 
         def on_disconnect(client, userdata, reason_code, properties):
             if reason_code == 0:
@@ -121,7 +120,6 @@ class Logger:
     def start(self):
         try:
             if not os.path.exists(self.filepath):
-                # Error code: 1 (light)
                 raise FileNotFoundError(f"Log configuration file not found: {self.filepath}")
             with open(self.filepath, 'r') as f:
                 config = yaml.safe_load(f)
@@ -133,13 +131,28 @@ class Logger:
 
 
 class Camera:
-    def __init__(self, config):
-        self.width = config['width']
-        self.height = config['height']
+    def __init__(self, cam_config, basic_config):
+        # The best quality is set as default
+        self.quality = 95
         self.cam = Picamera2()
 
+        if basic_config['camera_settings_on']:
+            self.width = cam_config['width']
+            self.height = cam_config['height']
+            self.quality = cam_config['quality']
+
+        elif basic_config['quality'] == "4K":
+            self.width = 3840
+            self.height = 2160
+        elif basic_config['quality'] == "3K":
+            self.width = 2560
+            self.height = 1440
+        elif basic_config['quality'] == "HD":
+            self.width = 1920
+            self.height = 1080
+
     def start(self):
-        config = self.cam.create_still_configuration({"size": (self.width, self.height)})
+        config = self.cam.create_still_configuration({"size": (self.width, self.height), "quality": self.quality})
         self.cam.configure(config)
         self.cam.set_controls({"AfMode": controls.AfModeEnum.Continuous})
         self.cam.start(show_preview=False)
@@ -151,29 +164,41 @@ class Camera:
 
 class App:
     def __init__(self, config_path):
-        self.camera_config = self.load_camera_config(config_path)
-        self.camera = Camera(self.camera_config)
+        self.camera_config, self.basic_config = self.load_config(config_path)
+        self.camera = Camera(self.load_config(config_path))
         self.mqtt = MQTT()
 
     @staticmethod
-    def load_camera_config(path):
+    def load_config(path):
         try:
             with open(path, 'r') as file:
                 data = json.load(file)
+
             camera_config = data.get('Camera')
-            if camera_config is None:
-                raise KeyError("Key 'Camera' not found in the config file")
-            return camera_config
+            basic_config = data.get('Basic')
+
+            if camera_config or basic_config is None:
+                raise KeyError("Key not found in the config file")
+
+            return camera_config, basic_config
+
+        # TODO: solve the config error issue
         except json.JSONDecodeError as e:
             logging.error(f"Invalid JSON in the config file: {path} - {str(e)}")
-            raise
+            exit(1)
         except FileNotFoundError as e:
             logging.error(f"Config file not found: {path} - {str(e)}")
-            raise
+            exit(1)
+        except KeyError as e:
+            logging.error(e)
+            exit(1)
+        except Exception as e:
+            logging.error(e)
+            exit(1)
 
     def create_message(self, image_array, timestamp):
-        # Convert numpy array to bytes
         try:
+            # Convert numpy array to bytes (JPEG)
             image = Image.fromarray(image_array)
             image_bytes = io.BytesIO()
             image.save(image_bytes, format='JPEG', quality=75)
@@ -181,7 +206,7 @@ class App:
 
             image_base64 = pybase64.b64encode(image_data).decode('utf-8')
 
-        # Create a JSON object with image data and timestamp
+            # Create a JSON object with image data and timestamp
             message = {
                 "timestamp": timestamp,
                 "image": image_base64
