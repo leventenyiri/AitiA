@@ -56,26 +56,33 @@ class MQTT:
         def on_connect(client, userdata, flags, rc, properties=None):
             if rc == 0:
                 logging.info("Connected to MQTT Broker!")
+                # We need to reset the counter if the connection was successful
+                self.reconnect_counter = 0
             else:
                 logging.error(f"Failed to connect, return code {rc}")
 
         def on_disconnect(client, userdata, reason_code, properties):
+            if reason_code == 0:
+                logging.info("Disconnected voluntarily.")
+                return
+
+            logging.error(f"Involuntary disconnect. Reason code: {reason_code}")
+
             match self.reconnect_counter:
                 case 0:
                     self.client.connect(self.broker, self.port)
                 case 1 | 2 | 3 | 4:
-                    time.sleep(2)  # Note: changed 'time.wait(2)' to 'time.sleep(2)'
+                    time.sleep(2)
                     self.client.connect(self.broker, self.port)
                 case 5:
                     logging.critical("Couldn't reconnect 5 times, rebooting...")
-                case _:
-                    logging.critical("Exceeded maximum reconnection attempts, rebooting...")
+                    exit(2)
 
             self.reconnect_counter += 1
 
         self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
         self.client.on_connect = on_connect
-        self.client.on_connect_fail = on_disconnect
+        self.client.on_disconnect = on_disconnect
 
         self.client.connect(self.broker, self.port)
         # TODO retry a few times, if it cannot, then reboot the device (Exit code: 2)
@@ -83,13 +90,10 @@ class MQTT:
         return self.client
 
     def publish(self, message):
-        if not self.client:
-            logging.error("MQTT client not connected")
-            return
-
         try:
             start_time = time.time()
             msg_info = self.client.publish(self.pubtopic, message, qos=1)
+            # Take this out in production
             msg_info.wait_for_publish()
             end_time = time.time()
             time_taken = end_time - start_time
@@ -100,6 +104,7 @@ class MQTT:
                 logging.error(f"Failed to send image and timestamp to topic {self.pubtopic}")
         except Exception as e:
             logging.error(f"Error publishing image and timestamp: {str(e)}")
+            exit(1)
 
     def disconnect(self):
         if self.client:
@@ -167,18 +172,22 @@ class App:
 
     def create_message(self, image_array, timestamp):
         # Convert numpy array to bytes
-        image = Image.fromarray(image_array)
-        image_bytes = io.BytesIO()
-        image.save(image_bytes, format='JPEG', quality=75)
-        image_data = image_bytes.getvalue()
+        try:
+            image = Image.fromarray(image_array)
+            image_bytes = io.BytesIO()
+            image.save(image_bytes, format='JPEG', quality=75)
+            image_data = image_bytes.getvalue()
 
-        image_base64 = pybase64.b64encode(image_data).decode('utf-8')
+            image_base64 = pybase64.b64encode(image_data).decode('utf-8')
 
         # Create a JSON object with image data and timestamp
-        message = {
-            "timestamp": timestamp,
-            "image": image_base64
-        }
+            message = {
+                "timestamp": timestamp,
+                "image": image_base64
+            }
+        except Exception as e:
+            logging.error(f"Problem creating the message: {e}")
+            exit(1)
 
         return json.dumps(message)
 
@@ -222,6 +231,7 @@ if __name__ == "__main__":
     app = App(CONFIG_PATH)
 
     # Run for 60 seconds
+    # TODO get the run time from config
     app.run(duration=60)
 
     print("Image capture and publish sequence completed")
