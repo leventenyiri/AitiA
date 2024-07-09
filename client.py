@@ -48,6 +48,7 @@ class MQTT:
                 logging.info(f"Received and saved config to {CONFIG_PATH}")
             except Exception as e:
                 logging.error(e)
+                # TODO: ask for config resend
 
         self.client.on_message = on_message
         self.client.subscribe(self.subtopic)
@@ -58,35 +59,19 @@ class MQTT:
                 logging.info("Connected to MQTT Broker!")
             else:
                 logging.error(f"Failed to connect, return code {rc}")
+                # TODO: trying to reconnect a few number of times
 
         def on_disconnect(client, userdata, reason_code, properties):
-            match self.reconnect_counter:
-                case 0:
-                    self.client.connect(self.broker, self.port)
-                case 1 | 2 | 3 | 4:
-                    time.sleep(2)  # Note: changed 'time.wait(2)' to 'time.sleep(2)'
-                    self.client.connect(self.broker, self.port)
-                case 5:
-                    logging.critical("Couldn't reconnect 5 times, rebooting...")
-                case _:
-                    logging.critical("Exceeded maximum reconnection attempts, rebooting...")
-
-            self.reconnect_counter += 1
 
         self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
         self.client.on_connect = on_connect
-        self.client.on_connect_fail = on_disconnect
+        self.client.on_disconnect = on_disconnect
 
         self.client.connect(self.broker, self.port)
-        # TODO retry a few times, if it cannot, then reboot the device (Exit code: 2)
         self.client.loop_start()
         return self.client
 
     def publish(self, message):
-        if not self.client:
-            logging.error("MQTT client not connected")
-            return
-
         try:
             start_time = time.time()
             msg_info = self.client.publish(self.pubtopic, message, qos=1)
@@ -130,7 +115,6 @@ class Camera:
         self.width = config['width']
         self.height = config['height']
         self.cam = Picamera2()
-        self.counter = 0
 
     def start(self):
         config = self.cam.create_still_configuration({"size": (self.width, self.height)})
