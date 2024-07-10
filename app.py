@@ -1,4 +1,3 @@
-import os
 import logging
 import time
 import json
@@ -45,6 +44,7 @@ class App:
             logging.error(e)
             exit(1)
 
+    @log_execution_time("Creating the json message")
     def create_message(self, image_array, timestamp):
         try:
             # Convert numpy array to bytes (JPEG)
@@ -70,6 +70,7 @@ class App:
         image.thumbnail(max_size, Image.LANCZOS)
         return image
 
+    @log_execution_time("Starting the app")
     def start(self):
         # Start the camera
         self.camera.start()
@@ -79,24 +80,18 @@ class App:
         mqtt_client.enable_logger()
         self.mqtt.init_receive()
 
-    @log_execution_time("app.py run function")
+    @log_execution_time("Taking a picture and sending it")
     def run(self):
         # Capture the image
-        start_capture = time.time()
         image_raw = self.camera.capture()
-        capture_time = time.time() - start_capture
         logging.info(f"Image captured")
-        logging.info(f"Image capture time: {capture_time:.2f} seconds")
 
         # Create the message
         timestamp = datetime.now(pytz.utc).isoformat()
         message = self.create_message(image_raw, timestamp)
 
         # Publish the message
-        start_publish = time.time()
         self.mqtt.publish(message)
-        publish_time = time.time() - start_publish
-        logging.info(f"Image publish time: {publish_time:.2f} seconds")
 
     def run_old(self, duration):
         end_time = time.time() + duration

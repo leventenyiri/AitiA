@@ -4,6 +4,7 @@ try:
 except:
     Picamera2 = None
     controls = None
+from utils import log_execution_time
 
 
 class Camera:
@@ -36,6 +37,7 @@ class Camera:
         self.cam.set_controls({"AfMode": controls.AfModeEnum.Continuous})
         self.cam.start(show_preview=False)
 
+    @log_execution_time("Image capture time:")
     def capture(self):
         image = self.cam.capture_array()
         return image
