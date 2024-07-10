@@ -79,7 +79,7 @@ class App:
         mqtt_client.enable_logger()
         self.mqtt.init_receive()
 
-    @log_execution_time
+    @log_execution_time("app.py run function")
     def run(self):
         # Capture the image
         start_capture = time.time()
