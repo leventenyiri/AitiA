@@ -71,11 +71,11 @@ class MQTT:
         try:
             msg_info = self.client.publish(self.pubtopic, message, qos=1)
             # Take this out in production
-            msg_info.wait_for_publish()
-            if msg_info.is_published():
-                logging.info(f"Image and timestamp sent to topic {self.pubtopic}")
-            else:
-                logging.error(f"Failed to send image and timestamp to topic {self.pubtopic}")
+            # msg_info.wait_for_publish()
+            # if msg_info.is_published():
+            #     logging.info(f"Image and timestamp sent to topic {self.pubtopic}")
+            # else:
+            #     logging.error(f"Failed to send image and timestamp to topic {self.pubtopic}")
         except Exception as e:
             logging.error(f"Error publishing image and timestamp: {str(e)}")
             exit(1)

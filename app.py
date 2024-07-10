@@ -84,7 +84,6 @@ class App:
     def run(self):
         # Capture the image
         image_raw = self.camera.capture()
-        logging.info(f"Image captured")
 
         # Create the message
         timestamp = datetime.now(pytz.utc).isoformat()
