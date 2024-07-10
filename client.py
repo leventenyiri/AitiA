@@ -62,7 +62,7 @@ class MQTT:
             else:
                 logging.error(f"Failed to connect, return code {rc}")
 
-        def on_disconnect(client, userdata, reason_code, properties=None):
+        def on_disconnect(client, userdata, disconnect_flags, reason_code, properties=None):
             if reason_code == 0:
                 logging.info("Disconnected voluntarily.")
                 return
@@ -83,7 +83,6 @@ class MQTT:
 
         self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
         self.client.on_connect = on_connect
-        self.client.on_disconnect = on_disconnect
         self.client.on_disconnect = on_disconnect
 
         self.client.connect(self.broker, self.port)
@@ -289,17 +288,21 @@ if __name__ == "__main__":
     app = App(CONFIG_PATH)
     app.start()
 
-    # The app is taking pictures nonstop
-    if app.basic_config['mode'] == "always_on":
-        app.run_always()
+    try:
+        # The app is taking pictures nonstop
+        if app.basic_config['mode'] == "always_on":
+            app.run_always()
     # The app is sending the images periodically and shuts down in between
-    elif app.basic_config['mode'] == "periodic":
-        app.run_periodically(app.basic_config['period'])
+        elif app.basic_config['mode'] == "periodic":
+            app.run_periodically(app.basic_config['period'])
     # The app takes one picture then shuts down
-    elif app.basic_config['mode'] == "single-shot":
-        app.run()
+        elif app.basic_config['mode'] == "single-shot":
+            app.run()
+
+    finally:
         app.mqtt.disconnect()
 
+    print("Image capture and publish sequence completed")
     # Run for 60 seconds
     # TODO get the run time from config
     # app.run_old(duration=60)
