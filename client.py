@@ -1,26 +1,6 @@
-import os
-import logging
-import logging.config
-import yaml
 from app import App
+from utils import Logger
 from config import LOG_CONFIG_PATH, CONFIG_PATH
-
-
-class Logger:
-    def __init__(self, filepath):
-        self.filepath = filepath
-
-    def start(self):
-        try:
-            if not os.path.exists(self.filepath):
-                raise FileNotFoundError(f"Log configuration file not found: {self.filepath}")
-            with open(self.filepath, 'r') as f:
-                config = yaml.safe_load(f)
-            logging.config.dictConfig(config)
-            logging.info("Logging started")
-        except Exception as e:
-            logging.error(e)
-            exit(1)
 
 
 if __name__ == "__main__":

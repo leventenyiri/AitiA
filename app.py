@@ -9,6 +9,7 @@ import pytz
 import pybase64
 from mqtt import MQTT
 from camera import Camera
+from utils import log_execution_time
 
 
 class App:
@@ -78,6 +79,7 @@ class App:
         mqtt_client.enable_logger()
         self.mqtt.init_receive()
 
+    @log_execution_time
     def run(self):
         # Capture the image
         start_capture = time.time()
