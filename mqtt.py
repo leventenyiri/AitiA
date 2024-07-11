@@ -62,7 +62,6 @@ class MQTT:
         self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
         self.client.on_connect = on_connect
         self.client.on_disconnect = on_disconnect
-        self.client.connect_timeout = 0.5
         self.client.enable_logger()
 
         try:
