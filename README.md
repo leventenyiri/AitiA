@@ -31,7 +31,9 @@ Detecting starling swarms.
 - [ ] **Random TODOS**
   - Measure the current drawn
   - Send information about the device (temperature, battery, ...)
-  - Change the camera settings based on the current time
+  - Unit, integration testing
+  - CI pipeline optimizing
+  - Implementing periodic running
 
 Roadmap:
 https://github.com/users/borditamas/projects/2/views/4
