@@ -34,6 +34,7 @@ Detecting starling swarms.
   - Unit, integration testing
   - CI pipeline optimizing
   - Implementing periodic running
+  - Optimizing the OS boot time
 
 Roadmap:
 https://github.com/users/borditamas/projects/2/views/4
