@@ -31,7 +31,3 @@ if __name__ == "__main__":
 
     main()
     logging.info("Aplication has stopped\n")
-
-    # Run for 60 seconds
-    # TODO get the run time from config
-    # app.run_old(duration=60)
