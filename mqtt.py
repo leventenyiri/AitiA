@@ -1,6 +1,6 @@
 import logging
 import time
-from config import CONFIG_PATH, BROKER, PORT, PUBTOPIC, SUBTOPIC
+from config import CONFIG_PATH, BROKER, PORT, PUBTOPIC, SUBTOPIC, QOS
 from utils import log_execution_time
 try:
     from paho.mqtt import client as mqtt_client
@@ -14,6 +14,7 @@ class MQTT:
         self.pubtopic = PUBTOPIC
         self.subtopic = SUBTOPIC
         self.port = PORT
+        self.qos = QOS
         self.client = None
         self.reconnect_counter = 0
 
@@ -69,7 +70,7 @@ class MQTT:
     @log_execution_time("Image publish time")
     def publish(self, message):
         try:
-            msg_info = self.client.publish(self.pubtopic, message, qos=1)
+            msg_info = self.client.publish(self.pubtopic, message, qos=self.qos)
             # Take this out in production
             # msg_info.wait_for_publish()
             # if msg_info.is_published():

@@ -10,3 +10,4 @@ BROKER = "192.168.0.108"
 PORT = 1883
 PUBTOPIC = "mqtt/rpi/image"
 SUBTOPIC = "settings/er-edge"
+QOS = 0
