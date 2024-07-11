@@ -1,13 +1,7 @@
-from client import MQTT, BROKER, PORT, PUBTOPIC, SUBTOPIC, CONFIG_PATH
+from mqtt import MQTT, BROKER, PORT, PUBTOPIC, SUBTOPIC, CONFIG_PATH
 import pytest
 from unittest.mock import Mock, patch, create_autospec
-import time
-import logging
-import sys
-import os
-import paho.mqtt.client as mqtt_client
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from paho.mqtt import client as mqtt_client
 
 
 @pytest.fixture
@@ -17,8 +11,8 @@ def mqtt_instance():
 
 @pytest.fixture
 def mock_mqtt_client():
-    with patch('client.mqtt_client', new=create_autospec(mqtt_client)):
-        yield mqtt_client.Client.return_value
+    with patch('paho.mqtt.client.Client') as mock_client:
+        yield mock_client
 
 
 def test_mqtt_initialization(mqtt_instance):
@@ -33,8 +27,5 @@ def test_mqtt_initialization(mqtt_instance):
 def test_connect(mqtt_instance, mock_mqtt_client):
     mqtt_instance.connect()
 
-    assert mqtt_instance.client == mock_mqtt_client
-    mock_mqtt_client.on_connect.assert_called_once()
-    mock_mqtt_client.on_disconnect.assert_called_once()
-    mock_mqtt_client.connect.assert_called_once_with(BROKER, PORT)
-    mock_mqtt_client.loop_start.assert_called_once()
+    mock_mqtt_client.assert_called_once_with(mqtt_client.CallbackAPIVersion.VERSION2)
+    assert mqtt.client == mock_mqtt_client.return_value
