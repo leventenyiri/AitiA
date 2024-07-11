@@ -13,7 +13,7 @@ import pytz
 
 start_time = None
 
-broker = '192.168.0.108'
+broker = '192.168.0.104'
 port = 1883
 topic = "mqtt/rpi/image"
 logging.basicConfig(level=logging.DEBUG,

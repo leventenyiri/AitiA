@@ -77,7 +77,6 @@ class App:
 
         # Start the MQTT
         mqtt_client = self.mqtt.connect()
-        mqtt_client.enable_logger()
         self.mqtt.init_receive()
 
     @log_execution_time("Taking a picture and sending it")

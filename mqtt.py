@@ -62,9 +62,16 @@ class MQTT:
         self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
         self.client.on_connect = on_connect
         self.client.on_disconnect = on_disconnect
+        self.client.connect_timeout = 0.5
+        self.client.enable_logger()
 
-        self.client.connect(self.broker, self.port)
-        self.client.loop_start()
+        try:
+            self.client.connect(self.broker, self.port)
+            self.client.loop_start()
+        except Exception as e:
+            logging.error(f"Error connecting to the broker: {e}")
+            exit(1)
+
         return self.client
 
     @log_execution_time("Image publish time")
