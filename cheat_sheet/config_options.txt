@@ -1,6 +1,16 @@
  Basic:
-        "quality": "4K", "3K", "HD"
-        "mode": "always_on", "periodic", "single-shot"
-        "period": 0...max(int32)
-        "manual_camera_settings": true, false
+       "quality": "4K", "3K", "HD"
+       "mode": "always_on" == the device is taking pictures and sending them ASAP,
+               "periodic" == the device takes pictures and sends the periodically the time interval can be set with "period", 
+               "single-shot" == the device takes a picture then shuts down
+       "period": 0...max(int32)
+       "manual_camera_settings": true == the device uses the settings given in "Camera",
+                                 false == the device uses premade settings based on the set "quality" in Basic config
+       "wake_up_time": "00:00:00"..."23:59:59"
+       "shut_down_time": "00:00:00"..."23:59:59"
+
+Camera:
+       "quality": 0...95 == sets the JPEG quality level (0 is the worst)
+       "width": 0...4656
+       "height": 0...3496
     

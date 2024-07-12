@@ -66,7 +66,7 @@ class MQTT:
         self.client.enable_logger()
 
         try:
-            self.client.connect(self.broker, self.port)
+            self.client.connect_async(self.broker, self.port)
             self.client.loop_start()
         except Exception as e:
             logging.error(f"Error connecting to the broker: {e}")

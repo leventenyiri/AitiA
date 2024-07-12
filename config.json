@@ -1,9 +1,11 @@
 {
     "Basic":{
-        "quality": "4K",
+        "quality": "3K",
         "mode": "single-shot",
-        "period": 100,
-        "manual_camera_settings_on": false
+        "period": "0:0:50",
+        "manual_camera_settings_on": false,
+        "wake_up_time": "06:59:31",
+        "shut_down_time": "20:12:11"
     },
     "Camera": {
         "quality": 95,
