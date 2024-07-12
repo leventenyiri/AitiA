@@ -4,6 +4,7 @@ import os
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 LOG_CONFIG_PATH = os.path.join(SCRIPT_DIR, 'log_config.yaml')
 CONFIG_PATH = os.path.join(SCRIPT_DIR, 'config.json')
+TEMP_CONFIG_PATH = os.path.join(SCRIPT_DIR, 'temp_config.json')
 
 # MQTT Configuration
 BROKER = "192.168.0.104"

@@ -1,6 +1,7 @@
 import logging
 import time
-from static_config import CONFIG_PATH, BROKER, PORT, PUBTOPIC, SUBTOPIC, QOS, USERNAME, PASSWORD
+import shutil
+from static_config import *
 from utils import log_execution_time
 try:
     from paho.mqtt import client as mqtt_client
@@ -21,9 +22,13 @@ class MQTT:
     def init_receive(self):
         def on_message(client, userdata, msg):
             try:
-                with open(CONFIG_PATH, "wb") as config:
-                    config.write(msg.payload)
-                logging.info(f"Received and saved config to {CONFIG_PATH}")
+                with open(TEMP_CONFIG_PATH, "wb") as temp_config:
+                    temp_config.write(msg.payload)
+                logging.info(f"Received config to {TEMP_CONFIG_PATH}")
+
+                shutil.copyfile(TEMP_CONFIG_PATH, CONFIG_PATH)
+                logging.info(f"Config saved to {CONFIG_PATH}")
+
             except Exception as e:
                 logging.error(e)
                 # TODO: ask for config resend
