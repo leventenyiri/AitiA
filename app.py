@@ -8,7 +8,7 @@ import pytz
 import pybase64
 from mqtt import MQTT
 from camera import Camera
-from utils import log_execution_time
+from utils import log_execution_time, get_cpu_temperature
 
 
 class App:
@@ -55,9 +55,12 @@ class App:
 
             image_base64 = pybase64.b64encode(image_data).decode('utf-8')
 
+            cpu_temp = get_cpu_temperature()
+
             # Create a JSON object with image data and timestamp
             message = {
                 "timestamp": timestamp,
+                "CPU_temperature": cpu_temp,
                 "image": image_base64
             }
         except Exception as e:

@@ -3,6 +3,7 @@ import logging
 import logging.config
 import yaml
 import os
+from gpiozero import CPUTemperature
 from functools import wraps
 
 
@@ -24,6 +25,11 @@ def log_execution_time(operation_name=None):
             return result
         return wrapper
     return decorator
+
+
+def get_cpu_temperature():
+    cpu = CPUTemperature()
+    return cpu.temperature
 
 
 class Logger:
