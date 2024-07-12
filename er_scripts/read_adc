@@ -1,0 +1,32 @@
+#!/bin/bash
+
+conv() { 
+python -c "import ctypes;import sys;print(ctypes.c_int16(int(sys.argv[1],16)).value)" $1 
+}
+
+#reset watchdog
+i2cset -y 1 0x6b 0x16 0xa7
+
+# get status
+echo "Status (normal = 0x00)"
+i2cget -y 1 0x6b 0x1d
+
+# enable adc
+i2cset -y 1 0x6b 0x26  0xb0
+
+#ibus
+echo Ibus
+echo "$(conv $(i2cget -y 1 0x6b 0x28 w)) mA"
+
+# ibat
+echo Ibat
+echo "$(conv $(i2cget -y 1 0x6b 0x2a w)) mA"
+
+echo Vbat
+echo "$(conv $(i2cget -y 1 0x6b 0x30 w)) mV"
+
+echo VSys
+echo "$(conv $(i2cget -y 1 0x6b 0x32 w)) mV"
+
+echo "Status (normal = 0x00)"
+i2cget -y 1 0x6b 0x1d
