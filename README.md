@@ -39,7 +39,5 @@ Detecting starling swarms.
 Roadmap:
 https://github.com/users/borditamas/projects/2/views/4
 
-
-Used often:
-
-sudo mount -t nfs 192.168.0.108:/nfshost /mnt/nfs_share
+Boot time measuring help:
+https://www.freedesktop.org/software/systemd/man/latest/systemd-analyze.html
