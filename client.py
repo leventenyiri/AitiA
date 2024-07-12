@@ -1,6 +1,6 @@
 from app import App
 from utils import Logger, log_execution_time
-from config import LOG_CONFIG_PATH, CONFIG_PATH
+from static_config import LOG_CONFIG_PATH, CONFIG_PATH
 import logging
 
 

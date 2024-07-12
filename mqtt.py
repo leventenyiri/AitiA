@@ -1,6 +1,6 @@
 import logging
 import time
-from config import CONFIG_PATH, BROKER, PORT, PUBTOPIC, SUBTOPIC, QOS
+from static_config import CONFIG_PATH, BROKER, PORT, PUBTOPIC, SUBTOPIC, QOS, USERNAME, PASSWORD
 from utils import log_execution_time
 try:
     from paho.mqtt import client as mqtt_client
@@ -48,11 +48,11 @@ class MQTT:
             logging.error(f"Involuntary disconnect. Reason code: {reason_code}")
 
             if self.reconnect_counter == 0:
-                self.client.connect(self.broker, self.port)
+                self.client.reconnect(self.broker, self.port)
             elif 1 <= self.reconnect_counter <= 4:
                 time.sleep(2)
                 logging.info(f"Trying to reconnect: {self.reconnect_counter} out of 5")
-                self.client.connect(self.broker, self.port)
+                self.client.reconnect(self.broker, self.port)
             elif self.reconnect_counter == 5:
                 logging.critical("Couldn't reconnect 5 times, rebooting...")
                 exit(2)
@@ -62,6 +62,7 @@ class MQTT:
         self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
         self.client.on_connect = on_connect
         self.client.on_disconnect = on_disconnect
+        self.client.username_pw_set(USERNAME, PASSWORD)
         self.client.enable_logger()
 
         try:
