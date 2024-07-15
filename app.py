@@ -60,8 +60,8 @@ class App:
             # Create a JSON object with image data and timestamp
             message = {
                 "timestamp": timestamp,
-                "CPU_temperature": cpu_temp,
-                "image": image_base64
+                "image": image_base64,
+                "CPU_temperature": cpu_temp
             }
         except Exception as e:
             logging.error(f"Problem creating the message: {e}")
