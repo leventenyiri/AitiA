@@ -28,6 +28,9 @@ Detecting starling swarms.
   - 3D printed
   - Lens shouldnt get foggy, account for weather
 
+- [ ] **RTC**
+  - Setup: https://forums.raspberrypi.com/viewtopic.php?t=85683&sid=cf6676b19d36bf0d5bb0709b0152a900
+
 - [ ] **Random TODOS**
   - Measure the current drawn
   - Send information about the device (temperature, battery, ...)
