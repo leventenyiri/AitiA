@@ -9,3 +9,9 @@ transfer file: scp ~/AitiA/client.py admin@192.168.0.101:/home/admin/MQTT
 delete: rm -r filename
 
 set pi clock: ~$ date -R | ssh admin@192.168.0.109 'sudo tee /tmp/date.txt > /dev/null && sudo date --set="$(cat /tmp/date.txt)" && sudo rm /tmp/date.txt'
+
+RTC:
+
+    cat /sys/class/rtc/rtc0/time
+    timedatectl
+    clock sync: sudo hwclock --systohc

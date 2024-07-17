@@ -8,7 +8,7 @@ import pytz
 import pybase64
 from mqtt import MQTT
 from camera import Camera
-from utils import log_execution_time, get_cpu_temperature
+from utils import log_execution_time, get_cpu_temperature, RTC
 
 
 class App:
@@ -57,17 +57,18 @@ class App:
 
             cpu_temp = get_cpu_temperature()
 
-            # Create a JSON object with image data and timestamp
+            # timestamp is already an ISO format string, no need to format it
             message = {
                 "timestamp": timestamp,
                 "image": image_base64,
                 "CPU_temperature": cpu_temp
             }
+
+            return json.dumps(message)
+
         except Exception as e:
             logging.error(f"Problem creating the message: {e}")
-            exit(1)
-
-        return json.dumps(message)
+            raise
 
     def resize_image(self, image, max_size=(800, 600)):
         image.thumbnail(max_size, Image.LANCZOS)
@@ -84,36 +85,20 @@ class App:
 
     @log_execution_time("Taking a picture and sending it")
     def run(self):
-        # Capture the image
-        image_raw = self.camera.capture()
-
-        # Create the message
-        timestamp = datetime.now(pytz.utc).isoformat()
-        message = self.create_message(image_raw, timestamp)
-
-        # Publish the message
-        self.mqtt.publish(message)
-
-    def run_old(self, duration):
-        end_time = time.time() + duration
-        while time.time() < end_time:
-            start_capture = time.time()
+        try:
+            # Capture the image
             image_raw = self.camera.capture()
-            capture_time = time.time() - start_capture
-            logging.info(f"Image captured")
-            logging.info(f"Image capture time: {capture_time:.2f} seconds")
+
+            # Get the timestamp
+            timestamp = RTC.get_time()
 
             # Create the message
-            timestamp = datetime.now(pytz.utc).isoformat()
             message = self.create_message(image_raw, timestamp)
 
             # Publish the message
-            start_publish = time.time()
             self.mqtt.publish(message)
-            publish_time = time.time() - start_publish
-            logging.info(f"Image publish time: {publish_time:.2f} seconds")
-
-        self.mqtt.disconnect()
+        except Exception as e:
+            logging.error(f"Error in run method: {e}")
 
     def run_always(self):
         while True:
