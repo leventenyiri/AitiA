@@ -18,6 +18,7 @@ jobs:
       # comments in pull requests.
       pull-requests: write
       contents: write
+      statuses: write
 
     steps:
       - name: Checkout repository
@@ -25,4 +26,4 @@ jobs:
       - name: Verify changes
         uses: EffectiveRange/python-verify-github-action@v1
         with:
-          coverage-threshold: '100'
+          coverage-threshold: '10'

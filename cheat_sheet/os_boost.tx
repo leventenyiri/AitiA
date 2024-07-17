@@ -5,3 +5,8 @@ sudo systemctl disable keyboard-setup.service
 sudo systemctl stop systemd-timesyncd
 sudo systemctl disable systemd-timesyncd
 sudo systemctl mask systemd-timesyncd
+
+Shut-down:
+sudo nano /etc/systemd/system.conf
+#DefaultTimeoutStopSec=90s
+DefaultTimeoutStopSec=4s

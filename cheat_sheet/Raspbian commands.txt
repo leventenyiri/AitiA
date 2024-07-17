@@ -3,6 +3,7 @@ os info: sudo apt install lshw inxi
 
 boot time: systemd analyze
            systemd-analyze blame
+           dmesg
 
 transfer file: scp ~/AitiA/client.py admin@192.168.0.101:/home/admin/MQTT
 
