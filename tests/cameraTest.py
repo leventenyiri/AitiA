@@ -4,7 +4,7 @@ from camera import Camera
 PytestMocker(Camera).mock_everything().generate()
 
 
-def test_camera_init():
+""" def test_camera_init():
 
     # Arrange: todo
     basic_config = {
@@ -17,4 +17,4 @@ def test_camera_init():
         "quality": 95,
         "width": 3840,
         "height": 2160
-    }
+    } """

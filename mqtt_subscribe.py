@@ -1,13 +1,11 @@
 # python 3.11
-import random
 from paho.mqtt import client as mqtt_client
 import base64
-import time
 import logging
 import json
 from PIL import Image
 import io
-from datetime import datetime, timedelta
+from datetime import datetime
 from dateutil import parser
 import pytz
 
