@@ -86,3 +86,10 @@ class Logger:
         except Exception as e:
             logging.error(e)
             exit(1)
+
+
+class System:
+    @staticmethod
+    def shutdown():
+        logging.info("Pi has been shut down")
+        subprocess.run(['sudo', 'systemctl', 'poweroff', '-no-block'], check=True)

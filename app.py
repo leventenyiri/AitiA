@@ -3,9 +3,10 @@ import json
 import io
 from PIL import Image
 import pybase64
+from datetime import datetime, timedelta
 from mqtt import MQTT
 from camera import Camera
-from utils import log_execution_time, get_cpu_temperature, RTC
+from utils import log_execution_time, get_cpu_temperature, RTC, System
 
 
 class App:
@@ -41,6 +42,32 @@ class App:
             logging.error(e)
             exit(1)
 
+    def working_time_check(self):
+        wake_up_time = datetime.strptime(self.basic_config["wake_up_time"], "%H:%M:%S").time()
+        shut_down_time = datetime.strptime(self.basic_config["shut_down_time"], "%H:%M:%S").time()
+
+        utc_time = datetime.fromisoformat(RTC.get_time())
+
+        # Add two hours, because the RTC is in UTC, and Budapest is two hours ahead
+        adjusted_time = utc_time + timedelta(hours=2)
+
+        current_time = adjusted_time.time()
+
+        logging.info("working_time_check called \n")
+        logging.info(
+            f"wake up time is : {wake_up_time}, shutdown time is : {shut_down_time}, current time is : {current_time}")
+        logging.info(f"If true it can compare correctly : {current_time >= shut_down_time}")
+
+        # If e.g: wake up time = 6:00:00 and shutdown time = 20:00:00
+        if (wake_up_time < shut_down_time) and (wake_up_time > current_time or current_time >= shut_down_time):
+            logging.info("Starting shutdown")
+            System.shutdown()
+
+        # If e.g: wake up time = 20:00:00 and shutdown time = 6:00:00
+        elif (current_time >= shut_down_time and current_time < wake_up_time):
+            logging.info("Starting shutdown")
+            System.shutdown()
+
     @log_execution_time("Creating the json message")
     def create_message(self, image_array, timestamp):
         try:
@@ -73,6 +100,7 @@ class App:
 
     @log_execution_time("Starting the app")
     def start(self):
+        self.working_time_check()
         # Start the camera
         self.camera.start()
 

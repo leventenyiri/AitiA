@@ -10,6 +10,8 @@ def main():
     logger.start()
 
     app = App(CONFIG_PATH)
+    # We check if we are withing working hours, if not we shut down the device
+    # app.working_time_check()
     app.start()
 
     try:
