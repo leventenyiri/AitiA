@@ -1,6 +1,6 @@
-from mqtt import MQTT, BROKER, PORT, PUBTOPIC, SUBTOPIC, CONFIG_PATH
+from mqtt import MQTT, BROKER, PORT, PUBTOPIC, SUBTOPIC
 import pytest
-from unittest.mock import Mock, patch, create_autospec
+from unittest.mock import patch
 from paho.mqtt import client as mqtt_client
 import logging
 

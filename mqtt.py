@@ -82,7 +82,7 @@ class MQTT:
     @log_execution_time("Image publish time")
     def publish(self, message):
         try:
-            msg_info = self.client.publish(self.pubtopic, message, qos=self.qos)
+            self.client.publish(self.pubtopic, message, qos=self.qos)
             # Take this out in production
             # msg_info.wait_for_publish()
             # if msg_info.is_published():
