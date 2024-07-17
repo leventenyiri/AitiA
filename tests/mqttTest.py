@@ -1,7 +1,7 @@
 from mqtt import MQTT, BROKER, PORT, PUBTOPIC, SUBTOPIC
 import pytest
 from unittest.mock import patch
-from paho.mqtt import client as mqtt_client
+# from paho.mqtt import client as mqtt_client
 import logging
 
 
