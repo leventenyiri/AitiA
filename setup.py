@@ -11,5 +11,6 @@ setup(
     install_requires=['pytest',
                       'PyYAML>=6.0',
                       'pillow',
+                      'pytz',
                       'python-context-logger@git+https://github.com/EffectiveRange/python-context-logger.git@latest']
 )
