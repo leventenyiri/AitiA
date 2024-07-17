@@ -9,7 +9,7 @@ setup(
     packages=['example'],
     scripts=['client.py'],
     install_requires=['pytest',
-                      'mock_autogen',
+                      'mock-autogen',
                       'PyYAML>=6.0',
                       'pillow',
                       'python-context-logger@git+https://github.com/EffectiveRange/python-context-logger.git@latest']
