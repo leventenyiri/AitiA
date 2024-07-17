@@ -8,7 +8,12 @@ setup(
     author_email='info@effective-range.com',
     packages=['example'],
     scripts=['pc_client.py'],
-    install_requires=['netifaces',
+    install_requires=['pytest',
                       'PyYAML>=6.0',
+                      'libcamera',
+                      'picamera2',
+                      'pillow',
+                      'gpiozero',
+                      'functools',
                       'python-context-logger@git+https://github.com/EffectiveRange/python-context-logger.git@latest']
 )
