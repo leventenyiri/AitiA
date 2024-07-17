@@ -2,7 +2,7 @@ from utils import Logger
 import pytest
 import logging
 from unittest.mock import patch, mock_open
-from config import LOG_CONFIG_PATH
+from static_config import LOG_CONFIG_PATH
 
 
 @pytest.fixture

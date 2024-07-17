@@ -4,10 +4,14 @@ import logging.config
 import yaml
 import os
 import subprocess
-from gpiozero import CPUTemperature
 from functools import wraps
 from datetime import datetime
 import pytz
+
+try:
+    from gpiozero import CPUTemperature
+except ImportError:
+    CPUTemperature = None
 
 
 def log_execution_time(operation_name=None):
