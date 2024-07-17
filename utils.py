@@ -7,6 +7,7 @@ import subprocess
 from gpiozero import CPUTemperature
 from functools import wraps
 from datetime import datetime
+import pytz
 
 
 def log_execution_time(operation_name=None):
@@ -38,12 +39,22 @@ class RTC:
     @staticmethod
     def get_time():
         try:
-            result = subprocess.run(['cat', '/sys/class/rtc/rtc0/time'], capture_output=True, text=True)
-            time_str = result.stdout.strip()
-            return datetime.strptime(time_str, '%H:%M:%S').time()
+            result = subprocess.run(['timedatectl'], capture_output=True, text=True)
+            if result.returncode != 0:
+                raise Exception(f"Error getting date from timedatectl: {result.stderr}")
+
+            lines = result.stdout.splitlines()
+            utc_time_line = next(line for line in lines if "Universal time:" in line)
+            utc_time_str = utc_time_line.split(': ', 1)[1].strip()
+
+            utc_datetime = datetime.strptime(utc_time_str, "%a %Y-%m-%d %H:%M:%S UTC")
+            utc_datetime = pytz.UTC.localize(utc_datetime)
+
+            return utc_datetime.isoformat()
+
         except Exception as e:
-            logging.error(f"Error reading RTC time: {e}")
-            return None
+            logging.error(f"Error reading system time: {e}")
+            return datetime.now(pytz.UTC).isoformat()
 
     @staticmethod
     def set_time(time_to_set):

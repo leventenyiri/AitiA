@@ -2,7 +2,7 @@ import time
 import json
 from paho.mqtt import client as mqtt_client
 
-broker = "192.168.0.103"
+broker = "192.168.0.100"
 port = 1883
 topic = "settings/er-edge"
 
