@@ -2,10 +2,10 @@ name: Python test
 
 on:
   push:
-    branches:
-      - '**'
     paths-ignore:
       - 'er_scripts/**'
+    branches:
+      - '**'
 
 jobs:
   build:
