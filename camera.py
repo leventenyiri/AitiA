@@ -1,7 +1,7 @@
 try:
     from libcamera import controls
     from picamera2 import Picamera2
-except:
+except ImportError:
     Picamera2 = None
     controls = None
 from utils import log_execution_time

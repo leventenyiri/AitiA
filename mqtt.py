@@ -1,11 +1,11 @@
 import logging
 import time
 import shutil
-from static_config import *
+from static_config import BROKER, PUBTOPIC, SUBTOPIC, PORT, QOS, TEMP_CONFIG_PATH, CONFIG_PATH, USERNAME, PASSWORD
 from utils import log_execution_time
 try:
     from paho.mqtt import client as mqtt_client
-except:
+except ImportError:
     mqtt_client = None
 
 

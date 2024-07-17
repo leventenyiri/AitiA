@@ -1,10 +1,7 @@
 import logging
-import time
 import json
 import io
 from PIL import Image
-from datetime import datetime
-import pytz
 import pybase64
 from mqtt import MQTT
 from camera import Camera
@@ -80,7 +77,7 @@ class App:
         self.camera.start()
 
         # Start the MQTT
-        mqtt_client = self.mqtt.connect()
+        self.mqtt.connect()
         self.mqtt.init_receive()
 
     @log_execution_time("Taking a picture and sending it")
