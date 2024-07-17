@@ -2,3 +2,6 @@ pytest
 libcamera
 picamera2
 PyYAML==6.0
+pillow
+gpiozero
+functools
