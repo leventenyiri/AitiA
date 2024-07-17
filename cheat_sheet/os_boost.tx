@@ -1,0 +1,7 @@
+sudo systemctl disable keyboard-setup.service
+
+/boot/config.txt (add dtoverlay=disable-bt ) -> sudo systemctl disable bluetooth.service
+
+sudo systemctl stop systemd-timesyncd
+sudo systemctl disable systemd-timesyncd
+sudo systemctl mask systemd-timesyncd
