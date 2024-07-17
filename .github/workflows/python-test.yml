@@ -18,6 +18,7 @@ jobs:
       # comments in pull requests.
       pull-requests: write
       contents: write
+      statuses: write
 
     steps:
       - name: Checkout repository

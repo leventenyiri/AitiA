@@ -1,5 +1,0 @@
-[run]
-omit = 
-    er_scripts/*
-    */er_scripts/*
-    **/er_scripts/*
