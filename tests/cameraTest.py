@@ -1,7 +1,7 @@
-from mock_autogen import PytestMocker
-from camera import Camera
+# from mock_autogen import PytestMocker
+# from camera import Camera
 
-PytestMocker(Camera).mock_everything().generate()
+# PytestMocker(Camera).mock_everything().generate()
 
 
 """ def test_camera_init():
