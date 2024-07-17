@@ -19,7 +19,7 @@ Detecting starling swarms.
   - MQTT clients: https://www.emqx.com/en/mqtt-client-sdk?language=Python
     
 - [ ] **Optimizing**
-  - Power consumption: https://raspberrypi.stackexchange.com/questions/92138/power-rpi-from-a-battery-on-off-via-ui-or-sleep
+  - Power consumption: https://raspberrypi.stackexchange.com/questions/92138/power-rpi-from-a-battery-on-off-via-ui-or-sleep https://www.cnx-software.com/2021/12/09/raspberry-pi-zero-2-w-power-consumption/
   - Boot: https://forums.raspberrypi.com/viewtopic.php?t=241455 https://forums.raspberrypi.com/viewtopic.php?t=339114 https://forums.raspberrypi.com/viewtopic.php?f=29&t=25777
   - Right now running a light OS, weed out unnecessary processes (boot time around ~1min)
   - Goal: ~1week of runtime using a 5000mAh battery and solar panel
