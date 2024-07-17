@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 from mqtt import MQTT
 from camera import Camera
 from utils import log_execution_time, get_cpu_temperature, RTC, System
+import time
+import sys
 
 
 class App:
@@ -131,4 +133,28 @@ class App:
 
     # Need RTC API for the implementation
     def run_periodically(self, period):
-        return NotImplementedError
+        period_seconds = self.parse_period(period)
+
+        start_time = time.time()
+        self.run()
+
+        elapsed_time = time.time() - start_time
+        remaining_time = period_seconds - elapsed_time
+
+        if remaining_time > 120:  # If more than 2 minutes left
+            # Calculate wake-up time
+            wake_time = datetime.now() + timedelta(seconds=remaining_time - 60)  # Wake up 1 minute early
+
+            # Schedule wake-up
+            System.schedule_wakeup(wake_time)
+
+            logging.info(f"Scheduling wake-up for {wake_time}")
+            sys.exit(2)
+        else:
+            logging.info(f"Sleeping for {remaining_time} seconds")
+            time.sleep(remaining_time)
+
+    @staticmethod
+    def parse_period(period):
+        hours, minutes, seconds = map(int, period.split(':'))
+        return hours * 3600 + minutes * 60 + seconds
