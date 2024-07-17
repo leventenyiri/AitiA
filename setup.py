@@ -7,7 +7,7 @@ setup(
     author='Ferenc Nandor Janky & Attila Gombos',
     author_email='info@effective-range.com',
     packages=['example'],
-    scripts=['pc_client.py'],
+    scripts=['client.py'],
     install_requires=['pytest',
                       'PyYAML>=6.0',
                       'pillow',
