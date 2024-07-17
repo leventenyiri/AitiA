@@ -12,5 +12,6 @@ setup(
                       'PyYAML>=6.0',
                       'pillow',
                       'pytz',
+                      'paho-mqtt',
                       'python-context-logger@git+https://github.com/EffectiveRange/python-context-logger.git@latest']
 )
