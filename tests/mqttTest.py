@@ -1,7 +1,7 @@
 from mqtt import MQTT, BROKER, PORT, PUBTOPIC, SUBTOPIC
 import pytest
-from unittest.mock import patch
-# from paho.mqtt import client as mqtt_client
+from unittest.mock import patch,MagicMock
+from paho.mqtt import client as mqtt_client
 import logging
 
 
@@ -9,11 +9,15 @@ import logging
 def mqtt_instance():
     return MQTT()
 
-
 @pytest.fixture
-def mock_mqtt_client():
-    with patch('paho.mqtt.client.Client', autospec=True) as mock_client:
-        yield mock_client
+def mock_client():
+    with patch('mqtt.mqtt_client.Client', autospec=True) as mock_client_class:
+        # If i simply returned the mock_client_class, then it would have returned the class itself, but if i return the
+        # return value, then it returns an object of that class, which is what i want
+        mock_client = mock_client_class.return_value
+        # mock_client.connect_async = MagicMock()
+        # mock_client.loop_start = MagicMock()
+        yield mock_client 
 
 
 def test_mqtt_initialization(mqtt_instance):
@@ -25,20 +29,19 @@ def test_mqtt_initialization(mqtt_instance):
     assert mqtt_instance.reconnect_counter == 0
 
 
-""" def test_connect(mqtt_instance, mock_mqtt_client):
+def test_connect(mqtt_instance, mock_client):
     mqtt_instance.connect()
 
-    # Check if Client was called with the correct argument
-    mock_mqtt_client.assert_called_once_with(mqtt_client.CallbackAPIVersion.VERSION2)
+    # Check if Client was created with the correct argument
+    mqtt_client.Client.assert_called_once_with(mqtt_client.CallbackAPIVersion.VERSION2)
 
     # Check if the client is assigned to the instance
-    assert mqtt_instance.client == mock_mqtt_client.return_value
+    assert mqtt_instance.client == mock_client
 
-    # Check if connect was called on the client
-    mqtt_instance.client.connect.assert_called_once_with(mqtt_instance.broker, mqtt_instance.port)
-
-    # Check if loop_start was called
-    mqtt_instance.client.loop_start.assert_called_once() """
+    mock_client.username_pw_set.assert_called_once_with('er-edge-3c547181', 'admin')
+    mock_client.enable_logger.assert_called_once()
+    mock_client.connect_async.assert_called_once_with(mqtt_instance.broker, mqtt_instance.port)
+    mock_client.loop_start.assert_called_once()
 
 
 def test_on_connect_successful(mqtt_instance, caplog):
