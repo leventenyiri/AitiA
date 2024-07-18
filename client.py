@@ -2,6 +2,7 @@ from app import App
 from utils import Logger, log_execution_time
 from static_config import LOG_CONFIG_PATH, CONFIG_PATH
 import logging
+# import cProfile
 
 
 @log_execution_time("Application runtime")
@@ -31,5 +32,6 @@ def main():
 
 if __name__ == "__main__":
 
+    # cProfile.run(main)
     main()
     logging.info("Aplication has stopped\n")

@@ -1,9 +1,10 @@
+from unittest.mock import MagicMock
 try:
     from libcamera import controls
     from picamera2 import Picamera2
 except ImportError:
-    Picamera2 = None
-    controls = None
+    Picamera2 = MagicMock()
+    controls = MagicMock()
 from utils import log_execution_time
 import logging
 
@@ -31,7 +32,7 @@ class Camera:
             self.width = 1920
             self.height = 1080
         # If the specified quality is not found, default to 3K quality
-        else :
+        else:
             self.width = 2560
             self.height = 1440
             logging.error(f"Invalid quality specified: {basic_config['quality']}. Defaulting to 3K quality.")
