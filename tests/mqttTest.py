@@ -1,6 +1,6 @@
 from mqtt import MQTT, BROKER, PORT, PUBTOPIC, SUBTOPIC
 import pytest
-from unittest.mock import patch,MagicMock
+from unittest.mock import patch
 from paho.mqtt import client as mqtt_client
 import logging
 
@@ -8,6 +8,7 @@ import logging
 @pytest.fixture
 def mqtt_instance():
     return MQTT()
+
 
 @pytest.fixture
 def mock_client():
@@ -17,7 +18,7 @@ def mock_client():
         mock_client = mock_client_class.return_value
         # mock_client.connect_async = MagicMock()
         # mock_client.loop_start = MagicMock()
-        yield mock_client 
+        yield mock_client
 
 
 def test_mqtt_initialization(mqtt_instance):
