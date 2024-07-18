@@ -1,8 +1,9 @@
 from mqtt import MQTT, BROKER, PORT, PUBTOPIC, SUBTOPIC
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from paho.mqtt import client as mqtt_client
 import logging
+import json
 
 
 @pytest.fixture
@@ -70,3 +71,35 @@ def test_on_connect_failed(mqtt_instance, caplog):
 
     assert "Failed to connect, return code 1" in caplog.text
     assert mqtt_instance.reconnect_counter == 0  # Should not change on failed connect
+
+
+def test_init_receive(mqtt_instance, mock_client):
+    mqtt_instance.connect()  # This sets up the client
+    mqtt_instance.init_receive()
+
+    # Check if subscribe was called with the correct topic
+    mock_client.subscribe.assert_called_once_with(mqtt_instance.subtopic)
+
+    test_config = {
+        "Basic": {
+            "quality": "3K",
+            "mode": "single-shot",
+            "period": "0:0:50",
+            "manual_camera_settings_on": False,
+            "wake_up_time": "06:59:31",
+            "shut_down_time": "22:00:00"
+        },
+        "Camera": {
+            "quality": 95,
+            "width": 3840,
+            "height": 2160
+        }
+    }
+
+    test_payload = json.dumps(test_config).encode('utf-8')
+
+    # Test the on_message callback
+    msg = MagicMock()
+    msg.payload = test_payload
+    mock_client.on_message(mock_client, None, msg)
+    # Check the config.json and temp_config.json files
