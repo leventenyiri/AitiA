@@ -8,10 +8,11 @@ import io
 from datetime import datetime
 from dateutil import parser
 import pytz
+from static_config import BROKER
 
 start_time = None
 
-broker = '192.168.0.103'
+broker = BROKER
 port = 1883
 topic = "mqtt/rpi/image"
 logging.basicConfig(level=logging.DEBUG,
