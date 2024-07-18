@@ -2,16 +2,18 @@
 
 [Full report](https://htmlpreview.github.io/?https://github.com/leventenyiri/AitiA/blob/python-coverage-comment-action-data/htmlcov/index.html)
 
-| Name               |    Stmts |     Miss |   Branch |   BrPart |   Cover |   Missing |
-|------------------- | -------: | -------: | -------: | -------: | ------: | --------: |
-| mqtt.py            |       74 |       38 |       16 |        1 |     43% |8-9, 23-37, 49-65, 76-78, 83->82, 84-94, 97-99 |
-| static\_config.py  |       12 |        0 |        0 |        0 |    100% |           |
-| tests/mqttTest.py  |       42 |        0 |        6 |        3 |     94% |9->8, 14->13, 15->exit |
-| tests/utilsTest.py |       16 |        0 |        4 |        2 |     90% |9->8, 18->exit |
-| utils.py           |       75 |       37 |       18 |        6 |     47% |20->19, 21-32, 38-39, 44->43, 45-61, 64->63, 65-71, 81, 82->84, 86-88, 93->92, 94-95 |
-|          **TOTAL** |  **219** |   **75** |   **44** |   **12** | **60%** |           |
+| Name                |    Stmts |     Miss |   Branch |   BrPart |   Cover |   Missing |
+|-------------------- | -------: | -------: | -------: | -------: | ------: | --------: |
+| camera.py           |       38 |       12 |       10 |        3 |     69% |3, 25-26, 31-32, 40-44, 47->46, 48-49 |
+| mqtt.py             |       75 |        9 |       14 |        3 |     84% |8-9, 30->33, 39-42, 88->87, 97-99, 102->exit |
+| static\_config.py   |       12 |        0 |        0 |        0 |    100% |           |
+| tests/cameraTest.py |       35 |        0 |       20 |       10 |     82% |20->22, 21->20, 22->21, 30->32, 31->30, 32->31, 40->43, 41->40, 42->41, 43->42 |
+| tests/mqttTest.py   |      120 |        0 |       14 |        6 |     96% |14->13, 19->18, 20->exit, 118->120, 131->134, 186->191 |
+| tests/utilsTest.py  |       49 |        0 |       16 |        8 |     88% |13->12, 21->exit, 47->exit, 54->53, 67->exit, 70->72, 71->70, 72->71 |
+| utils.py            |       75 |       11 |       18 |        9 |     78% |20->19, 29, 38-39, 44->43, 48, 51->exit, 64->63, 71, 81, 82->84, 86-88, 93->92, 94-95 |
+|           **TOTAL** |  **404** |   **32** |   **92** |   **39** | **85%** |           |
 
-2 empty files skipped.
+1 empty file skipped.
 
 
 ## Setup coverage badge
