@@ -1,9 +1,10 @@
+from unittest.mock import MagicMock
 try:
     from libcamera import controls
     from picamera2 import Picamera2
 except ImportError:
-    Picamera2 = None
-    controls = None
+    Picamera2 = MagicMock()
+    controls = MagicMock()
 from utils import log_execution_time
 import logging
 
