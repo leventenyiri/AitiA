@@ -13,5 +13,6 @@ setup(
                       'pillow',
                       'pytz',
                       'paho-mqtt',
+                      'numpy',
                       'python-context-logger@git+https://github.com/EffectiveRange/python-context-logger.git@latest']
 )
