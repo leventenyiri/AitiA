@@ -17,7 +17,7 @@ Detecting starling swarms.
   - Setup: https://forums.raspberrypi.com/viewtopic.php?t=85683&sid=cf6676b19d36bf0d5bb0709b0152a900
 
 - [ ] **Workflow**
-  - Unit tests
+  - Unit tests -> Integration tests -> Sytem tests
   - Workflow, setup.py files
   - CI
     
