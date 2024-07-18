@@ -21,8 +21,6 @@ def mock_client():
         # If i simply returned the mock_client_class, then it would have returned the class itself, but if i return the
         # return value, then it returns an object of that class, which is what i want
         mock_client = mock_client_class.return_value
-        # mock_client.connect_async = MagicMock()
-        # mock_client.loop_start = MagicMock()
         yield mock_client
 
 
