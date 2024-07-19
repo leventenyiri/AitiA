@@ -77,16 +77,10 @@ class App:
         shut_down_time = datetime.strptime(self.basic_config["shut_down_time"], "%H:%M:%S").time()
 
         utc_time = datetime.fromisoformat(RTC.get_time())
+        current_time = utc_time.time()
 
-        # Add two hours, because the RTC is in UTC, and Budapest is two hours ahead
-        adjusted_time = utc_time + timedelta(hours=2)
-
-        current_time = adjusted_time.time()
-
-        logging.info("working_time_check called \n")
         logging.info(
             f"wake up time is : {wake_up_time}, shutdown time is : {shut_down_time}, current time is : {current_time}")
-        logging.info(f"If true it can compare correctly : {current_time >= shut_down_time}")
 
         # If e.g: wake up time = 6:00:00 and shutdown time = 20:00:00
         if (wake_up_time < shut_down_time) and (wake_up_time > current_time or current_time >= shut_down_time):
@@ -124,10 +118,6 @@ class App:
             logging.error(f"Problem creating the message: {e}")
             raise
 
-    def resize_image(self, image, max_size=(800, 600)):
-        image.thumbnail(max_size, Image.LANCZOS)
-        return image
-
     @log_execution_time("Starting the app")
     def start(self):
         self.working_time_check()
@@ -161,13 +151,11 @@ class App:
 
     # Need RTC API for the implementation
     def run_periodically(self, period):
-        period_seconds = self.parse_period(period)
-
         start_time = time.time()
         self.run()
 
         elapsed_time = time.time() - start_time
-        remaining_time = period_seconds - elapsed_time
+        remaining_time = period - elapsed_time
 
         if remaining_time > 120:  # If more than 2 minutes left
             # Calculate wake-up time
@@ -181,8 +169,3 @@ class App:
         else:
             logging.info(f"Sleeping for {remaining_time} seconds")
             time.sleep(remaining_time)
-
-    @staticmethod
-    def parse_period(period):
-        hours, minutes, seconds = map(int, period.split(':'))
-        return hours * 3600 + minutes * 60 + seconds
