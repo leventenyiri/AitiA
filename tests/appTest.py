@@ -1,7 +1,7 @@
 import pytest
 import json
 import logging
-from unittest.mock import patch, mock_open
+from unittest.mock import patch, mock_open, call
 import numpy as np
 from app import App
 from camera import Camera
@@ -299,3 +299,32 @@ def test_run(mock_publish, mock_create_message, mock_get_time, mock_capture,
         mock_get_time.assert_called_once()
         mock_create_message.assert_called_once_with(image_data, timestamp)
         mock_publish.assert_called_once_with(message)
+
+
+def test_start_order_of_operations(app):
+    with patch.object(App, 'working_time_check') as mock_working_time_check, \
+            patch.object(app.camera, 'start') as mock_camera_start, \
+            patch.object(app.mqtt, 'connect') as mock_mqtt_connect, \
+            patch.object(app.mqtt, 'init_receive') as mock_mqtt_init_receive:
+
+        app.start()
+
+        mock_working_time_check.assert_called_once()
+        mock_camera_start.assert_called_once()
+        mock_mqtt_connect.assert_called_once()
+        mock_mqtt_init_receive.assert_called_once()
+
+        # Check order
+        expected_order = [
+            call(),
+            call(),
+            call(),
+            call()
+        ]
+        actual_order = (
+            mock_working_time_check.mock_calls +
+            mock_camera_start.mock_calls +
+            mock_mqtt_connect.mock_calls +
+            mock_mqtt_init_receive.mock_calls
+        )
+        assert actual_order == expected_order
