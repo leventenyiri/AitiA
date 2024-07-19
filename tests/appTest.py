@@ -1,4 +1,6 @@
 import pytest
+import json
+import numpy as np
 from unittest.mock import patch
 from app import App
 from camera import Camera
@@ -60,3 +62,43 @@ def test_night_mode(mock_shutdown, mock_get_time, app):
     }
     app.working_time_check()
     mock_shutdown.assert_not_called()
+
+
+@patch('utils.CPUTemperature', autospec=True)
+@patch('utils.get_cpu_temperature')
+def test_create_message_valid_input(mock_get_cpu_temperature, MockCPUTemperature, app):
+    # Mock the temperature attribute of the CPUTemperature instance
+    MockCPUTemperature.return_value.temperature = 45.6
+    image = np.random.randint(0, 256, (480, 640), dtype=np.uint8)
+    timestamp = '2024-07-19T12:00:00Z'
+
+    message = app.create_message(image, timestamp)
+    message_dict = json.loads(message)
+
+    assert message_dict['timestamp'] == timestamp
+    assert message_dict['CPU_temperature'] == 45.6
+    assert message_dict['image'] is not None
+
+
+@patch('utils.CPUTemperature', autospec=True)
+@patch('utils.get_cpu_temperature')
+def test_create_message_invalid_image(mock_get_cpu_temperature, MockCPUTemperature, app):
+    # Mock the temperature attribute of the CPUTemperature instance
+    MockCPUTemperature.return_value.temperature = 45.6
+    image = "Invalid image data"
+    timestamp = '2024-07-19T12:00:00Z'
+
+    with pytest.raises(Exception):
+        app.create_message(image, timestamp)
+
+
+@patch('utils.CPUTemperature', autospec=True)
+@patch('utils.get_cpu_temperature')
+def test_create_message_invalid_cpu_temp_read(mock_get_cpu_temperature, MockCPUTemperature, app):
+    # Mock the temperature attribute of the CPUTemperature instance
+    MockCPUTemperature.side_effect = Exception('CPU temperature reading error')
+    image = np.random.randint(0, 256, (480, 640), dtype=np.uint8)
+    timestamp = '2024-07-19T12:00:00Z'
+
+    with pytest.raises(Exception):
+        app.create_message(image, timestamp)
