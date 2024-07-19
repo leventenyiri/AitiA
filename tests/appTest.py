@@ -103,3 +103,20 @@ def test_create_message_invalid_cpu_temp_read(mock_get_cpu_temperature, MockCPUT
 
     with pytest.raises(Exception):
         app.create_message(image, timestamp)
+
+
+@patch('camera.Camera.capture')
+@patch('utils.RTC.get_time')
+@patch('app.App.create_message')
+@patch('mqtt.MQTT.publish')
+def test_run_success(mock_publish, mock_create_message, mock_get_time, mock_capture, app):
+    mock_capture.return_value = 'mock_image_data'
+    mock_get_time.return_value = '2024-07-19T10:10:10'
+    mock_create_message.return_value = 'mock_message'
+
+    app.run()
+
+    mock_capture.assert_called_once()
+    mock_get_time.assert_called_once()
+    mock_create_message.assert_called_once_with('mock_image_data', '2024-07-19T10:10:10')
+    mock_publish.assert_called_once_with('mock_message')
