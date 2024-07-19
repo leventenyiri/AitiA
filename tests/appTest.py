@@ -9,6 +9,8 @@ from mqtt import MQTT
 from static_config import CONFIG_PATH
 
 
+# Need to make tests for config.json: checking the validity of the config data
+
 @pytest.fixture
 def app():
     return App(CONFIG_PATH)
@@ -64,7 +66,7 @@ def test_load_config_missing_key(valid_config):
     assert basic_config == {
         "quality": "3K",
         "mode": "single-shot",
-        "period": "0:0:50",
+        "period": "0:0:50",    # Change this to int
         "manual_camera_settings_on": False,
         "wake_up_time": "06:59:31",
         "shut_down_time": "22:00:00"

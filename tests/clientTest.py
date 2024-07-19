@@ -1,6 +1,19 @@
 """ from client import main
+from app import App
 from unittest.mock import patch
 import unittest
+import pytest
+from utils import Logger, LOG_CONFIG_PATH, CONFIG_PATH
+
+
+@pytest.fixture
+def logger():
+    return Logger(LOG_CONFIG_PATH)
+
+
+@pytest.fixture
+def app():
+    return App(CONFIG_PATH)
 
 
 class TestMainFunction(unittest.TestCase):
