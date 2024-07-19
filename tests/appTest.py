@@ -225,7 +225,8 @@ def test_load_config_extra_keys():
     ('2024-07-19T08:00:00', '06:00:00', '20:00:00', False),  # Working hours
     ('2024-07-19T05:00:00', '20:00:00', '06:00:00', False),
 ])
-def test_working_time_check(mock_shutdown, mock_get_time, app, current_time, wake_up_time, shut_down_time, should_shutdown):
+def test_working_time_check(mock_shutdown, mock_get_time, app, current_time,
+                            wake_up_time, shut_down_time, should_shutdown):
     app.basic_config = {
         "wake_up_time": wake_up_time,
         "shut_down_time": shut_down_time
