@@ -146,6 +146,7 @@ class App:
             self.mqtt.publish(message)
         except Exception as e:
             logging.error(f"Error in run method: {e}")
+            raise
 
     def run_always(self):
         while True:

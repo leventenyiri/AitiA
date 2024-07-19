@@ -274,14 +274,28 @@ def test_create_message(mock_get_cpu_temperature, MockCPUTemperature, app, image
 @patch('utils.RTC.get_time')
 @patch('app.App.create_message')
 @patch('mqtt.MQTT.publish')
-def test_run_success(mock_publish, mock_create_message, mock_get_time, mock_capture, app):
-    mock_capture.return_value = 'mock_image_data'
-    mock_get_time.return_value = '2024-07-19T10:10:10'
-    mock_create_message.return_value = 'mock_message'
+@pytest.mark.parametrize("image_data, timestamp, message, expected_exception", [
+    ('mock_image_data', '2024-07-19T10:10:10', 'mock_message', None),       # Valid input
+    ('invalid_image', '2024-07-19T10:10:10', None, Exception),              # Invalid image data
+    ('mock_image_data', 'invalid_timestamp', None, Exception),              # Invalid timestamp format
+    ('mock_image_data', '2024-07-19T10:10:10', 'mock_message', Exception),  # Exception in create_message
+])
+def test_run(mock_publish, mock_create_message, mock_get_time, mock_capture,
+             app, image_data, timestamp, message, expected_exception):
 
-    app.run()
+    mock_capture.return_value = image_data
+    mock_get_time.return_value = timestamp
+    mock_create_message.return_value = message
 
-    mock_capture.assert_called_once()
-    mock_get_time.assert_called_once()
-    mock_create_message.assert_called_once_with('mock_image_data', '2024-07-19T10:10:10')
-    mock_publish.assert_called_once_with('mock_message')
+    if expected_exception:
+        mock_publish.side_effect = expected_exception
+
+    if expected_exception:
+        with pytest.raises(expected_exception):
+            app.run()
+    else:
+        app.run()
+        mock_capture.assert_called_once()
+        mock_get_time.assert_called_once()
+        mock_create_message.assert_called_once_with(image_data, timestamp)
+        mock_publish.assert_called_once_with(message)
