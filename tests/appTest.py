@@ -64,11 +64,12 @@ def test_night_mode(mock_shutdown, mock_get_time, app):
     mock_shutdown.assert_not_called()
 
 
-@patch('utils.CPUTemperature', autospec=True)
+@patch('utils.CPUTemperature')
 @patch('utils.get_cpu_temperature')
 def test_create_message_valid_input(mock_get_cpu_temperature, MockCPUTemperature, app):
     # Mock the temperature attribute of the CPUTemperature instance
-    MockCPUTemperature.return_value.temperature = 45.6
+    mock_temp_instance = MockCPUTemperature.return_value
+    mock_temp_instance.temperature = 45.6
     image = np.random.randint(0, 256, (480, 640), dtype=np.uint8)
     timestamp = '2024-07-19T12:00:00Z'
 
