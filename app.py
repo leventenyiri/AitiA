@@ -10,7 +10,22 @@ from utils import log_execution_time, get_cpu_temperature, RTC, System
 import time
 import sys
 
-
+def deep_merge(default, update):
+    """
+    Recursively merge two dictionaries, preferring values from 'update',
+    but only for keys that exist in 'default'.
+    """
+    result = default.copy()
+    
+    common_keys = set(default.keys()) & set(update.keys())
+    
+    for key in common_keys:
+        if all(isinstance(d.get(key), dict) for d in (default, update)):
+            result[key] = deep_merge(default[key], update[key])
+        else:
+            result[key] = update[key]
+    
+    return result
 class App:
     def __init__(self, config_path):
         self.camera_config, self.basic_config = self.load_config(config_path)
@@ -19,16 +34,31 @@ class App:
 
     @staticmethod
     def load_config(path):
+        # Define default values
+        default_config = {
+            "Basic": {
+                "quality": "3K",
+                "mode": "single-shot",
+                "period": "0:0:50",
+                "manual_camera_settings_on": False,
+                "wake_up_time": "06:59:31",
+                "shut_down_time": "22:00:00"
+            },
+            "Camera": {
+                "quality": 95,
+                "width": 3840,
+                "height": 2160
+            }
+        }
+
         try:
             with open(path, 'r') as file:
                 data = json.load(file)
-
-            camera_config = data.get('Camera')
-            basic_config = data.get('Basic')
-
-            if camera_config is None or basic_config is None:
-                raise KeyError("Key not found in the config file")
-
+        
+            # Use a deep merge function to combine loaded data with defaults
+            camera_config = deep_merge(default_config['Camera'], data.get('Camera', {}))
+            basic_config = deep_merge(default_config['Basic'], data.get('Basic', {}))
+        
             return camera_config, basic_config
 
         except json.JSONDecodeError as e:
@@ -37,12 +67,10 @@ class App:
         except FileNotFoundError as e:
             logging.error(f"Config file not found: {path} - {str(e)}")
             exit(1)
-        except KeyError as e:
-            logging.error(e)
-            exit(1)
         except Exception as e:
-            logging.error(e)
+            logging.error(f"Unexpected error loading config: {e}")
             exit(1)
+
 
     def working_time_check(self):
         wake_up_time = datetime.strptime(self.basic_config["wake_up_time"], "%H:%M:%S").time()
