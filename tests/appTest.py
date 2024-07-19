@@ -217,89 +217,56 @@ def test_load_config_extra_keys():
     assert "ExtraSection" not in camera_config and "ExtraSection" not in basic_config
 
 
-@patch('utils.RTC.get_time', return_value='2024-07-19T10:00:00')
+@patch('utils.RTC.get_time')
 @patch('utils.System.shutdown')
-def test_working_hours(mock_shutdown, mock_get_time, app):
+@pytest.mark.parametrize("current_time, wake_up_time, shut_down_time, should_shutdown", [
+    ('2024-07-19T22:00:00', '06:00:00', '20:00:00', True),   # After shut down time
+    ('2024-07-19T05:00:00', '06:00:00', '20:00:00', True),   # Before wake up time
+    ('2024-07-19T08:00:00', '06:00:00', '20:00:00', False),  # Working hours
+    ('2024-07-19T05:00:00', '20:00:00', '06:00:00', False),
+])
+def test_working_time_check(mock_shutdown, mock_get_time, app, current_time, wake_up_time, shut_down_time, should_shutdown):
     app.basic_config = {
-        "wake_up_time": "06:00:00",
-        "shut_down_time": "20:00:00"
+        "wake_up_time": wake_up_time,
+        "shut_down_time": shut_down_time
     }
+    mock_get_time.return_value = current_time
+
     app.working_time_check()
-    mock_shutdown.assert_not_called()
 
-
-@patch('utils.RTC.get_time', return_value='2024-07-19T22:00:00')
-@patch('utils.System.shutdown')
-def test_shutdown_after_shut_down_time(mock_shutdown, mock_get_time, app):
-    app.basic_config = {
-        "wake_up_time": "06:00:00",
-        "shut_down_time": "20:00:00"
-    }
-    app.working_time_check()
-    mock_shutdown.assert_called_once()
-
-
-@patch('utils.RTC.get_time', return_value='2024-07-19T05:00:00')
-@patch('utils.System.shutdown')
-def test_shutdown_before_wake_up_time(mock_shutdown, mock_get_time, app):
-    app.basic_config = {
-        "wake_up_time": "06:00:00",
-        "shut_down_time": "20:00:00"
-    }
-    app.working_time_check()
-    mock_shutdown.assert_called_once()
-
-
-@patch('utils.RTC.get_time', return_value='2024-07-19T02:00:00')
-@patch('utils.System.shutdown')
-def test_night_mode(mock_shutdown, mock_get_time, app):
-    app.basic_config = {
-        "wake_up_time": "20:00:00",
-        "shut_down_time": "06:00:00"
-    }
-    app.working_time_check()
-    mock_shutdown.assert_not_called()
+    if should_shutdown:
+        mock_shutdown.assert_called_once()
+    else:
+        mock_shutdown.assert_not_called()
 
 
 @patch('utils.CPUTemperature')
 @patch('utils.get_cpu_temperature')
-def test_create_message_valid_input(mock_get_cpu_temperature, MockCPUTemperature, app):
-    # Mock the temperature attribute of the CPUTemperature instance
-    mock_temp_instance = MockCPUTemperature.return_value
-    mock_temp_instance.temperature = 45.6
-    image = np.random.randint(0, 256, (480, 640), dtype=np.uint8)
+@pytest.mark.parametrize("image, mock_temp, exception_expected", [
+    (np.random.randint(0, 256, (480, 640), dtype=np.uint8), 45.6, None),  # Valid input
+    ("Invalid image data", 45.6, Exception),  # Invalid image data
+    (np.random.randint(0, 256, (480, 640), dtype=np.uint8), Exception(
+        'CPU temperature reading error'), Exception)  # Invalid CPU temp read
+])
+def test_create_message(mock_get_cpu_temperature, MockCPUTemperature, app, image, mock_temp, exception_expected):
+    if isinstance(mock_temp, Exception):
+        MockCPUTemperature.side_effect = mock_temp
+    else:
+        mock_temp_instance = MockCPUTemperature.return_value
+        mock_temp_instance.temperature = mock_temp
+
     timestamp = '2024-07-19T12:00:00Z'
 
-    message = app.create_message(image, timestamp)
-    message_dict = json.loads(message)
+    if exception_expected:
+        with pytest.raises(exception_expected):
+            app.create_message(image, timestamp)
+    else:
+        message = app.create_message(image, timestamp)
+        message_dict = json.loads(message)
 
-    assert message_dict['timestamp'] == timestamp
-    assert message_dict['CPU_temperature'] == 45.6
-    assert message_dict['image'] is not None
-
-
-@patch('utils.CPUTemperature', autospec=True)
-@patch('utils.get_cpu_temperature')
-def test_create_message_invalid_image(mock_get_cpu_temperature, MockCPUTemperature, app):
-    # Mock the temperature attribute of the CPUTemperature instance
-    MockCPUTemperature.return_value.temperature = 45.6
-    image = "Invalid image data"
-    timestamp = '2024-07-19T12:00:00Z'
-
-    with pytest.raises(Exception):
-        app.create_message(image, timestamp)
-
-
-@patch('utils.CPUTemperature', autospec=True)
-@patch('utils.get_cpu_temperature')
-def test_create_message_invalid_cpu_temp_read(mock_get_cpu_temperature, MockCPUTemperature, app):
-    # Mock the temperature attribute of the CPUTemperature instance
-    MockCPUTemperature.side_effect = Exception('CPU temperature reading error')
-    image = np.random.randint(0, 256, (480, 640), dtype=np.uint8)
-    timestamp = '2024-07-19T12:00:00Z'
-
-    with pytest.raises(Exception):
-        app.create_message(image, timestamp)
+        assert message_dict['timestamp'] == timestamp
+        assert message_dict['CPU_temperature'] == mock_temp
+        assert message_dict['image'] is not None
 
 
 @patch('camera.Camera.capture')
