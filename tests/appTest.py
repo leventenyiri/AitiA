@@ -40,7 +40,7 @@ def test_shutdown_after_shut_down_time(mock_shutdown, mock_get_time, app):
     mock_shutdown.assert_called_once()
 
 
-@patch('utils.RTC.get_time', return_value='2024-07-19T02:00:00')
+@patch('utils.RTC.get_time', return_value='2024-07-19T05:00:00')
 @patch('utils.System.shutdown')
 def test_shutdown_before_wake_up_time(mock_shutdown, mock_get_time, app):
     app.basic_config = {
