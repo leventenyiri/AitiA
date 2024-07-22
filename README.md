@@ -39,6 +39,14 @@ Detecting starling swarms.
   - Optimizing the OS boot time
   - RTC and internal time doesn't match ask for time set
   - Make reading config more robust -> if there were an error in the received config.json (i.e: missing key), then dont copy the temp_config.json into the real one, and ask for a resend over mqtt
+  - Improving bash script
+    
+- [ ] **Effective Range dependencies**
+  - Current measuring
+  - RTC wake up API
+  - shutdown API
+  - battery charging driver
+  - 3D case and battery case
 
 Roadmap:
 https://github.com/users/borditamas/projects/2/views/4
