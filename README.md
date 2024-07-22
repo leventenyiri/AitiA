@@ -17,7 +17,7 @@ Detecting starling swarms.
   - Setup: https://forums.raspberrypi.com/viewtopic.php?t=85683&sid=cf6676b19d36bf0d5bb0709b0152a900
 
 - [ ] **Workflow**
-  - Unit tests
+  - Unit tests -> Integration tests -> Sytem tests
   - Workflow, setup.py files
   - CI
     
@@ -38,6 +38,7 @@ Detecting starling swarms.
   - Implementing periodic running: -> with shut down, and without shut down
   - Optimizing the OS boot time
   - RTC and internal time doesn't match ask for time set
+  - Make reading config more robust -> if there were an error in the received config.json (i.e: missing key), then dont copy the temp_config.json into the real one, and ask for a resend over mqtt
 
 Roadmap:
 https://github.com/users/borditamas/projects/2/views/4

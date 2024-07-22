@@ -7,6 +7,7 @@ try:
     from paho.mqtt import client as mqtt_client
 except ImportError:
     mqtt_client = None
+import json
 
 
 class MQTT:
@@ -22,16 +23,23 @@ class MQTT:
     def init_receive(self):
         def on_message(client, userdata, msg):
             try:
-                with open(TEMP_CONFIG_PATH, "wb") as temp_config:
-                    temp_config.write(msg.payload)
+                # Parse the JSON message
+                config_data = json.loads(msg.payload)
+
+                # Write the formatted JSON to the temp file
+                with open(TEMP_CONFIG_PATH, "w") as temp_config:
+                    json.dump(config_data, temp_config, indent=4)
+
                 logging.info(f"Received config to {TEMP_CONFIG_PATH}")
 
+                # Copy the file
                 shutil.copyfile(TEMP_CONFIG_PATH, CONFIG_PATH)
                 logging.info(f"Config saved to {CONFIG_PATH}")
 
+            except json.JSONDecodeError as e:
+                logging.error(f"Invalid JSON received: {e}")
             except Exception as e:
-                logging.error(e)
-                # TODO: ask for config resend
+                logging.error(f"Error processing message: {e}")
 
         self.client.on_message = on_message
         self.client.subscribe(self.subtopic)
@@ -49,20 +57,17 @@ class MQTT:
             if reason_code == 0:
                 logging.info("Disconnected voluntarily.")
                 return
-
             logging.error(f"Involuntary disconnect. Reason code: {reason_code}")
 
-            if self.reconnect_counter == 0:
-                self.client.reconnect(self.broker, self.port)
-            elif 1 <= self.reconnect_counter <= 4:
-                time.sleep(2)
+            self.reconnect_counter += 1
+
+            if self.reconnect_counter <= 5:
                 logging.info(f"Trying to reconnect: {self.reconnect_counter} out of 5")
-                self.client.reconnect(self.broker, self.port)
-            elif self.reconnect_counter == 5:
+                time.sleep(2)  # Sleep for all reconnection attempts
+                self.client.reconnect()
+            else:
                 logging.critical("Couldn't reconnect 5 times, rebooting...")
                 exit(2)
-
-            self.reconnect_counter += 1
 
         self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
         self.client.on_connect = on_connect

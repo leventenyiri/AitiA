@@ -11,6 +11,24 @@ import time
 import sys
 
 
+def deep_merge(default, update):
+    """
+    Recursively merge two dictionaries, preferring values from 'update',
+    but only for keys that exist in 'default'.
+    """
+    result = default.copy()
+
+    common_keys = set(default.keys()) & set(update.keys())
+
+    for key in common_keys:
+        if all(isinstance(d.get(key), dict) for d in (default, update)):
+            result[key] = deep_merge(default[key], update[key])
+        else:
+            result[key] = update[key]
+
+    return result
+
+
 class App:
     def __init__(self, config_path):
         self.camera_config, self.basic_config = self.load_config(config_path)
@@ -19,15 +37,30 @@ class App:
 
     @staticmethod
     def load_config(path):
+        # Define default values
+        default_config = {
+            "Basic": {
+                "quality": "3K",
+                "mode": "single-shot",
+                "period": "0:0:50",
+                "manual_camera_settings_on": False,
+                "wake_up_time": "06:59:31",
+                "shut_down_time": "22:00:00"
+            },
+            "Camera": {
+                "quality": 95,
+                "width": 3840,
+                "height": 2160
+            }
+        }
+
         try:
             with open(path, 'r') as file:
                 data = json.load(file)
 
-            camera_config = data.get('Camera')
-            basic_config = data.get('Basic')
-
-            if camera_config is None or basic_config is None:
-                raise KeyError("Key not found in the config file")
+            # Use a deep merge function to combine loaded data with defaults
+            camera_config = deep_merge(default_config['Camera'], data.get('Camera', {}))
+            basic_config = deep_merge(default_config['Basic'], data.get('Basic', {}))
 
             return camera_config, basic_config
 
@@ -37,11 +70,8 @@ class App:
         except FileNotFoundError as e:
             logging.error(f"Config file not found: {path} - {str(e)}")
             exit(1)
-        except KeyError as e:
-            logging.error(e)
-            exit(1)
         except Exception as e:
-            logging.error(e)
+            logging.error(f"Unexpected error loading config: {e}")
             exit(1)
 
     def working_time_check(self):
@@ -49,16 +79,10 @@ class App:
         shut_down_time = datetime.strptime(self.basic_config["shut_down_time"], "%H:%M:%S").time()
 
         utc_time = datetime.fromisoformat(RTC.get_time())
+        current_time = utc_time.time()
 
-        # Add two hours, because the RTC is in UTC, and Budapest is two hours ahead
-        adjusted_time = utc_time + timedelta(hours=2)
-
-        current_time = adjusted_time.time()
-
-        logging.info("working_time_check called \n")
         logging.info(
             f"wake up time is : {wake_up_time}, shutdown time is : {shut_down_time}, current time is : {current_time}")
-        logging.info(f"If true it can compare correctly : {current_time >= shut_down_time}")
 
         # If e.g: wake up time = 6:00:00 and shutdown time = 20:00:00
         if (wake_up_time < shut_down_time) and (wake_up_time > current_time or current_time >= shut_down_time):
@@ -96,10 +120,6 @@ class App:
             logging.error(f"Problem creating the message: {e}")
             raise
 
-    def resize_image(self, image, max_size=(800, 600)):
-        image.thumbnail(max_size, Image.LANCZOS)
-        return image
-
     @log_execution_time("Starting the app")
     def start(self):
         self.working_time_check()
@@ -126,6 +146,7 @@ class App:
             self.mqtt.publish(message)
         except Exception as e:
             logging.error(f"Error in run method: {e}")
+            raise
 
     def run_always(self):
         while True:
@@ -133,13 +154,11 @@ class App:
 
     # Need RTC API for the implementation
     def run_periodically(self, period):
-        period_seconds = self.parse_period(period)
-
         start_time = time.time()
         self.run()
 
         elapsed_time = time.time() - start_time
-        remaining_time = period_seconds - elapsed_time
+        remaining_time = period - elapsed_time
 
         if remaining_time > 120:  # If more than 2 minutes left
             # Calculate wake-up time
@@ -153,8 +172,3 @@ class App:
         else:
             logging.info(f"Sleeping for {remaining_time} seconds")
             time.sleep(remaining_time)
-
-    @staticmethod
-    def parse_period(period):
-        hours, minutes, seconds = map(int, period.split(':'))
-        return hours * 3600 + minutes * 60 + seconds
