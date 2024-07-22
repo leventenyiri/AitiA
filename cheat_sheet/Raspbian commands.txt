@@ -16,3 +16,5 @@ RTC:
     cat /sys/class/rtc/rtc0/time
     timedatectl
     clock sync: sudo hwclock --systohc
+
+network interface restart: sudo ip link set wlan0 down && sudo ip link set wla0 up
