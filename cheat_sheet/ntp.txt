@@ -1,0 +1,16 @@
+Timesync ntp-vel:
+    Bme-s wifiről firewall issue miatt nem működik, telefonos hotspotról ment.
+
+Lépések:
+
+    sudo timedatectl set-timezone Europe/Budapest
+    sudo nano /etc/systemd/timesyncd.conf – ba beírni ezt:
+
+    [Time]                                                                                                                  
+    NTP=time.google.com
+    FallbackNTP=time.cloudflare.com 0.debian.pool.ntp.org 1.debian.pool.ntp.org 2.debian.pool.ntp.org                       
+    RootDistanceMaxSec=30
+    sudo timedatectl set-ntp true
+
+Ha csintalankodik:
+    restart network interface: sudo ip link set wlan0 down && sudo ip link set wlan0 up
