@@ -1,0 +1,4 @@
+Release:
+git commit ...
+git tag v*.*.*
+git push origin v*.*.*
