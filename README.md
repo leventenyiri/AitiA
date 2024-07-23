@@ -44,7 +44,7 @@ Detecting starling swarms.
   - Current measuring
   - RTC wake up API
   - shutdown API
-  - battery charging driver
+  - battery charging driver ✅
   - 3D case and battery case
 
 Roadmap:
