@@ -10,11 +10,22 @@ transfer file: scp ~/AitiA/client.py admin@192.168.0.101:/home/admin/MQTT
 delete: rm -r filename
 
 set pi clock: ~$ date -R | ssh admin@192.168.0.109 'sudo tee /tmp/date.txt > /dev/null && sudo date --set="$(cat /tmp/date.txt)" && sudo rm /tmp/date.txt'
-              ~$ sudo date -s "2024-07-22 10:48:30"
+
 RTC:
+
+    Ez alapján setup: https://github.com/EffectiveRange/drv-rx8130ce
+    Ha innen le van töltve és át scp-zve a deb package, akkor: sudo dpkg -i mrhat-rx8130_0.1.0-1_all.deb
+    lsmod | grep rtc -nél látni kell, az rtc_ds1307-et
+    Még hasznos command check-hez: dtc -I fs /proc/device-tree 2>/dev/null | grep -A10 "rtc@32"
+    cat /boot/config.txt -bele kerültek-e a dolgok
 
     cat /sys/class/rtc/rtc0/time
     timedatectl
     clock sync: sudo hwclock --systohc
 
 network interface restart: sudo ip link set wlan0 down && sudo ip link set wla0 up
+
+Battery:
+
+    fw-t átrakni pi-re
+    sudo picprogrammer -w --hex -f fw-mrhat.production.hex
