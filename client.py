@@ -2,7 +2,6 @@ from app import App
 from utils import Logger, log_execution_time
 from static_config import LOG_CONFIG_PATH, CONFIG_PATH
 import logging
-# import cProfile
 
 
 @log_execution_time("Application runtime")
@@ -11,8 +10,6 @@ def main():
     logger.start()
 
     app = App(CONFIG_PATH)
-    # We check if we are withing working hours, if not we shut down the device
-    # app.working_time_check()
     app.start()
 
     try:
@@ -31,7 +28,5 @@ def main():
 
 
 if __name__ == "__main__":
-
-    # cProfile.run(main)
     main()
-    logging.info("Aplication has stopped\n")
+    logging.info("Application has stopped\n")
