@@ -26,4 +26,4 @@ jobs:
       - name: Verify changes
         uses: EffectiveRange/python-verify-github-action@v1
         with:
-          coverage-threshold: '10'
+          coverage-threshold: '80'
