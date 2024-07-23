@@ -37,8 +37,7 @@ Detecting starling swarms.
   - Unit, integration testing
   - Implementing periodic running: -> with shut down, and without shut down
   - Optimizing the OS boot time
-  - RTC and internal time doesn't match ask for time set
-  - Make reading config more robust -> if there were an error in the received config.json (i.e: missing key), then dont copy the temp_config.json into the real one, and ask for a resend over mqtt
+  - If RTC and internal time doesn't match ask for time set
   - Improving bash script
     
 - [ ] **Effective Range dependencies**
