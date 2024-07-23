@@ -1,4 +1,6 @@
 sudo systemctl disable keyboard-setup.service
+sudo systemctl disable fake-hwclock.service
+sudo systemctl disable rpi-display-backlight.service
 
 /boot/config.txt (add dtoverlay=disable-bt ) -> sudo systemctl disable bluetooth.service
 
