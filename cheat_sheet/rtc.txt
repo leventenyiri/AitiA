@@ -1,0 +1,14 @@
+RTC:
+    Ez alapján setup: https://github.com/EffectiveRange/drv-rx8130ce
+    Ha innen le van töltve és át scp-zve a deb package, akkor: sudo dpkg -i mrhat-rx8130_0.1.0-1_all.deb
+    lsmod | grep rtc -nél látni kell, az rtc_ds1307-et
+    Még hasznos command check-hez: dtc -I fs /proc/device-tree 2>/dev/null | grep -A10 "rtc@32"
+    cat /boot/config.txt -bele kerültek-e a dolgok
+
+    cat /sys/class/rtc/rtc0/time
+    timedatectl
+    clock sync: sudo hwclock --systohc
+
+sudo rtctest
+hwclock -r
+sudo hwclock --systohc

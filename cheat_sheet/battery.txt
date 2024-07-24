@@ -1,0 +1,8 @@
+Battery:
+    fw-t átrakni pi-re
+    sudo picprogrammer -w --hex -f fw-mrhat.production.hex
+    
+sudo apt install upower
+upower -i /org/freedesktop/UPower/devices/battery_bq2562x_battery
+cat /sys/class/power_supply/bq2562x-battery/uevent
+cat /sys/class/power_supply/bq2562x-charger/uevent
