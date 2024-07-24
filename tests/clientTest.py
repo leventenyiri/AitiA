@@ -1,19 +1,22 @@
+import time
+import threading
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 import json
 from datetime import datetime
 import pytz
 import numpy as np
 from app import App
-from utils import System
+from utils import System, CPUTemperature
 
-
-# need to test periodic mode as well
 
 @pytest.fixture
 def mock_mqtt():
     with patch('app.MQTT', autospec=True) as mock_mqtt:
-        yield mock_mqtt.return_value
+        mock_mqtt_instance = mock_mqtt.return_value
+        mock_mqtt_instance.client = MagicMock()
+        mock_mqtt_instance.client.is_connected.return_value = False  # Start disconnected
+        yield mock_mqtt_instance
 
 
 @pytest.fixture
@@ -79,6 +82,7 @@ def test_single_shot_mode(app):
     app.camera.start.assert_called_once()
     app.camera.capture.assert_called_once()
     app.mqtt.connect.assert_called_once()
+    app.mqtt.init_receive.assert_called_once()
     app.mqtt.publish.assert_called_once()
     System.shutdown.assert_not_called()
 

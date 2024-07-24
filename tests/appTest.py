@@ -278,18 +278,23 @@ def test_create_message(mock_get_cpu_temperature, MockCPUTemperature, app, image
 @patch('utils.RTC.get_time')
 @patch('app.App.create_message')
 @patch('mqtt.MQTT.publish')
-@pytest.mark.parametrize("image_data, timestamp, message, expected_exception", [
-    # ('mock_image_data', '2024-07-19T10:10:10', 'mock_message', None),       # Valid input
-    ('invalid_image', '2024-07-19T10:10:10', None, Exception),              # Invalid image data
-    ('mock_image_data', 'invalid_timestamp', None, Exception),              # Invalid timestamp format
-    ('mock_image_data', '2024-07-19T10:10:10', 'mock_message', Exception),  # Exception in create_message
+@patch('mqtt.mqtt_client.Client.is_connected')  # Change this line
+@patch('app.App.connect_mqtt')
+@pytest.mark.parametrize("image_data, timestamp, message, is_connected, expected_exception", [
+    ('mock_image_data', '2024-07-19T10:10:10', 'mock_message', True, None),  # Valid input, connected
+    ('mock_image_data', '2024-07-19T10:10:10', 'mock_message', False, None),  # Valid input, not connected
+    ('invalid_image', '2024-07-19T10:10:10', None, True, Exception),         # Invalid image data
+    ('mock_image_data', 'invalid_timestamp', None, True, Exception),         # Invalid timestamp format
+    ('mock_image_data', '2024-07-19T10:10:10', 'mock_message', True, Exception),  # Exception in publish
 ])
-def test_run(mock_publish, mock_create_message, mock_get_time, mock_capture,
-             app, image_data, timestamp, message, expected_exception):
+def test_run(mock_connect_mqtt, mock_is_connected, mock_publish, mock_create_message,
+             mock_get_time, mock_capture, app, image_data, timestamp, message,
+             is_connected, expected_exception):
 
     mock_capture.return_value = image_data
     mock_get_time.return_value = timestamp
     mock_create_message.return_value = message
+    mock_is_connected.return_value = is_connected
 
     if expected_exception:
         mock_publish.side_effect = expected_exception
@@ -302,6 +307,8 @@ def test_run(mock_publish, mock_create_message, mock_get_time, mock_capture,
         mock_capture.assert_called_once()
         mock_get_time.assert_called_once()
         mock_create_message.assert_called_once_with(image_data, timestamp)
+        if not is_connected:
+            mock_connect_mqtt.assert_called_once()
         mock_publish.assert_called_once_with(message)
 
 
