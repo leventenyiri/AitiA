@@ -3,8 +3,19 @@
 # Redirect all output to a log file
 exec > >(tee -a /home/admin/MQTT/bash_script.log) 2>&1
 
+echo "Starting bash script at $(date)"
+
+# Function to read Python config
+read_config() {
+    python3 -c "from static_config import $1; print($1)"
+}
+
+# Read MQTT broker and port from config
+BROKER=$(read_config "BROKER")
+PORT=$(read_config "PORT")
+
 check_mqtt() {
-    nc -z -w 5 192.168.0.103 1883
+    nc -z -w 5 $BROKER $PORT
 }
 
 # Function to check MQTT broker connectivity with retries
@@ -29,8 +40,6 @@ if ! check_mqtt_with_retry; then
     exit 1
 fi
 echo "$(date '+%Y-%m-%d %H:%M:%S') - MQTT broker is reachable"
-
-echo "Starting bash script at $(date)"
 
 # Set the working directory
 cd /home/admin/MQTT
@@ -76,7 +85,7 @@ while true; do
     echo "Python script exited with code $EXIT_CODE after $runtime seconds"
 
     if [ $EXIT_CODE -eq 0 ]; then
-        echo "Script exited normally with code 0. Continuing..."
+        echo "Script exited normally with code 0. Shutting down..."
         RESTART_COUNT=0
         echo "$RESTART_COUNT" > "$RESTART_COUNT_FILE"
         exit 0
