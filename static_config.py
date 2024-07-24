@@ -11,6 +11,6 @@ BROKER = "192.168.0.104"
 PORT = 1883
 PUBTOPIC = "mqtt/rpi/image"
 SUBTOPIC = "settings/er-edge"
-QOS = 0
+QOS = 2
 USERNAME = "er-edge-3c547181"
 PASSWORD = "admin"

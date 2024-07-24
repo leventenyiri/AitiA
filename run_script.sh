@@ -5,42 +5,6 @@ exec > >(tee -a /home/admin/MQTT/bash_script.log) 2>&1
 
 echo "Starting bash script at $(date)"
 
-# Function to read Python config
-read_config() {
-    python3 -c "from static_config import $1; print($1)"
-}
-
-# Read MQTT broker and port from config
-BROKER=$(read_config "BROKER")
-PORT=$(read_config "PORT")
-
-check_mqtt() {
-    nc -z -w 5 $BROKER $PORT
-}
-
-# Function to check MQTT broker connectivity with retries
-check_mqtt_with_retry() {
-    local max_attempts=12
-    local attempt=1
-    while [ $attempt -le $max_attempts ]; do
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - MQTT broker check attempt $attempt of $max_attempts"
-        if check_mqtt; then
-            return 0
-        fi
-        attempt=$((attempt + 1))
-        sleep 5
-    done
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - MQTT broker check failed after $max_attempts attempts"
-    return 1
-}
-
-echo "$(date '+%Y-%m-%d %H:%M:%S') - Starting MQTT broker checks"
-if ! check_mqtt_with_retry; then
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - Failed to connect to MQTT broker. Exiting."
-    exit 1
-fi
-echo "$(date '+%Y-%m-%d %H:%M:%S') - MQTT broker is reachable"
-
 # Set the working directory
 cd /home/admin/MQTT
 echo "Current working directory: $(pwd)"

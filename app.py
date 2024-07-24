@@ -126,24 +126,36 @@ class App:
         # Start the camera
         self.camera.start()
 
+    def connect_mqtt(self):
         # Start the MQTT
         self.mqtt.connect()
         self.mqtt.init_receive()
 
+    def get_message(self):
+        # Capture the image
+        image_raw = self.camera.capture()
+
+        # Get the timestamp
+        timestamp = RTC.get_time()
+
+        # Create the message
+        message = self.create_message(image_raw, timestamp)
+
+        return message
+
     @log_execution_time("Taking a picture and sending it")
     def run(self):
         try:
-            # Capture the image
-            image_raw = self.camera.capture()
+            # Capturing the image, getting timestamp, creating message as soon as possible, while network is booting
+            message = self.get_message()
 
-            # Get the timestamp
-            timestamp = RTC.get_time()
-
-            # Create the message
-            message = self.create_message(image_raw, timestamp)
+            # If we are not connected to the broker, connect to it in a blocking fashion
+            if not self.mqtt.client.is_connected():
+                self.connect_mqtt()
 
             # Publish the message
             self.mqtt.publish(message)
+
         except Exception as e:
             logging.error(f"Error in run method: {e}")
             raise

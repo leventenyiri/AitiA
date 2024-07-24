@@ -8,6 +8,7 @@ try:
 except ImportError:
     mqtt_client = None
 import json
+import socket
 
 
 class MQTT:
@@ -17,7 +18,7 @@ class MQTT:
         self.subtopic = SUBTOPIC
         self.port = PORT
         self.qos = QOS
-        self.client = None
+        self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
         self.reconnect_counter = 0
 
     def init_receive(self):
@@ -48,10 +49,22 @@ class MQTT:
         def on_connect(client, userdata, flags, rc, properties=None):
             if rc == 0:
                 logging.info("Connected to MQTT Broker!")
-                # We need to reset the counter if the connection was successful
-                self.reconnect_counter = 0
             else:
                 logging.error(f"Failed to connect, return code {rc}")
+
+        self.client.on_connect = on_connect
+        self.client.username_pw_set(USERNAME, PASSWORD)
+        self.client.enable_logger()
+
+        """ while True:
+            try:
+                logging.info("Attempting to connect to MQTT broker...")
+                self.client.connect(self.broker, self.port)
+                self.client.loop_start()
+                break  # If connection succeeds, break out of the loop
+            except Exception as e:
+                logging.error(f"Connection failed: {e}. Retrying in 1 seconds...")
+                time.sleep(2) """
 
         def on_disconnect(client, userdata, disconnect_flags, reason_code, properties=None):
             if reason_code == 0:
@@ -69,31 +82,53 @@ class MQTT:
                 logging.critical("Couldn't reconnect 5 times, rebooting...")
                 exit(2)
 
-        self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
+        def on_connect_fail(client, userdata):
+            while not self.client.is_connected():
+                # Implement sleep to reduce power consumption if necessary
+                self.client.connect(self.broker, self.port)
+                time.sleep(1)
+
         self.client.on_connect = on_connect
         self.client.on_disconnect = on_disconnect
+        self.client.on_connect_fail = on_connect_fail
         self.client.username_pw_set(USERNAME, PASSWORD)
         self.client.enable_logger()
 
-        try:
-            self.client.connect_async(self.broker, self.port)
-            self.client.loop_start()
-        except Exception as e:
-            logging.error(f"Error connecting to the broker: {e}")
-            exit(1)
+        network_connect_counter = 0
+        # Making sure the network is up before trying to connect
+        while not self.is_network_available():
+            logging.info("Waiting for network to become available...")
+            time.sleep(0.5)
+            network_connect_counter += 1
+            if network_connect_counter == 20:
+                logging.error("Connecting to network failed 20 times, restarting script...")
+                exit(1)
+
+        self.client.connect(self.broker, self.port)
+        self.client.loop_start()
 
         return self.client
+
+    def is_network_available(self):
+        try:
+            socket.create_connection((BROKER, PORT), timeout=5)
+            return True
+        except OSError:
+            return False
+        except Exception as e:
+            logging.error(f"Error during creating connection: {e}")
+            exit(1)
 
     @log_execution_time("Image publish time")
     def publish(self, message):
         try:
-            self.client.publish(self.pubtopic, message, qos=self.qos)
-            # Take this out in production
-            # msg_info.wait_for_publish()
-            # if msg_info.is_published():
-            #     logging.info(f"Image and timestamp sent to topic {self.pubtopic}")
-            # else:
-            #     logging.error(f"Failed to send image and timestamp to topic {self.pubtopic}")
+            msg_info = self.client.publish(self.pubtopic, message, qos=self.qos)
+
+            msg_info.wait_for_publish()
+            if msg_info.is_published():
+                logging.info(f"Image and timestamp sent to topic {self.pubtopic}")
+            else:
+                logging.error(f"Failed to send image and timestamp to topic {self.pubtopic}")
         except Exception as e:
             logging.error(f"Error publishing image and timestamp: {str(e)}")
             exit(1)
