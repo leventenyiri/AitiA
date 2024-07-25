@@ -41,6 +41,8 @@ Detecting starling swarms.
   - Optimizing the OS boot time
   - If RTC and internal time doesn't match ask for time set
   - Improving bash script
+  - Add extra data to the published message (battery charge level, battery temperature)
+  - Packaging the software -> creating the Raspberry os image
     
 - [ ] **Effective Range dependencies**
   - Current measuring
