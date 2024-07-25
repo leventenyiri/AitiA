@@ -24,9 +24,9 @@ def deep_merge(default, update):
     dict: The merged dictionary.
     """
     result = default.copy()
-
+    # Finding common keys
     common_keys = set(default.keys()) & set(update.keys())
-
+    # Iterate through common keys and merge nested dictionaries recursively
     for key in common_keys:
         if all(isinstance(d.get(key), dict) for d in (default, update)):
             result[key] = deep_merge(default[key], update[key])
@@ -139,15 +139,9 @@ class App:
         self.mqtt.init_receive()
 
     def get_message(self):
-        # Capture the image
         image_raw = self.camera.capture()
-
-        # Get the timestamp
         timestamp = RTC.get_time()
-
-        # Create the message
         message = self.create_message(image_raw, timestamp)
-
         return message
 
     @log_execution_time("Taking a picture and sending it")
