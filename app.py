@@ -184,7 +184,7 @@ class App:
             self.run()
 
     def run_periodically(self, period):
-        
+
         remaining_time = self.run_with_time_measure(period)
 
         if remaining_time > 60:  # If more than a minutes left
@@ -199,16 +199,16 @@ class App:
 
             logging.info(f"Scheduling wake-up for {wake_time}")
             sys.exit(2)
-        
+        # Not working yet
         while remaining_time <= 60:
-            logging.info(f"Sleeping for {remaining_time} seconds")
-
-            if self.mqtt.is_config_changed():
+            """  if self.mqtt.is_config_changed():
                 logging.info("Config has changed. Restarting script...")
-                sys.exit(1)
+                sys.exit(1) """
 
+            logging.info(f"Sleeping for {remaining_time} seconds")
             time.sleep(remaining_time)
 
+            self.run()
 
     def run_with_time_measure(self, period):
         start_time = time.time()
