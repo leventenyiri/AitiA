@@ -15,6 +15,13 @@ def deep_merge(default, update):
     """
     Recursively merge two dictionaries, preferring values from 'update',
     but only for keys that exist in 'default'.
+
+    Parameters:
+    default (dict): The default dictionary to merge with 'update'.
+    update (dict): The dictionary to merge into 'default'.
+
+    Returns:
+    dict: The merged dictionary.
     """
     result = default.copy()
 
@@ -122,8 +129,8 @@ class App:
 
     @log_execution_time("Starting the app")
     def start(self):
+        # Checks if the current time is within the operational hours
         self.working_time_check()
-        # Start the camera
         self.camera.start()
 
     def connect_mqtt(self):
@@ -153,7 +160,6 @@ class App:
             if not self.mqtt.client.is_connected():
                 self.connect_mqtt()
 
-            # Publish the message
             self.mqtt.publish(message)
 
         except Exception as e:
