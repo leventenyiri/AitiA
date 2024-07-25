@@ -50,6 +50,7 @@ Detecting starling swarms.
   - shutdown API
   - battery charging driver ✅
   - 3D case and battery case
+  - battery warning-level monitoring script -> change device mode if the battery is to low
 
 Roadmap:
 https://github.com/users/borditamas/projects/2/views/4

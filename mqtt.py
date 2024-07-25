@@ -63,16 +63,6 @@ class MQTT:
         self.client.username_pw_set(USERNAME, PASSWORD)
         self.client.enable_logger()
 
-        """ while True:
-            try:
-                logging.info("Attempting to connect to MQTT broker...")
-                self.client.connect(self.broker, self.port)
-                self.client.loop_start()
-                break  # If connection succeeds, break out of the loop
-            except Exception as e:
-                logging.error(f"Connection failed: {e}. Retrying in 1 seconds...")
-                time.sleep(2) """
-
         def on_disconnect(client, userdata, disconnect_flags, reason_code, properties=None):
             if reason_code == 0:
                 logging.info("Disconnected voluntarily.")
