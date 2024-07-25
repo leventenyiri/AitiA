@@ -6,7 +6,8 @@ import pybase64
 from datetime import datetime, timedelta
 from mqtt import MQTT
 from camera import Camera
-from utils import log_execution_time, get_cpu_temperature, RTC, System
+from system import System, RTC
+from utils import log_execution_time
 import time
 import sys
 
@@ -82,6 +83,11 @@ class App:
             exit(1)
 
     def working_time_check(self):
+        """
+        Checks if the current time is within the operational hours defined in the configuration.
+        If the current time is outside the operational hours, the system will initiate a shutdown.
+        The time is in UTC timezone.
+        """
         wake_up_time = datetime.strptime(self.basic_config["wake_up_time"], "%H:%M:%S").time()
         shut_down_time = datetime.strptime(self.basic_config["shut_down_time"], "%H:%M:%S").time()
 
@@ -104,10 +110,8 @@ class App:
     @log_execution_time("Creating the json message")
     def create_message(self, image_array, timestamp):
         try:
-            
             image_base64 = self.create_base64_image(image_array)
-
-            cpu_temp = get_cpu_temperature()
+            cpu_temp = System.get_cpu_temperature()
 
             # timestamp is already an ISO format string, no need to format it
             message = {
@@ -123,13 +127,22 @@ class App:
             raise
 
     def create_base64_image(self, image_array):
-        # Convert numpy array to bytes (JPEG)
-            image = Image.fromarray(image_array)
-            image_bytes = io.BytesIO()
-            image.save(image_bytes, format='JPEG', quality=75)
-            image_data = image_bytes.getvalue()
+        """
+        Converts a numpy array representing an image into a base64-encoded JPEG string.
 
-            return pybase64.b64encode(image_data).decode('utf-8')
+        Parameters:
+        image_array: The image data as a numpy array.
+
+        Returns:
+        str: The base64-encoded string representation of the JPEG image.
+        """
+
+        image = Image.fromarray(image_array)
+        image_bytes = io.BytesIO()
+        image.save(image_bytes, format='JPEG')
+        image_data = image_bytes.getvalue()
+
+        return pybase64.b64encode(image_data).decode('utf-8')
 
     @log_execution_time("Starting the app")
     def start(self):
@@ -168,12 +181,10 @@ class App:
         while True:
             self.run()
 
-    # Need RTC API for the implementation
     def run_periodically(self, period):
-        start_time = time.time()
+        start_time = RTC.get_time()
         self.run()
-
-        elapsed_time = time.time() - start_time
+        elapsed_time = RTC.get_time() - start_time
         remaining_time = period - elapsed_time
 
         if remaining_time > 120:  # If more than 2 minutes left
