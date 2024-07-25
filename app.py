@@ -110,14 +110,16 @@ class App:
     @log_execution_time("Creating the json message")
     def create_message(self, image_array, timestamp):
         try:
-            image_base64 = self.create_base64_image(image_array)
-            cpu_temp = System.get_cpu_temperature()
-
+            battery_info = System.get_battery_info()
+            logging.info(
+                f"Battery temperature: {battery_info['temperature']}°C, battery percentage: {battery_info['percentage']}%")
             # timestamp is already an ISO format string, no need to format it
             message = {
                 "timestamp": timestamp,
-                "image": image_base64,
-                "CPU_temperature": cpu_temp
+                "image": self.create_base64_image(image_array),
+                "CPU_temperature": System.get_cpu_temperature(),
+                "battery_temperature": battery_info["temperature"],
+                "battery_percentage": battery_info["percentage"]
             }
 
             return json.dumps(message)

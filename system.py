@@ -19,6 +19,31 @@ class System:
         cpu = CPUTemperature()
         return cpu.temperature
 
+    @staticmethod
+    def get_battery_info():
+        try:
+            # Battery info is path dependant!!!!
+            result = subprocess.run(['upower', '-i', '/org/freedesktop/UPower/devices/battery_bq2562x_battery'],
+                                    stdout=subprocess.PIPE, check=True)
+            info = result.stdout.decode('utf-8')
+
+            battery_info = {
+                'temperature': None,
+                'percentage': None
+            }
+
+            for line in info.splitlines():
+                if "temperature:" in line:
+                    battery_info['temperature'] = float(line.split(":")[1].strip().split()[0])
+                if "percentage:" in line:
+                    battery_info['percentage'] = float(line.split(":")[1].strip().replace('%', ''))
+
+            return battery_info
+
+        except subprocess.CalledProcessError as e:
+            logging.error(f"Failed to get battery info: {e}")
+            exit(1)
+
 
 class RTC:
     @staticmethod
@@ -41,7 +66,7 @@ class RTC:
             logging.error(f"Error reading system time: {e}")
             return datetime.now(pytz.UTC).isoformat()
 
-    # Time syncing problem???
+    # Time sync problem!!!
     @staticmethod
     def set_time(time_to_set):
         try:

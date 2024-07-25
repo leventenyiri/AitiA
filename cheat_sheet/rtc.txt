@@ -10,5 +10,5 @@ RTC:
     clock sync: sudo hwclock --systohc
 
 sudo rtctest
-hwclock -r
+sudo hwclock -r
 sudo hwclock --systohc
