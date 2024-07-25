@@ -104,13 +104,8 @@ class App:
     @log_execution_time("Creating the json message")
     def create_message(self, image_array, timestamp):
         try:
-            # Convert numpy array to bytes (JPEG)
-            image = Image.fromarray(image_array)
-            image_bytes = io.BytesIO()
-            image.save(image_bytes, format='JPEG', quality=75)
-            image_data = image_bytes.getvalue()
-
-            image_base64 = pybase64.b64encode(image_data).decode('utf-8')
+            
+            image_base64 = self.create_base64_image(image_array)
 
             cpu_temp = get_cpu_temperature()
 
@@ -126,6 +121,15 @@ class App:
         except Exception as e:
             logging.error(f"Problem creating the message: {e}")
             raise
+
+    def create_base64_image(self, image_array):
+        # Convert numpy array to bytes (JPEG)
+            image = Image.fromarray(image_array)
+            image_bytes = io.BytesIO()
+            image.save(image_bytes, format='JPEG', quality=75)
+            image_data = image_bytes.getvalue()
+
+            return pybase64.b64encode(image_data).decode('utf-8')
 
     @log_execution_time("Starting the app")
     def start(self):
