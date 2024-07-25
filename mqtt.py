@@ -20,6 +20,7 @@ class MQTT:
         self.qos = QOS
         self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
         self.reconnect_counter = 0
+        self.config_changed = False
 
     def init_receive(self):
         def on_message(client, userdata, msg):
@@ -37,6 +38,8 @@ class MQTT:
                 shutil.copyfile(TEMP_CONFIG_PATH, CONFIG_PATH)
                 logging.info(f"Config saved to {CONFIG_PATH}")
 
+                self.config_changed = True
+
             except json.JSONDecodeError as e:
                 logging.error(f"Invalid JSON received: {e}")
             except Exception as e:
@@ -44,6 +47,10 @@ class MQTT:
 
         self.client.on_message = on_message
         self.client.subscribe(self.subtopic)
+
+    def is_config_changed(self):
+        return self.config_changed
+            
 
     def connect(self):
         def on_connect(client, userdata, flags, rc, properties=None):

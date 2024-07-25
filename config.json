@@ -2,7 +2,7 @@
     "Basic": {
         "quality": "3K",
         "mode": "single-shot",
-        "period": "0:0:50",
+        "period": 50,
         "manual_camera_settings_on": false,
         "wake_up_time": "06:59:31",
         "shut_down_time": "22:00:00"

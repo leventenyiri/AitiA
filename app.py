@@ -49,7 +49,7 @@ class App:
             "Basic": {
                 "quality": "3K",
                 "mode": "single-shot",
-                "period": "0:0:50",
+                "period": 50,
                 "manual_camera_settings_on": False,
                 "wake_up_time": "06:59:31",
                 "shut_down_time": "22:00:00"
@@ -176,21 +176,34 @@ class App:
 
     # Need RTC API for the implementation
     def run_periodically(self, period):
-        start_time = time.time()
-        self.run()
+        
+        remaining_time = self.run_with_time_measure(period)
 
-        elapsed_time = time.time() - start_time
-        remaining_time = period - elapsed_time
-
-        if remaining_time > 120:  # If more than 2 minutes left
+        if remaining_time > 60:  # If more than a minutes left
             # Calculate wake-up time
-            wake_time = datetime.now() + timedelta(seconds=remaining_time - 60)  # Wake up 1 minute early
+
+            raise NotImplemented
+
+            wake_time = datetime.now() + timedelta(seconds=remaining_time - 15)  # Takes about 15sec to boot
 
             # Schedule wake-up
             System.schedule_wakeup(wake_time)
 
             logging.info(f"Scheduling wake-up for {wake_time}")
             sys.exit(2)
-        else:
+        
+        while remaining_time <= 60:
             logging.info(f"Sleeping for {remaining_time} seconds")
+
+            if self.mqtt.is_config_changed():
+                logging.info("Config has changed. Restarting script...")
+                sys.exit(1)
+
             time.sleep(remaining_time)
+
+
+    def run_with_time_measure(self, period):
+        start_time = time.time()
+        self.run()
+        elapsed_time = time.time() - start_time
+        return (period - elapsed_time)
