@@ -37,7 +37,7 @@ class MQTT:
                 # Copy the file
                 shutil.copyfile(TEMP_CONFIG_PATH, CONFIG_PATH)
                 logging.info(f"Config saved to {CONFIG_PATH}")
-
+                # Signal the config change
                 self.config_changed = True
 
             except json.JSONDecodeError as e:
@@ -50,7 +50,6 @@ class MQTT:
 
     def is_config_changed(self):
         return self.config_changed
-            
 
     def connect(self):
         def on_connect(client, userdata, flags, rc, properties=None):

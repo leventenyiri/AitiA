@@ -14,18 +14,11 @@ export PATH="/usr/local/bin:$PATH"
 echo "Python path: $(which python3)"
 echo "Python version: $(python3 --version)"
 
-# Set up logging directory with correct permissions
-LOGDIR="/home/admin/MQTT/logs"
-mkdir -p "$LOGDIR"
-chown admin:admin "$LOGDIR"
-echo "Log directory: $LOGDIR"
-ls -l "$LOGDIR"
-
 # Print out environment variables
 echo "Environment variables:"
 env
 
-# Path to your Python script
+# Path to Python script
 PYTHON_SCRIPT="/home/admin/MQTT/client.py"
 RESTART_COUNT_FILE="/tmp/restart_count"
 
@@ -35,16 +28,13 @@ else
     RESTART_COUNT=0
 fi
 
-env > /tmp/daemon_env.log
-
 while true; do
     start_time=$(date +%s)
     echo "Starting Python script at $(date)"
     python3 $PYTHON_SCRIPT
-    end_time=$(date +%s)
-
-    runtime=$((end_time - start_time))
     EXIT_CODE=$?
+    end_time=$(date +%s)
+    runtime=$((end_time - start_time))
 
     echo "Python script exited with code $EXIT_CODE after $runtime seconds"
 
