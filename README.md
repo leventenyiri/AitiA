@@ -35,17 +35,15 @@ Detecting starling swarms.
   - Lens shouldnt get foggy, account for weather
 
 - [ ] **Random TODOS**
-  - Measure the current drawn, battery level, temperature
-  - Unit, integration testing
-  - Implementing periodic running: -> with shut down, and without shut down
-  - Optimizing the OS boot time
+  - Unit, integration testing ✅
+  - Implementing periodic running: -> with shut down, and without shut down ✅
+  - Optimizing the OS boot time ✅
   - If RTC and internal time doesn't match ask for time set
   - Improving bash script
-  - Add extra data to the published message (battery charge level, battery temperature)
+  - Add extra data to the published message (battery charge level, battery temperature) ✅
   - Packaging the software -> creating the Raspberry os image
     
 - [ ] **Effective Range dependencies**
-  - Current measuring
   - RTC wake up API
   - shutdown API
   - battery charging driver ✅
@@ -54,3 +52,5 @@ Detecting starling swarms.
 
 Roadmap:
 https://github.com/users/borditamas/projects/2/views/4
+
+🚫 Need to invert the logic for syncing the RTC in prod !4!!!
