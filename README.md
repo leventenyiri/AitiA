@@ -52,3 +52,5 @@ Detecting starling swarms.
 
 Roadmap:
 https://github.com/users/borditamas/projects/2/views/4
+
+🚫 Need to invert the logic for syncing the RTC in prod !4!!!
