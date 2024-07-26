@@ -8,6 +8,7 @@ from mqtt import MQTT
 from camera import Camera
 from system import System, RTC
 from utils import log_execution_time
+from static_config import SHUTDOWN_THRESHOLD
 import time
 import sys
 
@@ -184,10 +185,11 @@ class App:
             self.run()
 
     def run_periodically(self, period):
+        # Based on the run time either shut down or sleep for the remaining time
+        waiting_time = self.run_with_time_measure(period)
 
-        remaining_time = self.run_with_time_measure(period)
-
-        if remaining_time > 60:  # If more than a minutes left
+        # Shut down the device when waiting
+        if waiting_time > SHUTDOWN_THRESHOLD:
             # Calculate wake-up time
 
             raise NotImplemented
@@ -199,19 +201,27 @@ class App:
 
             logging.info(f"Scheduling wake-up for {wake_time}")
             sys.exit(2)
-        # Not working yet
-        while remaining_time <= 60:
-            """  if self.mqtt.is_config_changed():
+
+        # The device will sleep for the remaining time
+        while waiting_time <= SHUTDOWN_THRESHOLD:
+            if self.mqtt.is_config_changed():
                 logging.info("Config has changed. Restarting script...")
-                sys.exit(1) """
+                sys.exit(1)
 
-            logging.info(f"Sleeping for {remaining_time} seconds")
-            time.sleep(remaining_time)
+            logging.info(f"Sleeping for {waiting_time} seconds")
+            time.sleep(waiting_time)
 
-            self.run()
+            waiting_time = self.run_with_time_measure(period)
 
     def run_with_time_measure(self, period):
         start_time = time.time()
         self.run()
         elapsed_time = time.time() - start_time
-        return (period - elapsed_time)
+        # Need to sleep this much to produce images at the desired period
+        waiting_time = period - elapsed_time
+        # Ensure we don't sleep for a negative time
+        if waiting_time < 0:
+            logging.warning(f"Period time is set to low. Increase it by {abs(waiting_time)} seconds.")
+            waiting_time = 0
+
+        return (waiting_time)

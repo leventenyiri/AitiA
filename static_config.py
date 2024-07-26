@@ -14,3 +14,6 @@ SUBTOPIC = "settings/er-edge"
 QOS = 2
 USERNAME = "er-edge-3c547181"
 PASSWORD = "admin"
+
+# App configuration
+SHUTDOWN_THRESHOLD = 60  # in seconds

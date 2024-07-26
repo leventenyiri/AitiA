@@ -57,6 +57,8 @@ def subscribe(client: mqtt_client.Client):
             timestamp_str = payload['timestamp']
             image_base64 = payload['image']
             cpu_temp = payload['CPU_temperature']
+            battery_temp = payload['battery_temperature']
+            battery_percentage = payload['battery_percentage']
 
             # Parse the timestamp string
             timestamp = parser.isoparse(timestamp_str)
@@ -83,6 +85,8 @@ def subscribe(client: mqtt_client.Client):
             logging.info(f"Delay: {delay:.2f} seconds")
 
             logging.info(f"The cpu temperature is: {cpu_temp} °C")
+            logging.info(f"The battery temperature is: {battery_temp} °C")
+            logging.info(f"The battery percentage is: {battery_percentage}%")
 
         except Exception as e:
             logging.error(f"Failed to process image: {e}")

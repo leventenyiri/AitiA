@@ -1,8 +1,9 @@
 import time
 import json
 from paho.mqtt import client as mqtt_client
+from static_config import BROKER
 
-broker = "192.168.0.100"
+broker = BROKER
 port = 1883
 topic = "settings/er-edge"
 
@@ -32,6 +33,7 @@ def publish(client):
         message = json.dumps(config_data)
 
         result = client.publish(topic, message)
+        result.wait_for_publish()
         status = result[0]
         if status == 0:
             print(f"Sent config to topic {topic}")
@@ -49,7 +51,6 @@ def run():
     client = connect_mqtt()
     client.loop_start()
     publish(client)
-    time.sleep(1)  # Wait for the message to be published
     client.disconnect()
     client.loop_stop()
 
