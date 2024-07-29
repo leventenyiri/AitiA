@@ -191,6 +191,7 @@ class App:
             self.run()
 
     def run_periodically(self, period):
+        # This wont work, because the last_shutdown_time and boot_shutdown_time will get overwritten on every boot with None...
         while True:
             waiting_time = self.run_with_time_measure(period)
 
@@ -209,12 +210,12 @@ class App:
 
             if waiting_time > SHUTDOWN_THRESHOLD and self.boot_shutdown_time is not None:
                 # Calculate the maximum time we can sleep
-                sleep_duration = waiting_time - self.boot_shutdown_time
-                if sleep_duration > 0:
+                shutdown_duration = waiting_time - self.boot_shutdown_time
+                if shutdown_duration > 0:
                     current_time = datetime.fromisoformat(RTC.get_time())
-                    wake_time = current_time + timedelta(seconds=sleep_duration)
+                    wake_time = current_time + timedelta(seconds=shutdown_duration)
 
-                    logging.info(f"Shutting down for {sleep_duration} seconds")
+                    logging.info(f"Shutting down for {shutdown_duration} seconds")
                     logging.info(f"Scheduling wake-up for {wake_time}")
 
                     System.schedule_wakeup(wake_time)
