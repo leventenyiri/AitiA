@@ -106,6 +106,7 @@ class MQTT:
 
         return self.client
 
+    # Check if the network is available, before trying to connect to the MQTT broker
     def is_network_available(self):
         try:
             socket.create_connection((BROKER, PORT), timeout=5)
