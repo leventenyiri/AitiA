@@ -9,6 +9,6 @@ transfer file: scp ~/AitiA/client.py admin@192.168.0.101:/home/admin/MQTT
 
 delete: rm -r filename
 
-set pi clock: ~$ date -R | ssh admin@192.168.0.109 'sudo tee /tmp/date.txt > /dev/null && sudo date --set="$(cat /tmp/date.txt)" && sudo rm /tmp/date.txt'
+enable daemon: sudo systemctl enable client.service
 
 network interface restart: sudo ip link set wlan0 down && sudo ip link set wla0 up
