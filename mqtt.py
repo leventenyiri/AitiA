@@ -1,19 +1,8 @@
 import logging
 import time
 import shutil
-from static_config import (
-    BROKER,
-    PUBTOPIC,
-    SUBTOPIC,
-    PORT,
-    QOS,
-    TEMP_CONFIG_PATH,
-    CONFIG_PATH,
-    USERNAME,
-    PASSWORD,
-)
+from static_config import BROKER, PUBTOPIC, SUBTOPIC, PORT, QOS, TEMP_CONFIG_PATH, CONFIG_PATH, USERNAME, PASSWORD
 from utils import log_execution_time
-
 try:
     from paho.mqtt import client as mqtt_client
 except ImportError:
@@ -59,6 +48,7 @@ class MQTT:
         self.client.on_message = on_message
         self.client.subscribe(self.subtopic)
 
+    # If a config.json has been received through MQTT, this method returns True
     def is_config_changed(self):
         return self.config_changed
 
@@ -73,9 +63,7 @@ class MQTT:
         self.client.username_pw_set(USERNAME, PASSWORD)
         self.client.enable_logger()
 
-        def on_disconnect(
-            client, userdata, disconnect_flags, reason_code, properties=None
-        ):
+        def on_disconnect(client, userdata, disconnect_flags, reason_code, properties=None):
             if reason_code == 0:
                 logging.info("Disconnected voluntarily.")
                 return
@@ -110,9 +98,7 @@ class MQTT:
             time.sleep(0.5)
             network_connect_counter += 1
             if network_connect_counter == 20:
-                logging.error(
-                    "Connecting to network failed 20 times, restarting script..."
-                )
+                logging.error("Connecting to network failed 20 times, restarting script...")
                 exit(1)
 
         self.client.connect(self.broker, self.port)
@@ -139,9 +125,7 @@ class MQTT:
             if msg_info.is_published():
                 logging.info(f"Image and timestamp sent to topic {self.pubtopic}")
             else:
-                logging.error(
-                    f"Failed to send image and timestamp to topic {self.pubtopic}"
-                )
+                logging.error(f"Failed to send image and timestamp to topic {self.pubtopic}")
         except Exception as e:
             logging.error(f"Error publishing image and timestamp: {str(e)}")
             exit(1)
