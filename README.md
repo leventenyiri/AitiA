@@ -52,5 +52,7 @@ Detecting starling swarms.
 
 Roadmap:
 https://github.com/users/borditamas/projects/2/views/4
+Storage repo:
+https://github.com/bnyitrai03/rpizero_storage
 
 🚫 Need to invert the logic for syncing the RTC in prod !4!!!
