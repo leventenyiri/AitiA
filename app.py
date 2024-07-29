@@ -43,6 +43,8 @@ class App:
         self.camera_config, self.basic_config = self.load_config(config_path)
         self.camera = Camera(self.camera_config, self.basic_config)
         self.mqtt = MQTT()
+        self.boot_shutdown_time = None  # To store the combined boot and shutdown time
+        self.last_shutdown_time = None  # To store when we last shut down
 
     @staticmethod
     def load_config(path):
@@ -54,22 +56,18 @@ class App:
                 "period": 50,
                 "manual_camera_settings_on": False,
                 "wake_up_time": "06:59:31",
-                "shut_down_time": "22:00:00"
+                "shut_down_time": "22:00:00",
             },
-            "Camera": {
-                "quality": 95,
-                "width": 3840,
-                "height": 2160
-            }
+            "Camera": {"quality": 95, "width": 3840, "height": 2160},
         }
 
         try:
-            with open(path, 'r') as file:
+            with open(path, "r") as file:
                 data = json.load(file)
 
             # Use a deep merge function to combine loaded data with defaults
-            camera_config = deep_merge(default_config['Camera'], data.get('Camera', {}))
-            basic_config = deep_merge(default_config['Basic'], data.get('Basic', {}))
+            camera_config = deep_merge(default_config["Camera"], data.get("Camera", {}))
+            basic_config = deep_merge(default_config["Basic"], data.get("Basic", {}))
 
             return camera_config, basic_config
 
@@ -89,22 +87,29 @@ class App:
         If the current time is outside the operational hours, the system will initiate a shutdown.
         The time is in UTC timezone.
         """
-        wake_up_time = datetime.strptime(self.basic_config["wake_up_time"], "%H:%M:%S").time()
-        shut_down_time = datetime.strptime(self.basic_config["shut_down_time"], "%H:%M:%S").time()
+        wake_up_time = datetime.strptime(
+            self.basic_config["wake_up_time"], "%H:%M:%S"
+        ).time()
+        shut_down_time = datetime.strptime(
+            self.basic_config["shut_down_time"], "%H:%M:%S"
+        ).time()
 
         utc_time = datetime.fromisoformat(RTC.get_time())
         current_time = utc_time.time()
 
         logging.info(
-            f"wake up time is : {wake_up_time}, shutdown time is : {shut_down_time}, current time is : {current_time}")
+            f"wake up time is : {wake_up_time}, shutdown time is : {shut_down_time}, current time is : {current_time}"
+        )
 
         # If e.g: wake up time = 6:00:00 and shutdown time = 20:00:00
-        if (wake_up_time < shut_down_time) and (wake_up_time > current_time or current_time >= shut_down_time):
+        if (wake_up_time < shut_down_time) and (
+            wake_up_time > current_time or current_time >= shut_down_time
+        ):
             logging.info("Starting shutdown")
             System.shutdown()
 
         # If e.g: wake up time = 20:00:00 and shutdown time = 6:00:00
-        elif (current_time >= shut_down_time and current_time < wake_up_time):
+        elif current_time >= shut_down_time and current_time < wake_up_time:
             logging.info("Starting shutdown")
             System.shutdown()
 
@@ -113,14 +118,15 @@ class App:
         try:
             battery_info = System.get_battery_info()
             logging.info(
-                f"Battery temperature: {battery_info['temperature']}°C, battery percentage: {battery_info['percentage']}%")
+                f"Battery temperature: {battery_info['temperature']}°C, battery percentage: {battery_info['percentage']}%"
+            )
             # timestamp is already an ISO format string, no need to format it
             message = {
                 "timestamp": timestamp,
                 "image": self.create_base64_image(image_array),
                 "CPU_temperature": System.get_cpu_temperature(),
                 "battery_temperature": battery_info["temperature"],
-                "battery_percentage": battery_info["percentage"]
+                "battery_percentage": battery_info["percentage"],
             }
 
             return json.dumps(message)
@@ -142,10 +148,10 @@ class App:
 
         image = Image.fromarray(image_array)
         image_bytes = io.BytesIO()
-        image.save(image_bytes, format='JPEG')
+        image.save(image_bytes, format="JPEG")
         image_data = image_bytes.getvalue()
 
-        return pybase64.b64encode(image_data).decode('utf-8')
+        return pybase64.b64encode(image_data).decode("utf-8")
 
     @log_execution_time("Starting the app")
     def start(self):
@@ -185,43 +191,54 @@ class App:
             self.run()
 
     def run_periodically(self, period):
-        # Based on the run time either shut down or sleep for the remaining time
-        waiting_time = self.run_with_time_measure(period)
-
-        # Shut down the device when waiting
-        if waiting_time > SHUTDOWN_THRESHOLD:
-            # Calculate wake-up time
-
-            raise NotImplemented
-
-            wake_time = datetime.now() + timedelta(seconds=remaining_time - 15)  # Takes about 15sec to boot
-
-            # Schedule wake-up
-            System.schedule_wakeup(wake_time)
-
-            logging.info(f"Scheduling wake-up for {wake_time}")
-            sys.exit(2)
-
-        # The device will sleep for the remaining time
-        while waiting_time <= SHUTDOWN_THRESHOLD:
-            if self.mqtt.is_config_changed():
-                logging.info("Config has changed. Restarting script...")
-                sys.exit(1)
-
-            logging.info(f"Sleeping for {waiting_time} seconds")
-            time.sleep(waiting_time)
-
+        while True:
             waiting_time = self.run_with_time_measure(period)
 
-    def run_with_time_measure(self, period):
-        start_time = time.time()
-        self.run()
-        elapsed_time = time.time() - start_time
-        # Need to sleep this much to produce images at the desired period
-        waiting_time = period - elapsed_time
-        # Ensure we don't sleep for a negative time
-        if waiting_time < 0:
-            logging.warning(f"Period time is set to low. Increase it by {abs(waiting_time)} seconds.")
-            waiting_time = 0
+            if self.boot_shutdown_time is None:
+                logging.info("First run: measuring boot and shutdown time")
+                self.last_shutdown_time = RTC.get_time()
+                System.shutdown()
 
-        return (waiting_time)
+            elif self.last_shutdown_time is not None:
+                # Second run: calculate boot and shutdown time
+                current_time = RTC.get_time()
+                self.boot_shutdown_time = (datetime.fromisoformat(current_time) -
+                                           datetime.fromisoformat(self.last_shutdown_time)).total_seconds()
+                self.last_shutdown_time = None
+                logging.info(f"Measured boot and shutdown time: {self.boot_shutdown_time} seconds")
+
+            if waiting_time > SHUTDOWN_THRESHOLD and self.boot_shutdown_time is not None:
+                # Calculate the maximum time we can sleep
+                sleep_duration = waiting_time - self.boot_shutdown_time
+                if sleep_duration > 0:
+                    current_time = datetime.fromisoformat(RTC.get_time())
+                    wake_time = current_time + timedelta(seconds=sleep_duration)
+
+                    logging.info(f"Shutting down for {sleep_duration} seconds")
+                    logging.info(f"Scheduling wake-up for {wake_time}")
+
+                    System.schedule_wakeup(wake_time)
+                    self.last_shutdown_time = RTC.get_time()
+                    System.shutdown()
+                else:
+                    # Not enough time to shutdown, just sleep
+                    logging.info(f"Sleeping for {waiting_time} seconds")
+                    time.sleep(waiting_time)
+            elif waiting_time > 0:
+                if self.mqtt.is_config_changed():
+                    logging.info("Config has changed. Restarting script...")
+                    sys.exit(1)
+
+                logging.info(f"Sleeping for {waiting_time} seconds")
+                time.sleep(waiting_time)
+            else:
+                logging.warning(f"Period time is set too low. Increase it by {abs(waiting_time)} seconds.")
+
+    def run_with_time_measure(self, period):
+        start_time = RTC.get_time()
+        self.run()
+        end_time = RTC.get_time()
+        # Some transformation is necessary because of the way we are getting the time from the RTC
+        elapsed_time = (datetime.fromisoformat(end_time) - datetime.fromisoformat(start_time)).total_seconds()
+        waiting_time = period - elapsed_time
+        return max(waiting_time, 0)  # Ensure we don't return negative time

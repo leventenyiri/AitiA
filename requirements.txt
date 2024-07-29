@@ -7,3 +7,7 @@ gpiozero
 functools
 numpy
 black
+paho-mqtt
+pillow
+python-dateutil
+pytz

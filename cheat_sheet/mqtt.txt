@@ -1,0 +1,6 @@
+Broker oldalon:
+
+    sudo apt-get install mosquitto mosquitto-clients
+    sudo systemctl status mosquitto
+    sudo nano /etc/mosquitto/mosquitto.conf -> listener 1883 allow_anonymous true
+    sudo systemctl restart mosquitto

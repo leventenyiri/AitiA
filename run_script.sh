@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Redirect all output to a log file
-exec > >(tee -a /home/admin/MQTT/bash_script.log) 2>&1
+exec > >(tee -a /home/admin/APPLICATION/bash_script.log) 2>&1
 
 echo "Starting bash script at $(date)"
 
 # Set the working directory
-cd /home/admin/MQTT
+cd /home/admin/APPLICATION
 echo "Current working directory: $(pwd)"
 
 # Ensure the correct Python environment is used
@@ -19,7 +19,7 @@ echo "Environment variables:"
 env
 
 # Path to Python script
-PYTHON_SCRIPT="/home/admin/MQTT/client.py"
+PYTHON_SCRIPT="/home/admin/APPLICATION/client.py"
 RESTART_COUNT_FILE="/tmp/restart_count"
 
 if [ -f "$RESTART_COUNT_FILE" ]; then
