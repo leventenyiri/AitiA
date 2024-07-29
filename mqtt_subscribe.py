@@ -56,9 +56,9 @@ def subscribe(client: mqtt_client.Client):
             # Extract timestamp and image data
             timestamp_str = payload['timestamp']
             image_base64 = payload['image']
-            cpu_temp = payload['CPU_temperature']
-            battery_temp = payload['battery_temperature']
-            battery_percentage = payload['battery_percentage']
+            cpu_temp = payload['cpuTemp']
+            battery_temp = payload['batteryTemp']
+            battery_percentage = payload['batteryCharge']
 
             # Parse the timestamp string
             timestamp = parser.isoparse(timestamp_str)

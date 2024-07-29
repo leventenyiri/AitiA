@@ -124,9 +124,9 @@ class App:
             message = {
                 "timestamp": timestamp,
                 "image": self.create_base64_image(image_array),
-                "CPU_temperature": System.get_cpu_temperature(),
-                "battery_temperature": battery_info["temperature"],
-                "battery_percentage": battery_info["percentage"],
+                "cpuTemp": System.get_cpu_temperature(),
+                "batteryTemp": battery_info["temperature"],
+                "batteryCharge": battery_info["percentage"]
             }
 
             return json.dumps(message)
