@@ -1,4 +1,4 @@
 1. sudo apt install pip, upower
 2. libcamera: https://docs.arducam.com/Raspberry-Pi-Camera/Native-camera/Libcamera-User-Guide/#for-arducam-16mp64mp-autofocus-camera
-3. pip install pyyaml, pillow, paho-mqtt, pybase64, pytz
-4. copy source files: app.py  camera.py  client.py  config.json  log_config.yaml  mqtt.py  static_config.py  utils.py
+3. copy setup.py -> install it
+4. copy source files: app.py  camera.py  client.py  config.json  log_config.yaml  mqtt.py  static_config.py  utils.py system.py
