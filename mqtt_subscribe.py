@@ -86,7 +86,7 @@ def subscribe(client: mqtt_client.Client):
 
             logging.info(f"The cpu temperature is: {cpu_temp} °C")
             logging.info(f"The battery temperature is: {battery_temp} °C")
-            logging.info(f"The battery percentage is: {battery_percentage}%")
+            logging.info(f"The battery percentage is: {battery_percentage} %")
 
         except Exception as e:
             logging.error(f"Failed to process image: {e}")

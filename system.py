@@ -45,7 +45,7 @@ class System:
                 if "temperature:" in line:
                     battery_info['temperature'] = float(line.split(":")[1].strip().split()[0])
                 if "percentage:" in line:
-                    battery_info['percentage'] = float(line.split(":")[1].strip().replace('%', ''))
+                    battery_info['percentage'] = int(line.split(":")[1].strip().replace('%', ''))
 
             return battery_info
 
@@ -59,7 +59,7 @@ class RTC:
     def sync_RTC_to_system():
         try:
             subprocess.run(['sudo', 'hwclock', '--systohc'], check=True)
-            logging.info(f"RTC synced to system clock")
+            logging.info("RTC synced to system clock")
         except subprocess.CalledProcessError as e:
             logging.error(f"Error syncing RTC: {e}")
 
@@ -132,7 +132,7 @@ class RTC:
 
             # If the RTC time is different from the system clock, sync the RTC
             if rtc_datetime != utc_datetime:
-                RTC.sync()
+                RTC.sync_RTC_to_system()
 
             return utc_datetime
 

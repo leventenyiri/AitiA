@@ -1,4 +1,3 @@
-import time
 import json
 from paho.mqtt import client as mqtt_client
 from static_config import BROKER

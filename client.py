@@ -1,5 +1,5 @@
 from app import App
-from utils import Logger, log_execution_time
+from utils import Logger
 from static_config import LOG_CONFIG_PATH, CONFIG_PATH
 import logging
 import sys
@@ -17,13 +17,13 @@ def main():
 
     try:
         # The app is taking pictures nonstop
-        if app.basic_config['mode'] == "always_on":
+        if app.config['mode'] == "always_on":
             app.run_always()
         # The app is sending the images periodically
-        elif app.basic_config['mode'] == "periodic":
-            app.run_periodically(app.basic_config['period'])
+        elif app.config['mode'] == "periodic":
+            app.run_periodically(app.config['period'])
         # The app takes one picture then shuts down
-        elif app.basic_config['mode'] == "single-shot":
+        elif app.config['mode'] == "single-shot":
             app.run()
 
     except SystemExit as e:

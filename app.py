@@ -41,8 +41,8 @@ def deep_merge(default, update):
 
 class App:
     def __init__(self, config_path):
-        self.camera_config, self.basic_config = self.load_config(config_path)
-        self.camera = Camera(self.camera_config, self.basic_config)
+        self.config = self.load_config(config_path)
+        self.camera = Camera(self.config)
         self.mqtt = MQTT()
         self.state_file = "state_file.json"  # Choose an appropriate path
         self.load_state()
@@ -52,26 +52,19 @@ class App:
     def load_config(path):
         # Define default values
         default_config = {
-            "Basic": {
-                "quality": "3K",
-                "mode": "single-shot",
-                "period": 50,
-                "manual_camera_settings_on": False,
-                "wake_up_time": "06:59:31",
-                "shut_down_time": "22:00:00",
-            },
-            "Camera": {"quality": 95, "width": 3840, "height": 2160},
+            "quality": "3K",
+            "mode": "single-shot",
+            "period": 50,
+            "wake_up_time": "06:59:31",
+            "shut_down_time": "22:00:00"
         }
 
         try:
             with open(path, "r") as file:
                 data = json.load(file)
-
             # Use a deep merge function to combine loaded data with defaults
-            camera_config = deep_merge(default_config["Camera"], data.get("Camera", {}))
-            basic_config = deep_merge(default_config["Basic"], data.get("Basic", {}))
-
-            return camera_config, basic_config
+            camera_config = deep_merge(default_config, data)
+            return camera_config
 
         except json.JSONDecodeError as e:
             logging.error(f"Invalid JSON in the config file: {path} - {str(e)}")
@@ -90,10 +83,10 @@ class App:
         The time is in UTC timezone.
         """
         wake_up_time = datetime.strptime(
-            self.basic_config["wake_up_time"], "%H:%M:%S"
+            self.config["wake_up_time"], "%H:%M:%S"
         ).time()
         shut_down_time = datetime.strptime(
-            self.basic_config["shut_down_time"], "%H:%M:%S"
+            self.config["shut_down_time"], "%H:%M:%S"
         ).time()
 
         utc_time = datetime.fromisoformat(RTC.get_time())
@@ -120,7 +113,7 @@ class App:
         try:
             battery_info = System.get_battery_info()
             logging.info(
-                f"Battery temperature: {battery_info['temperature']}°C, battery percentage: {battery_info['percentage']}%"
+                f"Battery temp: {battery_info['temperature']}°C, battery percentage: {battery_info['percentage']} %"
             )
             # timestamp is already an ISO format string, no need to format it
             message = {
