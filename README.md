@@ -50,6 +50,7 @@ Detecting starling swarms.
   - 3D case and battery case
   - battery warning-level monitoring script -> change device mode if the battery is to low
   - battery costumization: https://www.batemo.com/products/batemo-cell-explorer/samsung-inr21700-53g1/
+  - battery datasheet: https://batteryservice.bg/wp-content/uploads/2018/12/INR21700-50E.pdf
 
 Roadmap:
 https://github.com/users/borditamas/projects/2/views/4
