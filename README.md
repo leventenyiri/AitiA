@@ -49,7 +49,7 @@ Detecting starling swarms.
   - battery charging driver ✅
   - 3D case and battery case
   - battery warning-level monitoring script -> change device mode if the battery is to low
-  - battery costumization
+  - battery costumization: https://www.batemo.com/products/batemo-cell-explorer/samsung-inr21700-53g1/
 
 Roadmap:
 https://github.com/users/borditamas/projects/2/views/4
