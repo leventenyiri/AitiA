@@ -16,6 +16,14 @@ class System:
         subprocess.run(['sudo', 'systemctl', 'poweroff', '-no-block'], check=True)
 
     @staticmethod
+    def reboot():
+        raise NotImplementedError
+
+    @staticmethod
+    def schedule_wakeup():
+        raise NotImplementedError
+
+    @staticmethod
     def get_cpu_temperature():
         cpu = CPUTemperature()
         return cpu.temperature

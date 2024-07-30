@@ -11,6 +11,7 @@ from utils import log_execution_time
 from static_config import SHUTDOWN_THRESHOLD
 import time
 import sys
+import os
 
 
 def deep_merge(default, update):
@@ -43,8 +44,9 @@ class App:
         self.camera_config, self.basic_config = self.load_config(config_path)
         self.camera = Camera(self.camera_config, self.basic_config)
         self.mqtt = MQTT()
-        self.boot_shutdown_time = None  # To store the combined boot and shutdown time
-        self.last_shutdown_time = None  # To store when we last shut down
+        self.state_file = "state_file.json"  # Choose an appropriate path
+        self.load_state()
+        self.max_boot_time = 10800  # 3 hours
 
     @staticmethod
     def load_config(path):
@@ -190,39 +192,64 @@ class App:
         while True:
             self.run()
 
+    def load_state(self):
+        if os.path.exists(self.state_file):
+            with open(self.state_file, 'r') as f:
+                state = json.load(f)
+            self.boot_shutdown_time = state.get('boot_shutdown_time')
+            self.last_shutdown_time = state.get('last_shutdown_time')
+        else:
+            self.boot_shutdown_time = None
+            self.last_shutdown_time = None
+
+    def save_state(self):
+        state = {
+            'boot_shutdown_time': self.boot_shutdown_time,
+            'last_shutdown_time': self.last_shutdown_time,
+        }
+        try:
+            with open(self.state_file, 'w') as f:
+                json.dump(state, f)
+        except IOError as e:
+            logging.error(f"Failed to save state file: {e}")
+
     def run_periodically(self, period):
-        # This wont work, because the last_shutdown_time and boot_shutdown_time will get overwritten on every boot with None...
         while True:
             waiting_time = self.run_with_time_measure(period)
 
-            if self.boot_shutdown_time is None:
-                logging.info("First run: measuring boot and shutdown time")
-                self.last_shutdown_time = RTC.get_time()
-                System.shutdown()
+            current_time = datetime.fromisoformat(RTC.get_time())
 
-            elif self.last_shutdown_time is not None:
-                # Second run: calculate boot and shutdown time
-                current_time = RTC.get_time()
-                self.boot_shutdown_time = (datetime.fromisoformat(current_time) -
-                                           datetime.fromisoformat(self.last_shutdown_time)).total_seconds()
-                self.last_shutdown_time = None
-                logging.info(f"Measured boot and shutdown time: {self.boot_shutdown_time} seconds")
+            if self.last_shutdown_time is None:
+                self.last_shutdown_time = current_time.isoformat()
+                self.save_state()
+                logging.info("First run or state file was reset. Will measure boot time on next cycle.")
+                System.reboot()
 
-            if waiting_time > SHUTDOWN_THRESHOLD and self.boot_shutdown_time is not None:
-                # Calculate the maximum time we can sleep
-                shutdown_duration = waiting_time - self.boot_shutdown_time
+            if self.last_shutdown_time is not None:
+                last_shutdown = datetime.fromisoformat(self.last_shutdown_time)
+                boot_time = (current_time - last_shutdown).total_seconds()
+
+                if boot_time <= self.max_boot_time:
+                    self.boot_shutdown_time = boot_time
+                    logging.info(f"Measured boot and shutdown time: {self.boot_shutdown_time} seconds")
+                else:
+                    logging.info(f"Long shutdown detected (duration: {boot_time} seconds). Not updating boot time.")
+
+            if waiting_time > SHUTDOWN_THRESHOLD:
+                shutdown_duration = waiting_time
+                shutdown_duration -= self.boot_shutdown_time
+
                 if shutdown_duration > 0:
-                    current_time = datetime.fromisoformat(RTC.get_time())
                     wake_time = current_time + timedelta(seconds=shutdown_duration)
 
                     logging.info(f"Shutting down for {shutdown_duration} seconds")
                     logging.info(f"Scheduling wake-up for {wake_time}")
 
                     System.schedule_wakeup(wake_time)
-                    self.last_shutdown_time = RTC.get_time()
+                    self.last_shutdown_time = current_time.isoformat()
+                    self.save_state()
                     System.shutdown()
                 else:
-                    # Not enough time to shutdown, just sleep
                     logging.info(f"Sleeping for {waiting_time} seconds")
                     time.sleep(waiting_time)
             elif waiting_time > 0:
@@ -234,6 +261,8 @@ class App:
                 time.sleep(waiting_time)
             else:
                 logging.warning(f"Period time is set too low. Increase it by {abs(waiting_time)} seconds.")
+
+            self.save_state()
 
     def run_with_time_measure(self, period):
         start_time = RTC.get_time()
