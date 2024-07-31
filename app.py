@@ -154,15 +154,9 @@ class App:
             # done running (end_time), which is basically the current time.
             waiting_time, end_time = self.run_with_time_measure()
 
-            # The update_boot_time function will return True for should_reboot if its the first time running the script,
-            # and the period is larger than the shutdown_treshold. This is needed, because on the first run we have no idea how much time it takes to shutdown and
-            # boot up, so we cant take this into consideration when calibrating the period. (Maybe rewrite this, so on the first run it just uses the waiting time
-            # as shutdown time)
-            should_reboot, message = self.schedule.update_boot_time(end_time)
+            # This will set the boot_shutdown_time, on the first run it will use the default value.
+            message = self.schedule.update_boot_time(end_time)
             logging.info(message)
-            if should_reboot:
-                self.schedule.save_boot_state()
-                System.reboot()
 
             # If based on the given period we have enough time to shut down between runs, this will calculate for how long we have to shut down, sets a wake time
             # for the RTC based interrupt and saves the current time as last_shutdown time before shutting down

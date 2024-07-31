@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import os
 import json
 import logging
-from static_config import SHUTDOWN_THRESHOLD
+from static_config import SHUTDOWN_THRESHOLD, DEFAULT_BOOT_SHUTDOWN_TIME
 
 
 class Schedule:
@@ -17,17 +17,16 @@ class Schedule:
 
     def update_boot_time(self, current_time):
         if self.last_shutdown_time is None and (self.period > self.shutdown_threshold):
-            self.last_shutdown_time = current_time.isoformat()
-            return True, "First run or state file was reset. Will measure boot time on next cycle."
+            return "First run or state file was reset. Will measure boot time on next cycle. Using default value for first shutdown period"
 
         last_shutdown = datetime.fromisoformat(self.last_shutdown_time)
         boot_time = (current_time - last_shutdown).total_seconds()
 
         if boot_time <= self.max_boot_time:
             self.boot_shutdown_time = boot_time
-            return False, f"Measured boot and shutdown time: {self.boot_shutdown_time} seconds"
+            return f"Measured boot and shutdown time: {self.boot_shutdown_time} seconds"
         else:
-            return False, f"Long shutdown detected (duration: {boot_time} seconds). Not updating boot time."
+            return f"Long shutdown detected (duration: {boot_time} seconds). Not updating boot time."
 
     def calculate_waiting_time(self, elapsed_time):
         return max(self.period - elapsed_time, 0)
@@ -49,7 +48,7 @@ class Schedule:
             self.boot_shutdown_time = state.get('boot_shutdown_time')
             self.last_shutdown_time = state.get('last_shutdown_time')
         else:
-            self.boot_shutdown_time = None
+            self.boot_shutdown_time = DEFAULT_BOOT_SHUTDOWN_TIME  # This will get overwritten on the first shutdown-wake sequence
             self.last_shutdown_time = None
 
     def save_boot_state(self):
