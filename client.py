@@ -17,13 +17,13 @@ def main():
 
     try:
         # The app is taking pictures nonstop
-        if app.config['mode'] == "always_on":
+        if app.config.data['mode'] == "always_on":
             app.run_always()
         # The app is sending the images periodically
-        elif app.config['mode'] == "periodic":
-            app.run_periodically(app.config['period'])
+        elif app.config.data['mode'] == "periodic":
+            app.run_periodically(app.config.data['period'])
         # The app takes one picture then shuts down
-        elif app.config['mode'] == "single-shot":
+        elif app.config.data['mode'] == "single-shot":
             app.run()
 
     except SystemExit as e:

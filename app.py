@@ -6,6 +6,7 @@ import pybase64
 from datetime import datetime, timedelta
 from mqtt import MQTT
 from camera import Camera
+from app_config import Config
 from system import System, RTC
 from utils import log_execution_time
 from static_config import SHUTDOWN_THRESHOLD
@@ -14,67 +15,14 @@ import sys
 import os
 
 
-def deep_merge(default, update):
-    """
-    Recursively merge two dictionaries, preferring values from 'update',
-    but only for keys that exist in 'default'.
-
-    Parameters:
-    default (dict): The default dictionary to merge with 'update'.
-    update (dict): The dictionary to merge into 'default'.
-
-    Returns:
-    dict: The merged dictionary.
-    """
-    result = default.copy()
-    # Finding common keys
-    common_keys = set(default.keys()) & set(update.keys())
-    # Iterate through common keys and merge nested dictionaries recursively
-    for key in common_keys:
-        if all(isinstance(d.get(key), dict) for d in (default, update)):
-            result[key] = deep_merge(default[key], update[key])
-        else:
-            result[key] = update[key]
-
-    return result
-
-
 class App:
     def __init__(self, config_path):
-        self.config = self.load_config(config_path)
-        self.camera = Camera(self.config)
+        self.config = Config(config_path)
+        self.camera = Camera(self.config.data)
         self.mqtt = MQTT()
         self.state_file = "state_file.json"  # Choose an appropriate path
         self.load_boot_state()
         self.max_boot_time = 10800  # 3 hours
-
-    @staticmethod
-    def load_config(path):
-        # Define default values
-        default_config = {
-            "quality": "3K",
-            "mode": "single-shot",
-            "period": 50,
-            "wake_up_time": "06:59:31",
-            "shut_down_time": "22:00:00"
-        }
-
-        try:
-            with open(path, "r") as file:
-                data = json.load(file)
-            # Use a deep merge function to combine loaded data with defaults
-            camera_config = deep_merge(default_config, data)
-            return camera_config
-
-        except json.JSONDecodeError as e:
-            logging.error(f"Invalid JSON in the config file: {path} - {str(e)}")
-            exit(1)
-        except FileNotFoundError as e:
-            logging.error(f"Config file not found: {path} - {str(e)}")
-            exit(1)
-        except Exception as e:
-            logging.error(f"Unexpected error loading config: {e}")
-            exit(1)
 
     def working_time_check(self):
         """
@@ -83,10 +31,10 @@ class App:
         The time is in UTC timezone.
         """
         wake_up_time = datetime.strptime(
-            self.config["wake_up_time"], "%H:%M:%S"
+            self.config.data["wake_up_time"], "%H:%M:%S"
         ).time()
         shut_down_time = datetime.strptime(
-            self.config["shut_down_time"], "%H:%M:%S"
+            self.config.data["shut_down_time"], "%H:%M:%S"
         ).time()
 
         utc_time = datetime.fromisoformat(RTC.get_time())
