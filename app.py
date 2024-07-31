@@ -9,7 +9,7 @@ from camera import Camera
 from app_config import Config
 from system import System, RTC
 from utils import log_execution_time
-from static_config import SHUTDOWN_THRESHOLD
+from static_config import SHUTDOWN_THRESHOLD, PUBTOPIC, CONFIGTOPIC
 import time
 import sys
 from schedule import Schedule
@@ -121,7 +121,7 @@ class App:
             if not self.mqtt.client.is_connected():
                 self.connect_mqtt()
 
-            self.mqtt.publish(message)
+            self.mqtt.publish(message, PUBTOPIC)
 
         except Exception as e:
             logging.error(f"Error in run method: {e}")
@@ -177,8 +177,16 @@ class App:
             # In case we dont have enough time to actually shut down we will just sleep inside the script.
             elif waiting_time > 0:
                 if self.mqtt.is_config_changed():
-                    logging.info("Config has changed. Restarting script...")
-                    sys.exit(1)
+                    try:
+                        # Try to load the new config
+                        self.config.load()
+                        # Send acknowledgement of the successful loading
+                        self.mqtt.publish("config-ok", CONFIGTOPIC)
+                    except Exception as e:
+                        logging.error(e)
+                        self.mqtt.publish(f"config-nok|{str(e)}", CONFIGTOPIC)
+                    # Go to the next iteration of the loop with the new config
+                    continue
 
                 logging.info(f"Sleeping for {waiting_time} seconds")
                 time.sleep(waiting_time)

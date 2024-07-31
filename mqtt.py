@@ -1,7 +1,7 @@
 import logging
 import time
 import shutil
-from static_config import BROKER, PUBTOPIC, SUBTOPIC, PORT, QOS, TEMP_CONFIG_PATH, CONFIG_PATH, USERNAME, PASSWORD
+from static_config import BROKER, SUBTOPIC, PORT, QOS, TEMP_CONFIG_PATH, CONFIG_PATH, USERNAME, PASSWORD
 from utils import log_execution_time
 try:
     from paho.mqtt import client as mqtt_client
@@ -14,7 +14,6 @@ import socket
 class MQTT:
     def __init__(self):
         self.broker = BROKER
-        self.pubtopic = PUBTOPIC
         self.subtopic = SUBTOPIC
         self.port = PORT
         self.qos = QOS
@@ -117,18 +116,18 @@ class MQTT:
             logging.error(f"Error during creating connection: {e}")
             exit(1)
 
-    @log_execution_time("Image publish time")
-    def publish(self, message):
+    @log_execution_time("Publish time")
+    def publish(self, message, topic):
         try:
-            msg_info = self.client.publish(self.pubtopic, message, qos=self.qos)
+            msg_info = self.client.publish(topic, message, qos=self.qos)
 
             msg_info.wait_for_publish()
             if msg_info.is_published():
-                logging.info(f"Image and timestamp sent to topic {self.pubtopic}")
+                logging.info(f"Message sent to topic: {topic}")
             else:
-                logging.error(f"Failed to send image and timestamp to topic {self.pubtopic}")
+                logging.error(f"Failed to send message to topic: {topic}")
         except Exception as e:
-            logging.error(f"Error publishing image and timestamp: {str(e)}")
+            logging.error(f"Error publishing message: {str(e)}")
             exit(1)
 
     def disconnect(self):

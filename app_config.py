@@ -1,59 +1,54 @@
 import logging
 import json
+from mqtt import MQTT
+from static_config import CONFIGTOPIC
 
 
 class Config:
     def __init__(self, path):
         self.path = path
         self.data = {}  # Empty dictionary to store settings
-        self.load()  # Load the config file and merge with default values
+        try:
+            self.load()  # Load the config file and merge with default values
+        # If there is an error during loading, publish an error message to the MQTT broker
+        except Exception as e:
+            logging.error(e)
+            mqtt = MQTT()
+            mqtt.connect()
+            mqtt.publish(f"config-nok|{str(e)}", CONFIGTOPIC)
+            mqtt.disconnect()
+
+            # Load the default config
+            self.data = self.get_default_config()
+            logging.error("Default config loaded")
 
     def load(self):
-        # Define default values
-        default_config = {
-            "quality": "3K",
-            "mode": "single-shot",
-            "period": 50,
-            "wake_up_time": "06:59:31",
-            "shut_down_time": "22:00:00"
-        }
-
+        default_config = self.get_default_config()
         try:
             with open(self.path, "r") as file:
                 new_config = json.load(file)
-            # Use a deep merge function to combine loaded data with defaults
-            self.data = Config.deep_merge(default_config, new_config)
+
+            # Check if the loaded config is valid
+            if default_config.keys() != new_config.keys():
+                raise ValueError("Config keys do not match the default config keys.")
 
         except json.JSONDecodeError as e:
-            logging.error(f"Invalid JSON in the config file: {self.path} - {str(e)}")
-            exit(1)
+            logging.error(f"Invalid JSON in the config file: {str(e)}")
+            raise
         except FileNotFoundError as e:
             logging.error(f"Config file not found: {self.path} - {str(e)}")
-            exit(1)
+            raise
         except Exception as e:
             logging.error(f"Unexpected error loading config: {e}")
-            exit(1)
+            raise
 
-    def deep_merge(default, update):
-        """
-        Recursively merge two dictionaries, preferring values from 'update',
-        but only for keys that exist in 'default'.
-
-        Parameters:
-        default (dict): The default dictionary to merge with 'update'.
-        update (dict): The dictionary to merge into 'default'.
-
-        Returns:
-        dict: The merged dictionary.
-        """
-        result = default.copy()
-        # Finding common keys
-        common_keys = set(default.keys()) & set(update.keys())
-        # Iterate through common keys and merge nested dictionaries recursively
-        for key in common_keys:
-            if all(isinstance(d.get(key), dict) for d in (default, update)):
-                result[key] = Config.deep_merge(default[key], update[key])
-            else:
-                result[key] = update[key]
-
-        return result
+    def get_default_config():
+        # Define the default config here, as a dictionary
+        default_config = {
+            "quality": "3K",
+            "mode": "periodic",
+            "period": 30,
+            "wake_up_time": "06:59:31",
+            "shut_down_time": "22:00:00"
+        }
+        return default_config

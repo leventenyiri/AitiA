@@ -24,3 +24,27 @@ def mount_nfs(self):
 
             time.sleep(1)
             logging.info("Retrying...")
+
+def deep_merge(default, update):
+        """
+        Recursively merge two dictionaries, preferring values from 'update',
+        but only for keys that exist in 'default'.
+
+        Parameters:
+        default (dict): The default dictionary to merge with 'update'.
+        update (dict): The dictionary to merge into 'default'.
+
+        Returns:
+        dict: The merged dictionary.
+        """
+        result = default.copy()
+        # Finding common keys
+        common_keys = set(default.keys()) & set(update.keys())
+        # Iterate through common keys and merge nested dictionaries recursively
+        for key in common_keys:
+            if all(isinstance(d.get(key), dict) for d in (default, update)):
+                result[key] = Config.deep_merge(default[key], update[key])
+            else:
+                result[key] = update[key]
+
+        return result
