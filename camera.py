@@ -16,13 +16,13 @@ class Camera:
         self.cam = Picamera2()
 
         # Set the premade settings
-        if config['quality'] == "4K":
+        if config["quality"] == "4K":
             self.width = 3840
             self.height = 2160
-        elif config['quality'] == "3K":
+        elif config["quality"] == "3K":
             self.width = 2560
             self.height = 1440
-        elif config['quality'] == "HD":
+        elif config["quality"] == "HD":
             self.width = 1920
             self.height = 1080
         # If the specified quality is not found, default to 3K quality

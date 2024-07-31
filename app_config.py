@@ -28,9 +28,14 @@ class Config:
             with open(self.path, "r") as file:
                 new_config = json.load(file)
 
+            if not isinstance(new_config, dict):
+                raise TypeError("Config loaded from file is not a dictionary.")
+
             # Check if the loaded config is valid
             if default_config.keys() != new_config.keys():
                 raise ValueError("Config keys do not match the default config keys.")
+
+            self.data.update(new_config)
 
         except json.JSONDecodeError as e:
             logging.error(f"Invalid JSON in the config file: {str(e)}")
@@ -39,16 +44,16 @@ class Config:
             logging.error(f"Config file not found: {self.path} - {str(e)}")
             raise
         except Exception as e:
-            logging.error(f"Unexpected error loading config: {e}")
+            logging.error(e)
             raise
 
-    def get_default_config():
+    def get_default_config(self):
         # Define the default config here, as a dictionary
         default_config = {
             "quality": "3K",
             "mode": "periodic",
-            "period": 30,
-            "wake_up_time": "06:59:31",
-            "shut_down_time": "22:00:00"
+            "period": 15,
+            "wakeUpTime": "06:59:31",
+            "shutDownTime": "22:00:00"
         }
         return default_config

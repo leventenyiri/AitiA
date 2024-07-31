@@ -29,10 +29,10 @@ class App:
         The time is in UTC timezone.
         """
         wake_up_time = datetime.strptime(
-            self.config.data["wake_up_time"], "%H:%M:%S"
+            self.config.data["wakeUpTime"], "%H:%M:%S"
         ).time()
         shut_down_time = datetime.strptime(
-            self.config.data["shut_down_time"], "%H:%M:%S"
+            self.config.data["shutDownTime"], "%H:%M:%S"
         ).time()
 
         utc_time = datetime.fromisoformat(RTC.get_time())
@@ -182,9 +182,12 @@ class App:
                         self.config.load()
                         # Send acknowledgement of the successful loading
                         self.mqtt.publish("config-ok", CONFIGTOPIC)
+                        logging.info("Config received and acknowledged")
                     except Exception as e:
-                        logging.error(e)
                         self.mqtt.publish(f"config-nok|{str(e)}", CONFIGTOPIC)
+
+                    # Reset the config received flag
+                    self.mqtt.reset_config_flag()
                     # Go to the next iteration of the loop with the new config
                     continue
 

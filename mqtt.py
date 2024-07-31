@@ -51,6 +51,9 @@ class MQTT:
     def is_config_changed(self):
         return self.config_changed
 
+    def reset_config_flag(self):
+        self.config_changed = False
+
     def connect(self):
         def on_connect(client, userdata, flags, rc, properties=None):
             if rc == 0:
