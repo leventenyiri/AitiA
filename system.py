@@ -3,6 +3,9 @@ import logging
 from datetime import datetime
 import pytz
 import time
+import os
+import fcntl
+import struct
 try:
     from gpiozero import CPUTemperature
 except ImportError:
@@ -20,9 +23,32 @@ class System:
         logging.info("System has rebooted")
         subprocess.run(['sudo', 'reboot'], check=True)
 
+    # Still experimental, do not have the real API yet.
     @staticmethod
-    def schedule_wakeup():
-        raise NotImplementedError
+    def schedule_wakeup(wake_time):
+        try:
+            # Convert wake_time to Unix timestamp
+            wake_timestamp = int(wake_time.timestamp())
+
+            # Construct the rtcwake command
+            cmd = [
+                'sudo', 'rtcwake',
+                '-d', 'rtc0',  # Use RTC0 device
+                '-m', 'no',    # Don't actually suspend, just set the alarm
+                '-t', str(wake_timestamp),
+                '-u'  # Use UTC time
+            ]
+
+            # Execute the command
+            result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+
+            logging.info(f"Wake-up alarm set for {wake_time}")
+            logging.debug(f"rtcwake output: {result.stdout}")
+
+        except subprocess.CalledProcessError as e:
+            logging.error(f"Failed to set RTC wake-up alarm: {e}")
+            logging.error(f"rtcwake error output: {e.stderr}")
+            raise
 
     @staticmethod
     def get_cpu_temperature():

@@ -9,7 +9,7 @@ from camera import Camera
 from app_config import Config
 from system import System, RTC
 from utils import log_execution_time
-from static_config import SHUTDOWN_THRESHOLD, PUBTOPIC, CONFIGTOPIC
+from static_config import MINIMUM_WAIT_TIME, PUBTOPIC, CONFIGTOPIC
 import time
 import sys
 from schedule import Schedule
@@ -154,6 +154,7 @@ class App:
             # done running (end_time), which is basically the current time.
             self.schedule.load_boot_state()
             waiting_time, end_time = self.run_with_time_measure()
+            waiting_time = max(waiting_time, MINIMUM_WAIT_TIME)
 
             # This will set the boot_shutdown_time, on the first run it will use the default value.
             message = self.schedule.update_boot_time(end_time)
@@ -167,12 +168,14 @@ class App:
                 wake_time = self.schedule.get_wake_time(end_time, shutdown_duration)
 
                 logging.info(f"Shutting down for {shutdown_duration} seconds")
-                logging.info(f"Scheduling wake-up for {wake_time}")
 
-                System.schedule_wakeup(wake_time)
-                self.schedule.last_shutdown_time = end_time.isoformat()
-                self.schedule.save_boot_state()
-                System.shutdown()
+                try:
+                    System.schedule_wakeup(wake_time)
+                    self.schedule.last_shutdown_time = end_time.isoformat()
+                    self.schedule.save_boot_state()
+                    System.shutdown()
+                except Exception as e:
+                    logging.error(f"Failed to schedule wake-up: {e}")
 
             # In case we dont have enough time to actually shut down we will just sleep inside the script.
             elif waiting_time > 0:
@@ -193,6 +196,6 @@ class App:
 
                 logging.info(f"Sleeping for {waiting_time} seconds")
                 time.sleep(waiting_time)
-            # If the waiting time is 0, we increase it. TODO: if its smaller than a given value, overwrite it
+
             else:
-                logging.warning(f"Period time is set too low. Increase it by {abs(waiting_time)} seconds.")
+                logging.warning(f"Period time is set too low. The minimum is {MINIMUM_WAIT_TIME} seconds.")

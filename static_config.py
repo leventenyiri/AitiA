@@ -19,3 +19,4 @@ PASSWORD = "admin"
 # App configuration
 SHUTDOWN_THRESHOLD = 60  # in seconds
 DEFAULT_BOOT_SHUTDOWN_TIME = 30  # in seconds
+MINIMUM_WAIT_TIME = 5  # in seconds
