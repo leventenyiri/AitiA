@@ -7,10 +7,10 @@ CONFIG_PATH = os.path.join(SCRIPT_DIR, 'config.json')
 TEMP_CONFIG_PATH = os.path.join(SCRIPT_DIR, 'temp_config.json')
 
 # MQTT Configuration
-BROKER = "192.168.0.105"
+BROKER = "192.168.0.103"
 PORT = 1883
 PUBTOPIC = "mqtt/rpi/image"
-CONFIGTOPIC = "er-edge/config"
+CONFIGTOPIC = "er-edge/confirm"
 SUBTOPIC = "settings/er-edge"
 QOS = 2
 USERNAME = "er-edge-3c547181"

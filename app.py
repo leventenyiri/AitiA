@@ -11,7 +11,6 @@ from system import System, RTC
 from utils import log_execution_time
 from static_config import MINIMUM_WAIT_TIME, PUBTOPIC, CONFIGTOPIC
 import time
-import sys
 from schedule import Schedule
 
 
@@ -185,7 +184,7 @@ class App:
                         self.config.load()
                         # Send acknowledgement of the successful loading
                         self.mqtt.publish("config-ok", CONFIGTOPIC)
-                        logging.info("\nConfig received and acknowledged\n")
+                        logging.info("Config received and acknowledged\n")
                     except Exception as e:
                         self.mqtt.publish(f"config-nok|{str(e)}", CONFIGTOPIC)
 

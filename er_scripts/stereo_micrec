@@ -1,2 +1,0 @@
-#!/bin/bash
-arecord -D plughw:0 -c2 -r 48000 -f S32_LE -t wav -V stereo -v file_stereo.wav

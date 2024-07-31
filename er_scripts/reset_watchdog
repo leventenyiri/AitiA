@@ -1,9 +1,0 @@
-#!/bin/bash
-#reset watchdog
-i2cset -y 1 0x6b 0x16 0xa7
-
-# get status
-echo "Status (normal = 0x00)"
-i2cget -y 1 0x6b 0x1d
-i2cget -y 1 0x6b 0x1d
-
