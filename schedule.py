@@ -9,7 +9,7 @@ class Schedule:
     def __init__(self, period):
         self.state_file = "state_file.json"
         self.period = period
-        self.max_boot_time = 10800,  # 3 hours
+        self.max_boot_time = 10800  # 3 hours
         self.shutdown_threshold = SHUTDOWN_THRESHOLD
         self.boot_shutdown_time = None
         self.last_shutdown_time = None
@@ -17,16 +17,22 @@ class Schedule:
 
     def update_boot_time(self, current_time):
         if self.last_shutdown_time is None and (self.period > self.shutdown_threshold):
+            self.last_shutdown_time = current_time.isoformat()
             return "First run or state file was reset. Will measure boot time on next cycle. Using default value for first shutdown period"
 
         last_shutdown = datetime.fromisoformat(self.last_shutdown_time)
         boot_time = (current_time - last_shutdown).total_seconds()
 
+        self.last_shutdown_time = current_time.isoformat()
+
+        if (boot_time <= self.max_boot_time) and (self.period < self.shutdown_threshold):
+            return "Period too small to shut down, sleeping in script..."
+
         if boot_time <= self.max_boot_time:
             self.boot_shutdown_time = boot_time
             return f"Measured boot and shutdown time: {self.boot_shutdown_time} seconds"
         else:
-            return f"Long shutdown detected (duration: {boot_time} seconds). Not updating boot time."
+            return f"Long shutdown detected (duration: {boot_time} seconds). Not updating boot time. Current_time is :{current_time}, last_shutdown is: {last_shutdown}"
 
     def calculate_waiting_time(self, elapsed_time):
         return max(self.period - elapsed_time, 0)

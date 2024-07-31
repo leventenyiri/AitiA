@@ -152,11 +152,13 @@ class App:
             # First we run the code thats responsible for taking a picture and sending it, but also measures the time it takes and substracts it from the period
             # (so when we calibrate the timing, we start the script that much sooner, to get the correct period), it also returns what time is it after the script is
             # done running (end_time), which is basically the current time.
+            self.schedule.load_boot_state()
             waiting_time, end_time = self.run_with_time_measure()
 
             # This will set the boot_shutdown_time, on the first run it will use the default value.
             message = self.schedule.update_boot_time(end_time)
             logging.info(message)
+            self.schedule.save_boot_state()
 
             # If based on the given period we have enough time to shut down between runs, this will calculate for how long we have to shut down, sets a wake time
             # for the RTC based interrupt and saves the current time as last_shutdown time before shutting down
