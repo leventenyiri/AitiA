@@ -147,16 +147,28 @@ class App:
 
     def run_periodically(self):
         while True:
-            logging.info(f"Entered run_periodically")
-            waiting_time, end_time = self.run_with_time_measure()
-            logging.info(f"Survived run_with_time_measure")
+            """ For the logic of the function to work we have to save when the last shutdown occured (last_shutdown_time), and the time it takes for the device to
+            shutdown and boot up (boot_shutdown_time), because we have to calibrate the timing to achieve the given period. last_shutdown_time and boot_shutdown_time
+            have to be saved in a separate json file, to make it persist between shutdowns. The script will create this file, DO NOT CREATE IT, the logic of the
+            function depends on it not existing on the first run. """
 
+            # First we run the code thats responsible for taking a picture and sending it, but also measures the time it takes and substracts it from the period
+            # (so when we calibrate the timing, we start the script that much sooner, to get the correct period), it also returns what time is it after the script is
+            # done running (end_time), which is basically the current time.
+            waiting_time, end_time = self.run_with_time_measure()
+
+            # The update_boot_time function will return True for should_reboot if its the first time running the script,
+            # and the period is larger than the shutdown_treshold. This is needed, because on the first run we have no idea how much time it takes to shutdown and
+            # boot up, so we cant take this into consideration when calibrating the period. (Maybe rewrite this, so on the first run it just uses the waiting time
+            # as shutdown time)
             should_reboot, message = self.schedule.update_boot_time(end_time)
             logging.info(message)
             if should_reboot:
                 self.schedule.save_boot_state()
                 System.reboot()
 
+            # If based on the given period we have enough time to shut down between runs, this will calculate for how long we have to shut down, sets a wake time
+            # for the RTC based interrupt and saves the current time as last_shutdown time before shutting down
             if self.schedule.should_shutdown(waiting_time):
                 shutdown_duration = self.schedule.calculate_shutdown_duration(waiting_time)
                 wake_time = self.schedule.get_wake_time(end_time, shutdown_duration)
@@ -169,6 +181,7 @@ class App:
                 self.schedule.save_boot_state()
                 System.shutdown()
 
+            # In case we dont have enough time to actually shut down we will just sleep inside the script.
             elif waiting_time > 0:
                 if self.mqtt.is_config_changed():
                     logging.info("Config has changed. Restarting script...")
@@ -176,5 +189,6 @@ class App:
 
                 logging.info(f"Sleeping for {waiting_time} seconds")
                 time.sleep(waiting_time)
+            # If the waiting time is 0, we increase it. TODO: if its smaller than a given value, overwrite it
             else:
                 logging.warning(f"Period time is set too low. Increase it by {abs(waiting_time)} seconds.")
