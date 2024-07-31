@@ -17,7 +17,8 @@ class System:
 
     @staticmethod
     def reboot():
-        raise NotImplementedError
+        logging.info("System has rebooted")
+        subprocess.run(['sudo', 'reboot'], check=True)
 
     @staticmethod
     def schedule_wakeup():

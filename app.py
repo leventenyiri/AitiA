@@ -45,7 +45,7 @@ class App:
         self.camera = Camera(self.config)
         self.mqtt = MQTT()
         self.state_file = "state_file.json"  # Choose an appropriate path
-        self.load_state()
+        self.load_boot_state()
         self.max_boot_time = 10800  # 3 hours
 
     @staticmethod
@@ -185,7 +185,7 @@ class App:
         while True:
             self.run()
 
-    def load_state(self):
+    def load_boot_state(self):
         if os.path.exists(self.state_file):
             with open(self.state_file, 'r') as f:
                 state = json.load(f)
@@ -195,7 +195,7 @@ class App:
             self.boot_shutdown_time = None
             self.last_shutdown_time = None
 
-    def save_state(self):
+    def save_boot_state(self):
         state = {
             'boot_shutdown_time': self.boot_shutdown_time,
             'last_shutdown_time': self.last_shutdown_time,
@@ -212,9 +212,10 @@ class App:
 
             current_time = datetime.fromisoformat(RTC.get_time())
 
+            # Dont reboot if we cant shut down, only sleep
             if self.last_shutdown_time is None:
                 self.last_shutdown_time = current_time.isoformat()
-                self.save_state()
+                self.save_boot_state()
                 logging.info("First run or state file was reset. Will measure boot time on next cycle.")
                 System.reboot()
 
@@ -240,7 +241,7 @@ class App:
 
                     System.schedule_wakeup(wake_time)
                     self.last_shutdown_time = current_time.isoformat()
-                    self.save_state()
+                    self.save_boot_state()
                     System.shutdown()
                 else:
                     logging.info(f"Sleeping for {waiting_time} seconds")
@@ -255,7 +256,7 @@ class App:
             else:
                 logging.warning(f"Period time is set too low. Increase it by {abs(waiting_time)} seconds.")
 
-            self.save_state()
+            self.save_boot_state()
 
     def run_with_time_measure(self, period):
         start_time = RTC.get_time()

@@ -8,3 +8,17 @@ cat /sys/class/power_supply/bq2562x-battery/uevent
 cat /sys/class/power_supply/bq2562x-charger/uevent
 
 cat /var/log/kern.log
+
+3órakor napon:
+    ~700mA töltés
+árnyékban ~50mA
+
+alapjáraton ~200mA fogyasztás
+
+5órakor napon:
+    ~560mA töltés
+
+10ms-enként lövünk 3K-s képeket + küldés-nél fogyasztás:
+    ~300mA
+
+    Van, hogy ~600mA...
