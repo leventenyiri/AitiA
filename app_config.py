@@ -19,7 +19,7 @@ class Config:
             mqtt.disconnect()
 
             # Load the default config
-            self.data = self.get_default_config()
+            self.data.update(self.get_default_config())
             logging.error("Default config loaded")
 
     def load(self):

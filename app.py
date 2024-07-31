@@ -185,7 +185,7 @@ class App:
                         self.config.load()
                         # Send acknowledgement of the successful loading
                         self.mqtt.publish("config-ok", CONFIGTOPIC)
-                        logging.info("Config received and acknowledged")
+                        logging.info("\nConfig received and acknowledged\n")
                     except Exception as e:
                         self.mqtt.publish(f"config-nok|{str(e)}", CONFIGTOPIC)
 
