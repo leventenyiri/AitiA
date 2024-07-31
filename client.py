@@ -21,7 +21,7 @@ def main():
             app.run_always()
         # The app is sending the images periodically
         elif app.config.data['mode'] == "periodic":
-            app.run_periodically(app.config.data['period'])
+            app.run_periodically()
         # The app takes one picture then shuts down
         elif app.config.data['mode'] == "single-shot":
             app.run()

@@ -3,7 +3,7 @@ import json
 import io
 from PIL import Image
 import pybase64
-from datetime import datetime, timedelta
+from datetime import datetime
 from mqtt import MQTT
 from camera import Camera
 from app_config import Config
@@ -12,7 +12,6 @@ from utils import log_execution_time
 from static_config import SHUTDOWN_THRESHOLD
 import time
 import sys
-import os
 from schedule import Schedule
 
 
@@ -23,7 +22,7 @@ class App:
         self.mqtt = MQTT()
         self.schedule = Schedule(
             state_file="state_file.json",
-            period=self.basic_config["period"],
+            period=self.config.data["period"],
             max_boot_time=10800,  # 3 hours
             shutdown_threshold=SHUTDOWN_THRESHOLD
         )
@@ -137,18 +136,20 @@ class App:
         while True:
             self.run()
 
-    def run_with_time_measure(self, period):
+    def run_with_time_measure(self):
         start_time = RTC.get_time()
         self.run()
         end_time = RTC.get_time()
         # Some transformation is necessary because of the way we are getting the time from the RTC
         elapsed_time = (datetime.fromisoformat(end_time) - datetime.fromisoformat(start_time)).total_seconds()
-        waiting_time = period - elapsed_time
+        waiting_time = self.config.data["period"] - elapsed_time
         return max(waiting_time, 0), datetime.fromisoformat(end_time)  # Ensure we don't return negative time
 
     def run_periodically(self):
         while True:
-            waiting_time, end_time = self.run_with_time_measure(self, self.schedule.period)
+            logging.info(f"Entered run_periodically")
+            waiting_time, end_time = self.run_with_time_measure()
+            logging.info(f"Survived run_with_time_measure")
 
             should_reboot, message = self.schedule.update_boot_time(end_time)
             logging.info(message)
