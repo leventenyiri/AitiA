@@ -20,12 +20,7 @@ class App:
         self.config = Config(config_path)
         self.camera = Camera(self.config.data)
         self.mqtt = MQTT()
-        self.schedule = Schedule(
-            state_file="state_file.json",
-            period=self.config.data["period"],
-            max_boot_time=10800,  # 3 hours
-            shutdown_threshold=SHUTDOWN_THRESHOLD
-        )
+        self.schedule = Schedule(period=self.config.data["period"])
 
     def working_time_check(self):
         """
@@ -146,6 +141,8 @@ class App:
         return max(waiting_time, 0), datetime.fromisoformat(end_time)  # Ensure we don't return negative time
 
     def run_periodically(self):
+        """ Periodically takes pictures and sends them over MQTT, based on the period it will either shut down between sending two pictures, or just sleep
+        within the script."""
         while True:
             """ For the logic of the function to work we have to save when the last shutdown occured (last_shutdown_time), and the time it takes for the device to
             shutdown and boot up (boot_shutdown_time), because we have to calibrate the timing to achieve the given period. last_shutdown_time and boot_shutdown_time
