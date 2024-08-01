@@ -132,6 +132,17 @@ class App:
         while True:
             self.run()
 
+    def acknowledge_config(self):
+        # Copy the acknowledgement message atomically to avoid on_message callback changing it
+        self.lock.acquire()
+        message = self.mqtt.config_confirm_message
+        self.lock.release()
+        # Send acknowledgement of the new config
+        self.mqtt.publish(message, CONFIGTOPIC)
+        logging.info("\nConfig received and acknowledged\n")
+        # Reset the config received flag
+        self.mqtt.reset_config_flag()
+
     def run_with_time_measure(self):
         start_time = RTC.get_time()
         self.run()
@@ -183,15 +194,7 @@ class App:
                 if self.mqtt.is_config_changed():
                     # Try to load the new config
                     self.config.load()
-                    # Copy the acknowledgement message atomically to avoid on_message callback changing it
-                    self.lock.acquire()
-                    message = self.mqtt.config_confirm_message
-                    self.lock.release()
-                    # Send acknowledgement of the new config
-                    self.mqtt.publish(message, CONFIGTOPIC)
-                    logging.info("Config received and acknowledged\n")
-                    # Reset the config received flag
-                    self.mqtt.reset_config_flag()
+                    self.acknowledge_config()
                     # Go to the next iteration of the loop with the new config
                     continue
 

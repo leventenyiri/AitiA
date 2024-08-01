@@ -26,6 +26,8 @@ class MQTT:
         def on_message(client, userdata, msg):
             from app_config import Config
             try:
+                # Signal the config change
+                self.config_changed = True
                 # Parse the JSON message
                 config_data = json.loads(msg.payload)
                 logging.info("Starting config validation...")
@@ -41,28 +43,12 @@ class MQTT:
                 shutil.copyfile(TEMP_CONFIG_PATH, CONFIG_PATH)
                 logging.info(f"Config saved to {CONFIG_PATH}")
                 self.config_confirm_message = "config-ok"
-                # Signal the config change
-                self.config_changed = True
 
             except json.JSONDecodeError as e:
-                error_message = f"Invalid JSON received: {e}"
-                logging.error(error_message)
-                self.publish(f"config-nok|{error_message}", CONFIGTOPIC)
-            except (TypeError, ValueError) as e:
-                error_message = f"Config validation error: {e}"
-                logging.error(error_message)
-                self.publish(f"config-nok|{error_message}", CONFIGTOPIC)
-            except IOError as e:
-                error_message = f"File I/O error: {e}"
-                logging.error(error_message)
-                self.publish(f"config-nok|{error_message}", CONFIGTOPIC)
-                self.config_confirm_message = f"config-nok|{e}"
+                self.config_confirm_message = f"config-nok|Invalid JSON received: {e}"
                 logging.error(f"Invalid JSON received: {e}")
             except Exception as e:
-                error_message = f"Unexpected error processing message: {e}"
-                logging.error(error_message)
-                self.publish(f"config-nok|{error_message}", CONFIGTOPIC)
-                self.config_confirm_message = f"config-nok|{e}"
+                self.config_confirm_message = f"config-nok| {e}"
                 logging.error(f"Error processing message: {e}")
 
         self.client.on_message = on_message
