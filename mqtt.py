@@ -9,6 +9,7 @@ except ImportError:
     mqtt_client = None
 import json
 import socket
+import threading
 
 
 class MQTT:
@@ -19,7 +20,7 @@ class MQTT:
         self.qos = QOS
         self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
         self.reconnect_counter = 0
-        self.config_changed = False
+        self.config_received_event = threading.Event()
         self.config_confirm_message = "config-nok|Confirm message uninitialized"
 
     def init_receive(self):
@@ -42,18 +43,18 @@ class MQTT:
                 logging.info(f"Config saved to {CONFIG_PATH}")
                 self.config_confirm_message = "config-ok"
                 # Signal the config change
-                self.config_changed = True
+                self.config_received_event.set()
 
             except json.JSONDecodeError as e:
                 self.config_confirm_message = f"config-nok|Invalid JSON received: {e}"
                 logging.error(f"Invalid JSON received: {e}")
                 # Signal the config change
-                self.config_changed = True
+                self.config_received_event.set()
             except Exception as e:
                 self.config_confirm_message = f"config-nok| {e}"
                 logging.error(f"Error processing message: {e}")
                 # Signal the config change
-                self.config_changed = True
+                self.config_received_event.set()
 
         self.client.on_message = on_message
         self.client.subscribe(self.subtopic)
@@ -63,7 +64,7 @@ class MQTT:
         return self.config_changed
 
     def reset_config_flag(self):
-        self.config_changed = False
+        self.config_received_event.clear()
 
     def connect(self):
         def on_connect(client, userdata, flags, rc, properties=None):

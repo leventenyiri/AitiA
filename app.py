@@ -191,15 +191,16 @@ class App:
 
             # In case we dont have enough time to actually shut down we will just sleep inside the script.
             elif waiting_time > 0:
-                if self.mqtt.is_config_changed():
+                logging.info(f"Sleeping for {waiting_time} seconds")
+                # If there is no new config, sleep waiting_time seconds and config_received_event is set to False
+                config_received = self.mqtt.config_received_event.wait(timeout=waiting_time)
+                if config_received:
                     # Try to load the new config
                     self.config.load()
                     self.acknowledge_config()
-                    # Go to the next iteration of the loop with the new config
+                    # Reset the event
+                    self.mqtt.reset_config_flag()
                     continue
-
-                logging.info(f"Sleeping for {waiting_time} seconds")
-                time.sleep(waiting_time)
 
             else:
                 logging.warning(f"Period time is set too low. The minimum is {MINIMUM_WAIT_TIME} seconds.")
