@@ -1,0 +1,2 @@
+Replace "github.com" with "raw.githubusercontent.com"
+Remove the "/blob" part from the URL

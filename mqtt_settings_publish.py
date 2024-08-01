@@ -31,7 +31,7 @@ def publish(client):
         # Convert the JSON object to a string
         message = json.dumps(config_data)
 
-        result = client.publish(topic, message)
+        result = client.publish(topic, "fasz")
         result.wait_for_publish()
         status = result[0]
         if status == 0:

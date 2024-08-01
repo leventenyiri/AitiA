@@ -1,0 +1,9 @@
+multicast DNS setup:
+
+    sudo apt-get install avahi-daemon
+
+Hostname lekérdezése:
+
+    hostname -f
+
+Ezt lehet használni IP helyett
