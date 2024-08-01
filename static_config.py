@@ -20,3 +20,4 @@ PASSWORD = "admin"
 SHUTDOWN_THRESHOLD = 60  # in seconds
 DEFAULT_BOOT_SHUTDOWN_TIME = 30  # in seconds
 MINIMUM_WAIT_TIME = 5  # in seconds
+MAXIMUM_WAIT_TIME = 10800  # 3 hours in seconds

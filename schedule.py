@@ -2,14 +2,14 @@ from datetime import datetime, timedelta
 import os
 import json
 import logging
-from static_config import SHUTDOWN_THRESHOLD, DEFAULT_BOOT_SHUTDOWN_TIME
+from static_config import SHUTDOWN_THRESHOLD, DEFAULT_BOOT_SHUTDOWN_TIME, MAXIMUM_WAIT_TIME
 
 
 class Schedule:
     def __init__(self, period):
         self.state_file = "state_file.json"
         self.period = period
-        self.max_boot_time = 10800  # 3 hours
+        self.max_boot_time = MAXIMUM_WAIT_TIME
         self.shutdown_threshold = SHUTDOWN_THRESHOLD
         self.boot_shutdown_time = None
         self.last_shutdown_time = None
