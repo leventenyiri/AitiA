@@ -10,6 +10,8 @@ transfer file:
     for transferring a whole folder: scp -r ~/Dev/AitiA rpizero:/home/admin/APPLICATION
     transferring multiple files at once: scp ~/Dev/AitiA/{app.py,config.py,utils.py} rpizero:/home/admin/APPLICATION
 
+    scp ~/Dev/AitiA/{app.py,app_config.py,client.py,mqtt.py,run_script.sh,schedule.py,system.py,static_config.py,utils.py} rpizero:/home/admin/APPLICATION
+
 
 
 delete: rm -r filename

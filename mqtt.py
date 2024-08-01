@@ -45,9 +45,23 @@ class MQTT:
                 self.config_changed = True
 
             except json.JSONDecodeError as e:
+                error_message = f"Invalid JSON received: {e}"
+                logging.error(error_message)
+                self.publish(f"config-nok|{error_message}", CONFIGTOPIC)
+            except (TypeError, ValueError) as e:
+                error_message = f"Config validation error: {e}"
+                logging.error(error_message)
+                self.publish(f"config-nok|{error_message}", CONFIGTOPIC)
+            except IOError as e:
+                error_message = f"File I/O error: {e}"
+                logging.error(error_message)
+                self.publish(f"config-nok|{error_message}", CONFIGTOPIC)
                 self.config_confirm_message = f"config-nok|{e}"
                 logging.error(f"Invalid JSON received: {e}")
             except Exception as e:
+                error_message = f"Unexpected error processing message: {e}"
+                logging.error(error_message)
+                self.publish(f"config-nok|{error_message}", CONFIGTOPIC)
                 self.config_confirm_message = f"config-nok|{e}"
                 logging.error(f"Error processing message: {e}")
 
