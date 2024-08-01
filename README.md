@@ -38,7 +38,7 @@ Detecting starling swarms.
   - Unit, integration testing ✅
   - Implementing periodic running: -> with shut down, and without shut down ✅
   - Optimizing the OS boot time ✅
-  - If RTC and internal time doesn't match ask for time set
+  - If RTC and internal time doesn't match ask for time set ✅
   - Improving bash script
   - Add extra data to the published message (battery charge level, battery temperature) ✅
   - Packaging the software -> creating the Raspberry os image
