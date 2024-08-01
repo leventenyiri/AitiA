@@ -42,7 +42,7 @@ Detecting starling swarms.
   - Improving bash script
   - Add extra data to the published message (battery charge level, battery temperature) ✅
   - Packaging the software -> creating the Raspberry os image
-  - MQTT DNS
+  - MQTT DNS ✅
   - Config input sanitazing
     
 - [ ] **Effective Range dependencies**
