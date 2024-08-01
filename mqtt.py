@@ -20,6 +20,7 @@ class MQTT:
         self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
         self.reconnect_counter = 0
         self.config_changed = False
+        self.config_confirm_message = "config-nok|Confirm message uninitialized"
 
     def init_receive(self):
         def on_message(client, userdata, msg):
@@ -27,7 +28,7 @@ class MQTT:
             try:
                 # Parse the JSON message
                 config_data = json.loads(msg.payload)
-
+                logging.info("Starting config validation...")
                 Config.validate_config(config_data)
 
                 # Write the validated JSON to the temp file
@@ -39,15 +40,16 @@ class MQTT:
                 # Copy the file
                 shutil.copyfile(TEMP_CONFIG_PATH, CONFIG_PATH)
                 logging.info(f"Config saved to {CONFIG_PATH}")
+                self.config_confirm_message = "config-ok"
                 # Signal the config change
                 self.config_changed = True
 
             except json.JSONDecodeError as e:
+                self.config_confirm_message = f"config-nok|{e}"
                 logging.error(f"Invalid JSON received: {e}")
-                self.publish(f"config-nok|{str(e)}", CONFIGTOPIC)
             except Exception as e:
+                self.config_confirm_message = f"config-nok|{e}"
                 logging.error(f"Error processing message: {e}")
-                self.publish(f"config-nok|{str(e)}", CONFIGTOPIC)
 
         self.client.on_message = on_message
         self.client.subscribe(self.subtopic)

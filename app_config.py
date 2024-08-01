@@ -60,25 +60,26 @@ class Config:
 
         if not isinstance(new_config, dict):
             raise TypeError("Config loaded from file is not a dictionary.")
-
+        logging.debug(f"New config is dict")
         if default_config.keys() != new_config.keys():
             raise ValueError("Config keys do not match.")
-
+        logging.debug(f"New config keys match")
         if new_config["quality"] not in ["4K", "3K", "HD"]:
             raise ValueError("Invalid quality specified in the config.")
-
+        logging.debug(f"New config quality is valid")
         if new_config["mode"] not in ["periodic", "single-shot", "always-on"]:
             raise ValueError("Invalid mode specified in the config.")
-
+        logging.debug(f"New config mode is valid")
         if new_config["mode"] == "periodic":
             if not isinstance(new_config["period"], int):
                 raise TypeError("Period specified in the config is not an integer.")
             if new_config["period"] < MINIMUM_WAIT_TIME:
                 raise ValueError("Period specified in the config is less than the minimum allowed wait time.")
-
+        logging.debug(f"New config period is valid")
         # REGEX: hh:mm:ss
         time_pattern = re.compile(r'^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$')
         if bool(time_pattern.match(new_config["wakeUpTime"])) is False:
             raise TypeError("Invalid wake-up time format in the config.")
         if bool(time_pattern.match(new_config["shutDownTime"])) is False:
             raise TypeError("Invalid shut-down time format in the config.")
+        logging.debug(f"New config times are valid")

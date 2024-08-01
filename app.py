@@ -1,6 +1,8 @@
 import logging
 import json
 import io
+import threading
+import time
 from PIL import Image
 import pybase64
 from datetime import datetime
@@ -10,7 +12,6 @@ from app_config import Config
 from system import System, RTC
 from utils import log_execution_time
 from static_config import MINIMUM_WAIT_TIME, PUBTOPIC, CONFIGTOPIC
-import time
 from schedule import Schedule
 
 
@@ -20,6 +21,7 @@ class App:
         self.camera = Camera(self.config.data)
         self.mqtt = MQTT()
         self.schedule = Schedule(period=self.config.data["period"])
+        self.lock = threading.Lock()
 
     def working_time_check(self):
         """
@@ -181,10 +183,13 @@ class App:
                 if self.mqtt.is_config_changed():
                     # Try to load the new config
                     self.config.load()
-                    # Send acknowledgement of the successful loading
-                    self.mqtt.publish("config-ok", CONFIGTOPIC)
+                    # Copy the acknowledgement message atomically to avoid on_message callback changing it
+                    self.lock.acquire()
+                    message = self.mqtt.config_confirm_message
+                    self.lock.release()
+                    # Send acknowledgement of the new config
+                    self.mqtt.publish(message, CONFIGTOPIC)
                     logging.info("Config received and acknowledged\n")
-
                     # Reset the config received flag
                     self.mqtt.reset_config_flag()
                     # Go to the next iteration of the loop with the new config
