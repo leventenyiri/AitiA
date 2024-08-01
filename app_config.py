@@ -1,7 +1,8 @@
 import logging
 import json
+import re
 from mqtt import MQTT
-from static_config import CONFIGTOPIC
+from static_config import CONFIGTOPIC, MINIMUM_WAIT_TIME
 
 
 class Config:
@@ -19,21 +20,15 @@ class Config:
             mqtt.disconnect()
 
             # Load the default config
-            self.data.update(self.get_default_config())
+            self.data.update(Config.get_default_config())
             logging.error("Default config loaded")
 
     def load(self):
-        default_config = self.get_default_config()
         try:
             with open(self.path, "r") as file:
                 new_config = json.load(file)
 
-            if not isinstance(new_config, dict):
-                raise TypeError("Config loaded from file is not a dictionary.")
-
-            # Check if the loaded config is valid
-            if default_config.keys() != new_config.keys():
-                raise ValueError("Config keys do not match the default config keys.")
+            Config.validate_config(new_config)
 
             self.data.update(new_config)
 
@@ -47,7 +42,8 @@ class Config:
             logging.error(e)
             raise
 
-    def get_default_config(self):
+    @staticmethod
+    def get_default_config():
         # Define the default config here, as a dictionary
         default_config = {
             "quality": "3K",
@@ -57,3 +53,32 @@ class Config:
             "shutDownTime": "22:00:00"
         }
         return default_config
+
+    @staticmethod
+    def validate_config(new_config):
+        default_config = Config.get_default_config()
+
+        if not isinstance(new_config, dict):
+            raise TypeError("Config loaded from file is not a dictionary.")
+
+        if default_config.keys() != new_config.keys():
+            raise ValueError("Config keys do not match.")
+
+        if new_config["quality"] not in ["4K", "3K", "HD"]:
+            raise ValueError("Invalid quality specified in the config.")
+
+        if new_config["mode"] not in ["periodic", "single-shot", "always-on"]:
+            raise ValueError("Invalid mode specified in the config.")
+
+        if new_config["mode"] == "periodic":
+            if not isinstance(new_config["period"], int):
+                raise TypeError("Period specified in the config is not an integer.")
+            if new_config["period"] < MINIMUM_WAIT_TIME:
+                raise ValueError("Period specified in the config is less than the minimum allowed wait time.")
+
+        # REGEX: hh:mm:ss
+        time_pattern = re.compile(r'^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$')
+        if bool(time_pattern.match(new_config["wakeUpTime"])) is False:
+            raise TypeError("Invalid wake-up time format in the config.")
+        if bool(time_pattern.match(new_config["shutDownTime"])) is False:
+            raise TypeError("Invalid shut-down time format in the config.")

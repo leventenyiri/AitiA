@@ -1,6 +1,6 @@
  Basic:
        "quality": "4K", "3K", "HD"
-       "mode": "always_on" == the device is taking pictures and sending them ASAP,
+       "mode": "always-on" == the device is taking pictures and sending them ASAP,
                "periodic" == the device takes pictures and sends the periodically the time interval can be set with "period", 
                "single-shot" == the device takes a picture then shuts down
        "period": 0...max(int32)

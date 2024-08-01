@@ -17,7 +17,7 @@ def main():
 
     try:
         # The app is taking pictures nonstop
-        if app.config.data['mode'] == "always_on":
+        if app.config.data['mode'] == "always-on":
             app.run_always()
         # The app is sending the images periodically
         elif app.config.data['mode'] == "periodic":

@@ -179,14 +179,11 @@ class App:
             # In case we dont have enough time to actually shut down we will just sleep inside the script.
             elif waiting_time > 0:
                 if self.mqtt.is_config_changed():
-                    try:
-                        # Try to load the new config
-                        self.config.load()
-                        # Send acknowledgement of the successful loading
-                        self.mqtt.publish("config-ok", CONFIGTOPIC)
-                        logging.info("Config received and acknowledged\n")
-                    except Exception as e:
-                        self.mqtt.publish(f"config-nok|{str(e)}", CONFIGTOPIC)
+                    # Try to load the new config
+                    self.config.load()
+                    # Send acknowledgement of the successful loading
+                    self.mqtt.publish("config-ok", CONFIGTOPIC)
+                    logging.info("Config received and acknowledged\n")
 
                     # Reset the config received flag
                     self.mqtt.reset_config_flag()

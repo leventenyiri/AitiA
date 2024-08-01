@@ -1,7 +1,7 @@
 import logging
 import time
 import shutil
-from static_config import BROKER, SUBTOPIC, PORT, QOS, TEMP_CONFIG_PATH, CONFIG_PATH, USERNAME, PASSWORD
+from static_config import BROKER, SUBTOPIC, CONFIGTOPIC, PORT, QOS, TEMP_CONFIG_PATH, CONFIG_PATH, USERNAME, PASSWORD
 from utils import log_execution_time
 try:
     from paho.mqtt import client as mqtt_client
@@ -23,11 +23,14 @@ class MQTT:
 
     def init_receive(self):
         def on_message(client, userdata, msg):
+            from app_config import Config
             try:
                 # Parse the JSON message
                 config_data = json.loads(msg.payload)
 
-                # Write the formatted JSON to the temp file
+                Config.validate_config(config_data)
+
+                # Write the validated JSON to the temp file
                 with open(TEMP_CONFIG_PATH, "w") as temp_config:
                     json.dump(config_data, temp_config, indent=4)
 
@@ -41,8 +44,10 @@ class MQTT:
 
             except json.JSONDecodeError as e:
                 logging.error(f"Invalid JSON received: {e}")
+                self.publish(f"config-nok|{str(e)}", CONFIGTOPIC)
             except Exception as e:
                 logging.error(f"Error processing message: {e}")
+                self.publish(f"config-nok|{str(e)}", CONFIGTOPIC)
 
         self.client.on_message = on_message
         self.client.subscribe(self.subtopic)
