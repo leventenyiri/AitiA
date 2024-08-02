@@ -23,6 +23,12 @@ class MQTT:
         self.config_received_event = threading.Event()
         self.config_confirm_message = "config-nok|Confirm message uninitialized"
 
+    def is_connected(self):
+        return self.client.is_connected() if self.client else False
+
+    def get_client(self):
+        return self.client
+
     def init_receive(self):
         """
         Initializes the MQTT client to receive messages on the subscribed topic and process them.

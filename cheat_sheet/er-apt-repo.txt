@@ -1,0 +1,9 @@
+Az apt source listához hozzá kell adni a repot:
+
+sudo echo "deb http://aptrepo.effective-range.com stable main" | sudo tee -a /etc/apt/sources.list
+
+Aztán még a public key is kell, hogy hozzá legyen adva az apt keychainhez:
+
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv C1AEE2EDBAEC37595801DDFAE15BC62117A4E0F3
+
+Utána egy apt update és el fogjátok érni a packageinket
