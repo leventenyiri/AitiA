@@ -57,11 +57,23 @@ class App:
 
     @log_execution_time("Creating the json message")
     def create_message(self, image_array, timestamp):
+        """
+        Creates a JSON message containing image data, timestamp, CPU temperature, battery temperature, and battery charge percentage.
+
+        Parameters:
+        image_array (numpy.ndarray): The image data as a numpy array.
+        timestamp (str): The timestamp in ISO 8601 format.
+
+        Returns:
+            str: A JSON string containing the image data and system information.
+
+        Raises:
+        Exception: If an error occurs during the creation of the message.
+        """
         try:
             battery_info = System.get_battery_info()
             logging.info(
-                f"Battery temp: {battery_info['temperature']}°C, battery percentage: {battery_info['percentage']} %"
-            )
+                f"Battery temp: {battery_info['temperature']}°C, battery percentage: {battery_info['percentage']} %")
             # timestamp is already an ISO format string, no need to format it
             message = {
                 "timestamp": timestamp,
@@ -82,10 +94,10 @@ class App:
         Converts a numpy array representing an image into a base64-encoded JPEG string.
 
         Parameters:
-        image_array: The image data as a numpy array.
+        image_array (numpy.ndarray): The image data as a numpy array.
 
         Returns:
-        str: The base64-encoded string representation of the JPEG image.
+            str: The base64-encoded string representation of the JPEG image.
         """
 
         image = Image.fromarray(image_array)
@@ -107,6 +119,12 @@ class App:
         self.mqtt.init_receive()
 
     def get_message(self):
+        """
+        Captures an image using the camera, retrieves the current timestamp, and creates a JSON message containing the image data and system information.
+
+        Returns:
+            str: A JSON string containing the image data, timestamp, CPU temperature, battery temperature, and battery charge percentage.
+        """
         image_raw = self.camera.capture()
         timestamp = RTC.get_time()
         message = self.create_message(image_raw, timestamp)
@@ -149,8 +167,8 @@ class App:
         # Send acknowledgement of the new config
         self.mqtt.publish(message, CONFIGTOPIC)
         logging.info("\nConfig received and acknowledged\n")
-        # Reset the config received flag
-        self.mqtt.reset_config_flag()
+        # Reset the config received event
+        self.mqtt.reset_config_received_event()
 
     def run_with_time_measure(self):
         start_time = RTC.get_time()
@@ -211,8 +229,6 @@ class App:
                     # Try to load the new config
                     self.config.load()
                     self.acknowledge_config()
-                    # Reset the event
-                    self.mqtt.reset_config_flag()
                     continue
 
             else:

@@ -24,6 +24,15 @@ class MQTT:
         self.config_confirm_message = "config-nok|Confirm message uninitialized"
 
     def init_receive(self):
+        """
+        Initializes the MQTT client to receive messages on the subscribed topic and process them.
+
+        This function sets up the MQTT client's `on_message` callback to handle incoming messages.
+        When a message is received, it attempts to parse the message as JSON, validate the configuration,
+        and save it to a temporary file. If successful, the configuration is copied to the final
+        configuration path, and a confirmation message is set. If an error occurs, an appropriate
+        error message is set.
+        """
         def on_message(client, userdata, msg):
             from app_config import Config
             try:
@@ -59,11 +68,7 @@ class MQTT:
         self.client.on_message = on_message
         self.client.subscribe(self.subtopic)
 
-    # If a config.json has been received through MQTT, this method returns True
-    def is_config_changed(self):
-        return self.config_changed
-
-    def reset_config_flag(self):
+    def reset_config_received_event(self):
         self.config_received_event.clear()
 
     def connect(self):
@@ -120,8 +125,16 @@ class MQTT:
 
         return self.client
 
-    # Check if the network is available, before trying to connect to the MQTT broker
     def is_network_available(self):
+        """
+        Check if the network is available by trying to connect to the MQTT broker.
+
+        Returns:
+            bool: True if the network is available, False otherwise.
+
+        Raises:
+        Exception: If an error occurs during the network check.
+        """
         try:
             socket.create_connection((BROKER, PORT), timeout=5)
             return True

@@ -32,6 +32,13 @@ class Camera:
             logging.error(f"Invalid quality specified: {config['quality']}. Defaulting to 3K quality.")
 
     def start(self):
+        """
+        Configures and starts the camera with the specified settings.
+
+        This function sets up the camera configuration based on the width and height
+        attributes, applies the quality setting, and sets the autofocus mode to continuous.
+        Finally, it starts the camera.
+        """
         config = self.cam.create_still_configuration({"size": (self.width, self.height)})
         self.cam.configure(config)
         self.cam.options["quality"] = self.quality
