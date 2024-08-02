@@ -22,7 +22,7 @@ echo "Environment variables:"
 env
 
 # Configuration
-PYTHON_SCRIPT="/home/admin/APPLICATION/client.py"
+PYTHON_SCRIPT="/home/admin/APPLICATION/main.py"
 RESTART_COUNT_FILE="/tmp/restart_count"
 
 # Initialize restart count

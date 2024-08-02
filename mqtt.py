@@ -146,6 +146,9 @@ class MQTT:
             exit(1)
 
     def disconnect(self):
+        """
+        Disconnect the client from the MQTT broker 
+        """
         if self.client:
             self.client.loop_stop()
             self.client.disconnect()

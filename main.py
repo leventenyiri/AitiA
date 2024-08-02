@@ -5,7 +5,6 @@ import logging
 import sys
 
 
-# @log_execution_time("Application runtime")
 def main():
     # Configuring and starting the logging
     logger = Logger(LOG_CONFIG_PATH)
@@ -33,7 +32,6 @@ def main():
 
 
 if __name__ == "__main__":
-    # Runs the application
     main()
 
     logging.info("Application has stopped\n")

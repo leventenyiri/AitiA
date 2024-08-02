@@ -11,7 +11,7 @@ from camera import Camera
 from app_config import Config
 from system import System, RTC
 from utils import log_execution_time
-from static_config import MINIMUM_WAIT_TIME, PUBTOPIC, CONFIGTOPIC
+from static_config import MINIMUM_WAIT_TIME, IMAGETOPIC, CONFIGTOPIC
 from schedule import Schedule
 
 
@@ -114,6 +114,15 @@ class App:
 
     @log_execution_time("Taking a picture and sending it")
     def run(self):
+        """
+        This function is responsible for capturing an image, creating a message with the image data,
+        timestamp, CPU temperature, battery temperature, and battery charge percentage, and sending it over MQTT.
+
+        If the MQTT client is not connected, it will attempt to connect in a blocking way.
+
+        Raises:
+        Exception: If an error occurs during the execution of the function.
+        """
         try:
             # Capturing the image, getting timestamp, creating message as soon as possible, while network is booting
             message = self.get_message()
@@ -122,7 +131,7 @@ class App:
             if not self.mqtt.client.is_connected():
                 self.connect_mqtt()
 
-            self.mqtt.publish(message, PUBTOPIC)
+            self.mqtt.publish(message, IMAGETOPIC)
 
         except Exception as e:
             logging.error(f"Error in run method: {e}")
@@ -153,17 +162,21 @@ class App:
         return max(waiting_time, 0), datetime.fromisoformat(end_time)  # Ensure we don't return negative time
 
     def run_periodically(self):
-        """ Periodically takes pictures and sends them over MQTT, based on the period it will either shut down between sending two pictures, or just sleep
-        within the script."""
+        """ 
+        Periodically takes pictures and sends them over MQTT, based on the period it will either shut down between sending two pictures, or just sleep
+        within the script.
+        """
         while True:
-            """ For the logic of the function to work we have to save when the last shutdown occured (last_shutdown_time), and the time it takes for the device to
+            """ 
+            For the logic of the function to work we have to save when the last shutdown occurred (last_shutdown_time), and the time it takes for the device to
             shutdown and boot up (boot_shutdown_time), because we have to calibrate the timing to achieve the given period. last_shutdown_time and boot_shutdown_time
             have to be saved in a separate json file, to make it persist between shutdowns. The script will create this file, DO NOT CREATE IT, the logic of the
-            function depends on it not existing on the first run. """
+            function depends on it not existing on the first run. 
 
-            # First we run the code thats responsible for taking a picture and sending it, but also measures the time it takes and substracts it from the period
-            # (so when we calibrate the timing, we start the script that much sooner, to get the correct period), it also returns what time is it after the script is
-            # done running (end_time), which is basically the current time.
+            First we run the code thats responsible for taking a picture and sending it, but also measures the time it takes and subtract it from the period
+            (so when we calibrate the timing, we start the script that much sooner, to get the correct period), it also returns what time is it after the script is
+            done running (end_time), which is basically the current time.
+            """
             self.schedule.load_boot_state()
             waiting_time, end_time = self.run_with_time_measure()
             waiting_time = max(waiting_time, MINIMUM_WAIT_TIME)

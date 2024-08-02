@@ -8,11 +8,12 @@ from static_config import CONFIGTOPIC, MINIMUM_WAIT_TIME, MAXIMUM_WAIT_TIME
 class Config:
     def __init__(self, path):
         self.path = path
-        self.data = {}  # Empty dictionary to store settings
+        self.data = {}  # Empty dictionary to store the config data
         try:
-            self.load()  # Load the config file and merge with default values
-        # If there is an error during loading, publish an error message to the MQTT broker
+            # Load the config file with validation
+            self.load()
         except Exception as e:
+            # If there is an error during loading, publish an error message to the MQTT broker
             logging.error(e)
             mqtt = MQTT()
             mqtt.connect()
@@ -24,6 +25,24 @@ class Config:
             logging.error("Default config loaded")
 
     def load(self):
+        """
+        Load the configuration from the specified file.
+
+        This function attempts to open and read the configuration file located at the
+        specified path. If the file is successfully opened and read, the configuration
+        data is validated and stored in the 'data' attribute of the Config instance.
+
+        If any errors occur during the loading process, appropriate error messages are
+        logged, and the function raises the encountered exception.
+
+        Parameters:
+        self (Config): The instance of the Config class.
+
+        Raises:
+        json.JSONDecodeError: If the configuration file contains invalid JSON format.
+        FileNotFoundError: If the configuration file is not found at the specified path.
+        Exception: If any other error occurs during the loading process.
+        """
         try:
             with open(self.path, "r") as file:
                 new_config = json.load(file)
@@ -44,7 +63,12 @@ class Config:
 
     @staticmethod
     def get_default_config():
-        # Define the default config here, as a dictionary
+        """
+        Defines a default config.
+
+        Returns:
+        dict: Default config as a dictionary.
+        """
         default_config = {
             "quality": "3K",
             "mode": "periodic",
@@ -56,6 +80,22 @@ class Config:
 
     @staticmethod
     def validate_config(new_config):
+        """
+        Validates the configuration dictionary against the default configuration and specific rules.
+
+        This function checks if the provided configuration dictionary matches the expected structure
+        and values. It raises appropriate exceptions if any validation checks fail.
+
+        Parameters:
+        new_config (dict): The configuration dictionary to be validated.
+
+        Raises:
+        TypeError: If the configuration is not a dictionary, or if the period is not an integer,
+                    or if the wake-up or shut-down time formats are invalid.
+        ValueError: If the configuration keys do not match the default configuration keys,
+                    or if the quality or mode values are invalid,
+                    or if the period is outside the allowed range.
+        """
         default_config = Config.get_default_config()
 
         if not isinstance(new_config, dict):

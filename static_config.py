@@ -9,11 +9,11 @@ TEMP_CONFIG_PATH = os.path.join(SCRIPT_DIR, 'temp_config.json')
 # MQTT Configuration
 BROKER = "debian.local"
 PORT = 1883
-PUBTOPIC = "mqtt/rpi/image"
+IMAGETOPIC = "mqtt/rpi/image"
 CONFIGTOPIC = "er-edge/confirm"
 SUBTOPIC = "settings/er-edge"
 QOS = 2
-USERNAME = "er-edge-3c547181"
+USERNAME = "er-edge"
 PASSWORD = "admin"
 
 # App configuration
