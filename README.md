@@ -59,4 +59,7 @@ https://github.com/users/borditamas/projects/2/views/4
 Storage repo:
 https://github.com/bnyitrai03/rpizero_storage
 
+Image repo/release:
+https://github.com/leventenyiri/raspbian-image-repository
+
 🚫 Need to invert the logic for syncing the RTC in prod !4!!!
