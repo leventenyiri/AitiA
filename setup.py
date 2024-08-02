@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='AitiA',
-    version='0.3.2',
+    version='0.3.3',
     description='Testing python code for Starling detection project',
     author='Ferenc Nandor Janky & Attila Gombos',
     author_email='info@effective-range.com',
