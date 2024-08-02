@@ -5,7 +5,7 @@
 --log warn
 --python-bin python3
 --python-package-name-prefix python3
---python-disable-dependency pyyaml
+--python-disable-dependency PyYAML
 --depends python3-yaml
 --python-disable-dependency pytz
 --depends python3-tz
