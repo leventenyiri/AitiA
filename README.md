@@ -34,16 +34,16 @@ Detecting starling swarms.
   - 3D printed
   - Lens shouldnt get foggy, account for weather
 
+- [ ] **Documentation**
+  - https://realpython.com/python-project-documentation-with-mkdocs/
+
 - [ ] **Random TODOS**
-  - Unit, integration testing ✅
-  - Implementing periodic running: -> with shut down, and without shut down ✅
-  - Optimizing the OS boot time ✅
-  - If RTC and internal time doesn't match ask for time set ✅
+  - Unit, integration testing
+  - Implementing periodic running: -> with shut down
   - Improving bash script
-  - Add extra data to the published message (battery charge level, battery temperature) ✅
   - Packaging the software -> creating the Raspberry os image
-  - MQTT DNS ✅
-  - Config input sanitazing
+  - Measuring the battery characteristics
+  - Logging through MQTT
     
 - [ ] **Effective Range dependencies**
   - RTC wake up API
@@ -51,8 +51,7 @@ Detecting starling swarms.
   - battery charging driver ✅
   - 3D case and battery case
   - battery warning-level monitoring script -> change device mode if the battery is to low
-  - battery costumization: https://www.batemo.com/products/batemo-cell-explorer/samsung-inr21700-53g1/
-  - battery datasheet: https://batteryservice.bg/wp-content/uploads/2018/12/INR21700-50E.pdf
+  - battery measuring scripts
 
 Roadmap:
 https://github.com/users/borditamas/projects/2/views/4
