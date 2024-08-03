@@ -4,42 +4,32 @@ from paho.mqtt import client as mqtt_client
 import logging
 from datetime import datetime
 import pytz
-from static_config import BROKER, LOGGING_TOPIC
+from static_config import BROKER, PORT, USERNAME, PASSWORD, LOGGING_TOPIC, QOS
 
 # Configure logging
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S')
 
-# MQTT Configuration
-PORT = 1883
-USERNAME = "er-edge-3c547181"
-PASSWORD = "admin"
-
 
 def on_connect(client, userdata, flags, rc, properties=None):
     if rc == 0:
-        logging.info("Connected to MQTT Broker!")
-        client.subscribe(LOGGING_TOPIC)
+        logging.info(f"Connected with result code {rc}")
+        logging.info(f"Subscribing to topic: {LOGGING_TOPIC} with QoS: {QOS}")
+        client.subscribe(LOGGING_TOPIC, qos=QOS)
+        logging.info("Subscribed successfully")
     else:
         logging.error(f"Failed to connect, return code {rc}")
 
 
 def on_message(client, userdata, msg):
-    try:
-        log_entry = msg.payload.decode()
-        level, message = log_entry.split('|', 1)
-        timestamp = datetime.now(pytz.UTC)
 
-        log_line = f"{timestamp} - {level} - {message}"
-        logging.info(f"Received log: {log_line}")
+    log_entry = msg.payload.decode()
+    timestamp = datetime.now(pytz.UTC)
 
-        # You can add additional processing here, such as storing logs in a file or database
+    logging.info(f"Received log: {log_entry}")
 
-    except ValueError:
-        logging.error(f"Received incorrectly formatted message: {msg.payload}")
-    except Exception as e:
-        logging.error(f"Error processing message: {e}")
+    # You can add additional processing here, such as storing logs in a file or database
 
 
 def connect_mqtt() -> mqtt_client.Client:
