@@ -2,8 +2,6 @@
 
 from paho.mqtt import client as mqtt_client
 import logging
-from datetime import datetime
-import pytz
 from static_config import BROKER, PORT, USERNAME, PASSWORD, LOGGING_TOPIC, QOS
 
 # Configure logging
@@ -25,8 +23,6 @@ def on_connect(client, userdata, flags, rc, properties=None):
 def on_message(client, userdata, msg):
 
     log_entry = msg.payload.decode()
-    timestamp = datetime.now(pytz.UTC)
-
     logging.info(f"Received log: {log_entry}")
 
     # You can add additional processing here, such as storing logs in a file or database

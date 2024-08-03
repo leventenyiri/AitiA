@@ -4,7 +4,6 @@ import logging.config
 import yaml
 import os
 from functools import wraps
-from log_mqtt_handler import MQTTHandler
 
 
 def log_execution_time(operation_name=None):

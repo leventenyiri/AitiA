@@ -2,7 +2,6 @@ import logging
 import threading
 from queue import Queue, Empty
 from static_config import LOGGING_TOPIC
-import time
 
 
 class MQTTHandler(logging.Handler):
