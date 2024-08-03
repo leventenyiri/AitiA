@@ -2,10 +2,11 @@ import logging
 import json
 import io
 import threading
-import time
+from typing import Dict, Any, Tuple
 from PIL import Image
 import pybase64
-from datetime import datetime
+from datetime import datetime, time
+import numpy as np
 from mqtt import MQTT
 from camera import Camera
 from app_config import Config
@@ -16,28 +17,29 @@ from schedule import Schedule
 
 
 class App:
-    def __init__(self, config_path):
+    def __init__(self, config_path: str) -> None:
         self.config = Config(config_path)
         self.camera = Camera(self.config.data)
         self.mqtt = MQTT()
         self.schedule = Schedule(period=self.config.data["period"])
         self.lock = threading.Lock()
 
-    def working_time_check(self):
+    def working_time_check(self) -> None:
         """
         Checks if the current time is within the operational hours defined in the configuration.
+
         If the current time is outside the operational hours, the system will initiate a shutdown.
         The time is in UTC timezone.
         """
-        wake_up_time = datetime.strptime(
+        wake_up_time: time = datetime.strptime(
             self.config.data["wakeUpTime"], "%H:%M:%S"
         ).time()
-        shut_down_time = datetime.strptime(
+        shut_down_time: time = datetime.strptime(
             self.config.data["shutDownTime"], "%H:%M:%S"
         ).time()
 
-        utc_time = datetime.fromisoformat(RTC.get_time())
-        current_time = utc_time.time()
+        utc_time: datetime = datetime.fromisoformat(RTC.get_time())
+        current_time: time = utc_time.time()
 
         logging.info(
             f"wake up time is : {wake_up_time}, shutdown time is : {shut_down_time}, current time is : {current_time}"
@@ -56,26 +58,33 @@ class App:
             System.shutdown()
 
     @log_execution_time("Creating the json message")
-    def create_message(self, image_array, timestamp):
+    def create_message(self, image_array: np.ndarray, timestamp: str) -> str:
         """
-        Creates a JSON message containing image data, timestamp, CPU temperature, battery temperature, and battery charge percentage.
+        Creates a JSON message containing image data, timestamp, CPU temperature, battery temperature,
+        and battery charge percentage.
 
-        Parameters:
-        image_array (numpy.ndarray): The image data as a numpy array.
-        timestamp (str): The timestamp in ISO 8601 format.
+        Parameters
+        ----------
+        image_array : numpy.ndarray
+            The image data as a numpy array.
+        timestamp : str
+            The timestamp in ISO 8601 format.
 
-        Returns:
-            str: A JSON string containing the image data and system information.
+        Returns
+        -------
+        str
+            A JSON string containing the image data and system information.
 
-        Raises:
-        Exception: If an error occurs during the creation of the message.
+        Raises
+        ------
+        Exception
+            If an error occurs during the creation of the message.
         """
         try:
-            battery_info = System.get_battery_info()
+            battery_info: Dict[str, float] = System.get_battery_info()
             logging.info(
                 f"Battery temp: {battery_info['temperature']}°C, battery percentage: {battery_info['percentage']} %")
-            # timestamp is already an ISO format string, no need to format it
-            message = {
+            message: Dict[str, Any] = {
                 "timestamp": timestamp,
                 "image": self.create_base64_image(image_array),
                 "cpuTemp": System.get_cpu_temperature(),
@@ -89,63 +98,69 @@ class App:
             logging.error(f"Problem creating the message: {e}")
             raise
 
-    def create_base64_image(self, image_array):
+    def create_base64_image(self, image_array: np.ndarray) -> str:
         """
         Converts a numpy array representing an image into a base64-encoded JPEG string.
 
-        Parameters:
-        image_array (numpy.ndarray): The image data as a numpy array.
+        Parameters
+        ----------
+        image_array : numpy.ndarray
+            The image data as a numpy array.
 
-        Returns:
-            str: The base64-encoded string representation of the JPEG image.
+        Returns
+        -------
+        str
+            The base64-encoded string representation of the JPEG image.
         """
 
-        image = Image.fromarray(image_array)
-        image_bytes = io.BytesIO()
+        image: Image.Image = Image.fromarray(image_array)
+        image_bytes: io.BytesIO = io.BytesIO()
         image.save(image_bytes, format="JPEG")
-        image_data = image_bytes.getvalue()
+        image_data: bytes = image_bytes.getvalue()
 
         return pybase64.b64encode(image_data).decode("utf-8")
 
     @log_execution_time("Starting the app")
-    def start(self):
-        # Checks if the current time is within the operational hours
+    def start(self) -> None:
         self.working_time_check()
         self.camera.start()
 
-    def connect_mqtt(self):
-        # Start the MQTT
+    def connect_mqtt(self) -> None:
         self.mqtt.connect()
         self.mqtt.init_receive()
 
-    def get_message(self):
+    def get_message(self) -> str:
         """
-        Captures an image using the camera, retrieves the current timestamp, and creates a JSON message containing the image data and system information.
+        Captures an image using the camera, retrieves the current timestamp, and creates a JSON message containing
+        the image data and system information.
 
-        Returns:
-            str: A JSON string containing the image data, timestamp, CPU temperature, battery temperature, and battery charge percentage.
+        Returns
+        -------
+        str
+            A JSON string containing the image data, timestamp, CPU temperature, battery temperature,
+            and battery charge percentage.
         """
-        image_raw = self.camera.capture()
-        timestamp = RTC.get_time()
-        message = self.create_message(image_raw, timestamp)
+        image_raw: np.ndarray = self.camera.capture()
+        timestamp: str = RTC.get_time()
+        message: str = self.create_message(image_raw, timestamp)
         return message
 
     @log_execution_time("Taking a picture and sending it")
-    def run(self):
+    def run(self) -> None:
         """
-        This function is responsible for capturing an image, creating a message with the image data,
-        timestamp, CPU temperature, battery temperature, and battery charge percentage, and sending it over MQTT.
+        Captures an image, creates a message with the image data, timestamp, CPU temperature, 
+        battery temperature, and battery charge percentage, and sends it over MQTT.
 
         If the MQTT client is not connected, it will attempt to connect in a blocking way.
 
-        Raises:
-        Exception: If an error occurs during the execution of the function.
+        Raises
+        ------
+        Exception
+            If an error occurs during the execution of the function.
         """
         try:
-            # Capturing the image, getting timestamp, creating message as soon as possible, while network is booting
-            message = self.get_message()
+            message: str = self.get_message()
 
-            # If we are not connected to the broker, connect to it in a blocking fashion
             if not self.mqtt.client.is_connected():
                 self.connect_mqtt()
 
@@ -155,60 +170,45 @@ class App:
             logging.error(f"Error in run method: {e}")
             raise
 
-    def run_always(self):
+    def run_always(self) -> None:
         while True:
             self.run()
 
-    def acknowledge_config(self):
-        # Copy the acknowledgement message atomically to avoid on_message callback changing it
+    def acknowledge_config(self) -> None:
         self.lock.acquire()
-        message = self.mqtt.config_confirm_message
+        message: str = self.mqtt.config_confirm_message
         self.lock.release()
-        # Send acknowledgement of the new config
         self.mqtt.publish(message, CONFIGTOPIC)
         logging.info("\nConfig received and acknowledged\n")
-        # Reset the config received event
         self.mqtt.reset_config_received_event()
 
-    def run_with_time_measure(self):
-        start_time = RTC.get_time()
+    def run_with_time_measure(self) -> Tuple[float, datetime]:
+        start_time: str = RTC.get_time()
         self.run()
-        end_time = RTC.get_time()
-        # Some transformation is necessary because of the way we are getting the time from the RTC
-        elapsed_time = (datetime.fromisoformat(end_time) - datetime.fromisoformat(start_time)).total_seconds()
-        waiting_time = self.config.data["period"] - elapsed_time
-        return max(waiting_time, 0), datetime.fromisoformat(end_time)  # Ensure we don't return negative time
+        end_time: str = RTC.get_time()
+        elapsed_time: float = (datetime.fromisoformat(end_time) - datetime.fromisoformat(start_time)).total_seconds()
+        waiting_time: float = self.config.data["period"] - elapsed_time
+        return max(waiting_time, 0), datetime.fromisoformat(end_time)
 
-    def run_periodically(self):
-        """ 
-        Periodically takes pictures and sends them over MQTT, based on the period it will either shut down between sending two pictures, or just sleep
-        within the script.
+    def run_periodically(self) -> None:
+        """
+        Periodically takes pictures and sends them over MQTT, based on the period it will
+        either shut down between sending two pictures, or just sleep within the script.
         """
         while True:
-            """ 
-            For the logic of the function to work we have to save when the last shutdown occurred (last_shutdown_time), and the time it takes for the device to
-            shutdown and boot up (boot_shutdown_time), because we have to calibrate the timing to achieve the given period. last_shutdown_time and boot_shutdown_time
-            have to be saved in a separate json file, to make it persist between shutdowns. The script will create this file, DO NOT CREATE IT, the logic of the
-            function depends on it not existing on the first run. 
-
-            First we run the code thats responsible for taking a picture and sending it, but also measures the time it takes and subtract it from the period
-            (so when we calibrate the timing, we start the script that much sooner, to get the correct period), it also returns what time is it after the script is
-            done running (end_time), which is basically the current time.
-            """
             self.schedule.load_boot_state()
+            waiting_time: float
+            end_time: datetime
             waiting_time, end_time = self.run_with_time_measure()
             waiting_time = max(waiting_time, MINIMUM_WAIT_TIME)
 
-            # This will set the boot_shutdown_time, on the first run it will use the default value.
-            message = self.schedule.update_boot_time(end_time)
+            message: str = self.schedule.update_boot_time(end_time)
             logging.info(message)
             self.schedule.save_boot_state()
 
-            # If based on the given period we have enough time to shut down between runs, this will calculate for how long we have to shut down, sets a wake time
-            # for the RTC based interrupt and saves the current time as last_shutdown time before shutting down
             if self.schedule.should_shutdown(waiting_time):
-                shutdown_duration = self.schedule.calculate_shutdown_duration(waiting_time)
-                wake_time = self.schedule.get_wake_time(end_time, shutdown_duration)
+                shutdown_duration: float = self.schedule.calculate_shutdown_duration(waiting_time)
+                wake_time: datetime = self.schedule.get_wake_time(end_time, shutdown_duration)
 
                 logging.info(f"Shutting down for {shutdown_duration} seconds")
 
@@ -220,13 +220,10 @@ class App:
                 except Exception as e:
                     logging.error(f"Failed to schedule wake-up: {e}")
 
-            # In case we dont have enough time to actually shut down we will just sleep inside the script.
             elif waiting_time > 0:
                 logging.info(f"Sleeping for {waiting_time} seconds")
-                # If there is no new config, sleep waiting_time seconds and config_received_event is set to False
-                config_received = self.mqtt.config_received_event.wait(timeout=waiting_time)
+                config_received: bool = self.mqtt.config_received_event.wait(timeout=waiting_time)
                 if config_received:
-                    # Try to load the new config
                     self.config.load()
                     self.acknowledge_config()
                     continue

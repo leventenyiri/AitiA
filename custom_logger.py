@@ -2,7 +2,6 @@ import logging
 from static_config import LOGGING_TOPIC
 from queue import Queue
 import threading
-import time
 
 
 class CustomLogger(logging.Logger):

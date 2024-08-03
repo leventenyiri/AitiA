@@ -2,7 +2,6 @@ import time
 import logging
 import logging.config
 import yaml
-import os
 import sys
 from functools import wraps
 from custom_logger import CustomLogger
