@@ -6,7 +6,35 @@ from static_config import CONFIGTOPIC, MINIMUM_WAIT_TIME, MAXIMUM_WAIT_TIME
 
 
 class Config:
+    """
+    A class to handle configuration loading, validation, and management.
+
+    Parameters
+    ----------
+    path : str
+        Path to the configuration file.
+
+    Attributes
+    ----------
+    path : str
+        Path to the configuration file.
+    data : dict
+        Dictionary to store the configuration data.
+    """
+
     def __init__(self, path):
+        """
+        Initializes the Config class with the given file path.
+
+        The constructor attempts to load the configuration file. If any errors occur
+        during loading, an error message is published to the MQTT broker, and the default
+        configuration is loaded.
+
+        Parameters
+        ----------
+        path : str
+            Path to the configuration file.
+        """
         self.path = path
         self.data = {}  # Empty dictionary to store the config data
         try:
@@ -35,13 +63,18 @@ class Config:
         If any errors occur during the loading process, appropriate error messages are
         logged, and the function raises the encountered exception.
 
-        Parameters:
-        self (Config): The instance of the Config class.
+        Parameters
+        ----------
+        None
 
-        Raises:
-        json.JSONDecodeError: If the configuration file contains invalid JSON format.
-        FileNotFoundError: If the configuration file is not found at the specified path.
-        Exception: If any other error occurs during the loading process.
+        Raises
+        ------
+        json.JSONDecodeError
+            If the configuration file contains invalid JSON format.
+        FileNotFoundError
+            If the configuration file is not found at the specified path.
+        Exception
+            If any other error occurs during the loading process.
         """
         try:
             with open(self.path, "r") as file:
@@ -64,10 +97,12 @@ class Config:
     @staticmethod
     def get_default_config():
         """
-        Defines a default config.
+        Defines and returns a default configuration dictionary.
 
-        Returns:
-        dict: Default config as a dictionary.
+        Returns
+        -------
+        dict
+            Default configuration as a dictionary.
         """
         default_config = {
             "quality": "3K",
@@ -86,15 +121,20 @@ class Config:
         This function checks if the provided configuration dictionary matches the expected structure
         and values. It raises appropriate exceptions if any validation checks fail.
 
-        Parameters:
-        new_config (dict): The configuration dictionary to be validated.
+        Parameters
+        ----------
+        new_config : dict
+            The configuration dictionary to be validated.
 
-        Raises:
-        TypeError: If the configuration is not a dictionary, or if the period is not an integer,
-                    or if the wake-up or shut-down time formats are invalid.
-        ValueError: If the configuration keys do not match the default configuration keys,
-                    or if the quality or mode values are invalid,
-                    or if the period is outside the allowed range.
+        Raises
+        ------
+        TypeError
+            If the configuration is not a dictionary, or if the period is not an integer,
+            or if the wake-up or shut-down time formats are invalid.
+        ValueError
+            If the configuration keys do not match the default configuration keys,
+            or if the quality or mode values are invalid,
+            or if the period is outside the allowed range.
         """
         default_config = Config.get_default_config()
 

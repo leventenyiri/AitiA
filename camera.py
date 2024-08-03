@@ -10,8 +10,40 @@ import logging
 
 
 class Camera:
+    """
+    A class to represent and manage the arducam 16 mpx autofocus camera.
+
+    Parameters
+    ----------
+    config : dict
+        Configuration dictionary specifying the camera settings.
+
+    Attributes
+    ----------
+    quality : int
+        The quality setting for image capture, with a default value of 95.
+    cam : Picamera2
+        The camera object, Picamera2 instance.
+    width : int
+        The width of the captured image based on the quality setting.
+    height : int
+        The height of the captured image based on the quality setting.
+    """
+
     def __init__(self, config):
-        # The best quality is set as default
+        """
+        Initializes the Camera class with the given configuration.
+
+        The constructor sets the image quality to 95 by default and initializes the
+        camera object. It then configures the camera resolution based on the provided
+        quality setting in the configuration dictionary. If an invalid quality setting
+        is specified, it defaults to 3K quality and logs an error.
+
+        Parameters
+        ----------
+        config : dict
+            Configuration dictionary specifying the camera settings.
+        """
         self.quality = 95
         self.cam = Picamera2()
 
@@ -38,6 +70,10 @@ class Camera:
         This function sets up the camera configuration based on the width and height
         attributes, applies the quality setting, and sets the autofocus mode to continuous.
         Finally, it starts the camera.
+
+        Parameters
+        ----------
+        None
         """
         config = self.cam.create_still_configuration({"size": (self.width, self.height)})
         self.cam.configure(config)
@@ -47,5 +83,16 @@ class Camera:
 
     @log_execution_time("Image capture time:")
     def capture(self):
+        """
+        Captures an image from the camera and returns it as numpy array.
+
+        This function captures an image using the camera's current settings and returns
+        the image data as a numpy array.
+
+        Returns
+        -------
+        ndarray
+            The captured image as a numpy array.
+        """
         image = self.cam.capture_array()
         return image

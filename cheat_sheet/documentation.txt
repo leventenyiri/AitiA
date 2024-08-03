@@ -20,3 +20,4 @@ documentation style: numpydoc
         Exception
             If an error occurs during the creation of the message.
         """
+tool: pdoc https://pdoc.dev/docs/pdoc.html
