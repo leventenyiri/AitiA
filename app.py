@@ -148,7 +148,7 @@ class App:
     @log_execution_time("Taking a picture and sending it")
     def run(self) -> None:
         """
-        Captures an image, creates a message with the image data, timestamp, CPU temperature, 
+        Captures an image, creates a message with the image data, timestamp, CPU temperature,
         battery temperature, and battery charge percentage, and sends it over MQTT.
 
         If the MQTT client is not connected, it will attempt to connect in a blocking way.

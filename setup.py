@@ -15,5 +15,6 @@ setup(
                       'paho-mqtt',
                       'numpy',
                       'pybase64',
+                      'pdocs',
                       'python-context-logger@git+https://github.com/EffectiveRange/python-context-logger.git@latest']
 )

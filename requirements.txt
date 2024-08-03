@@ -11,3 +11,4 @@ paho-mqtt
 pillow
 python-dateutil
 pytz
+pdocs
