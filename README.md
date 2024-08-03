@@ -2,13 +2,16 @@
 
 Detecting starling swarms.
 
-Documentation: [![website](https://github.com/leventenyiri/AitiA/actions/workflows/documentation-release.yml/badge.svg)](https://github.com/leventenyiri/AitiA/actions/workflows/documentation-release.yml)
-
-https://leventenyiri.github.io/AitiA/
-
-
+Documentation:  https://leventenyiri.github.io/AitiA/
 
 [![Coverage badge](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=coverage&query=%24.message&url=https%3A%2F%2Fraw.githubusercontent.com%2Fleventenyiri%2FAitiA%2Fpython-coverage-comment-action-data%2Fendpoint.json)](https://htmlpreview.github.io/?https://github.com/leventenyiri/AitiA/blob/python-coverage-comment-action-data/htmlcov/index.html)
+
+[![website](https://github.com/leventenyiri/AitiA/actions/workflows/documentation-release.yml/badge.svg)](https://github.com/leventenyiri/AitiA/actions/workflows/documentation-release.yml)
+
+[![Python release](https://github.com/leventenyiri/AitiA/actions/workflows/python-release.yml/badge.svg)](https://github.com/leventenyiri/AitiA/actions/workflows/python-release.yml)
+
+[![Python test](https://github.com/leventenyiri/AitiA/actions/workflows/python-test.yml/badge.svg)](https://github.com/leventenyiri/AitiA/actions/workflows/python-test.yml)
+
 
 ## To-Do List
 
