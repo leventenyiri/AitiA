@@ -52,7 +52,9 @@ Documentation:  https://leventenyiri.github.io/AitiA/
   - Improving bash script
   - Packaging the software -> creating the Raspberry os image
   - Measuring the battery characteristics
-  - Logging through MQTT
+  - Logging through MQTT ✅
+  - setting numpy docstring format to pdoc
+  - adding __init.py__ as main page for documentation
     
 - [ ] **Effective Range dependencies**
   - RTC wake up API
