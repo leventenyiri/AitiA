@@ -9,6 +9,7 @@ def main():
     # Configuring and starting the logging
     logger = Logger(LOG_CONFIG_PATH)
     logger.start()
+    logging.info("Application started")
 
     # Instantiating the Camera and MQTT objects with the provided configuration file
     app = App(CONFIG_PATH)
