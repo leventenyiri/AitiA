@@ -1,0 +1,22 @@
+documentation style: numpydoc
+        """
+        Creates a JSON message containing image data, timestamp, CPU temperature, battery temperature,
+        and battery charge percentage.
+
+        Parameters
+        ----------
+        image_array : numpy.ndarray
+            The image data as a numpy array.
+        timestamp : str
+            The timestamp in ISO 8601 format.
+
+        Returns
+        -------
+        str
+            A JSON string containing the image data and system information.
+
+        Raises
+        ------
+        Exception
+            If an error occurs during the creation of the message.
+        """

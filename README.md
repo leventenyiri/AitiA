@@ -2,6 +2,9 @@
 
 Detecting starling swarms.
 
+Documentation:
+https://leventenyiri.github.io/AitiA/
+
 [![Coverage badge](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=coverage&query=%24.message&url=https%3A%2F%2Fraw.githubusercontent.com%2Fleventenyiri%2FAitiA%2Fpython-coverage-comment-action-data%2Fendpoint.json)](https://htmlpreview.github.io/?https://github.com/leventenyiri/AitiA/blob/python-coverage-comment-action-data/htmlcov/index.html)
 
 ## To-Do List
