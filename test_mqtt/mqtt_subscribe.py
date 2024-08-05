@@ -8,7 +8,7 @@ import io
 from datetime import datetime
 from dateutil import parser
 import pytz
-from static_config import BROKER
+from source.static_config import BROKER
 
 start_time = None
 

@@ -3,10 +3,10 @@ import json
 import logging
 from unittest.mock import patch, mock_open, call
 import numpy as np
-from app import App
-from camera import Camera
-from mqtt import MQTT
-from static_config import CONFIG_PATH
+from source.app import App
+from source.camera import Camera
+from source.mqtt import MQTT
+from source.static_config import CONFIG_PATH
 
 
 # Need to make tests for config.json: checking the validity of the config data

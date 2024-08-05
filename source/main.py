@@ -1,6 +1,6 @@
-from app import App
-from utils import Logger
-from static_config import LOG_CONFIG_PATH, CONFIG_PATH
+from source.app import App
+from source.utils import Logger
+from source.static_config import LOG_CONFIG_PATH, CONFIG_PATH
 import logging
 import sys
 

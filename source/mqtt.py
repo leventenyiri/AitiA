@@ -1,8 +1,7 @@
 import logging
 import time
 import shutil
-from static_config import BROKER, SUBTOPIC, CONFIGTOPIC, PORT, QOS, TEMP_CONFIG_PATH, CONFIG_PATH, USERNAME, PASSWORD, LOGGING_TOPIC
-from utils import log_execution_time
+from source.static_config import BROKER, SUBTOPIC, PORT, QOS, TEMP_CONFIG_PATH, CONFIG_PATH, USERNAME, PASSWORD
 try:
     from paho.mqtt import client as mqtt_client
 except ImportError:
@@ -40,7 +39,7 @@ class MQTT:
         error message is set.
         """
         def on_message(client, userdata, msg):
-            from app_config import Config
+            from source.app_config import Config
             try:
                 # Parse the JSON message
                 config_data = json.loads(msg.payload)
@@ -156,13 +155,12 @@ class MQTT:
 
             msg_info.wait_for_publish()
 
-        except Exception as e:
-
+        except Exception:
             exit(1)
 
     def disconnect(self):
         """
-        Disconnect the client from the MQTT broker 
+        Disconnect the client from the MQTT broker
         """
         if self.client:
             self.client.loop_stop()

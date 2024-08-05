@@ -1,12 +1,12 @@
 import logging
 import threading
 from queue import Queue, Empty
-from static_config import LOGGING_TOPIC
+from source.static_config import LOGGING_TOPIC
 
 
 class MQTTHandler(logging.Handler):
     def __init__(self):
-        from mqtt import MQTT
+        from source.mqtt import MQTT
         super().__init__()
         self.mqtt_client = MQTT()
         self.mqtt_client.connect()

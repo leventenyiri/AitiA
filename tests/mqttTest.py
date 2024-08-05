@@ -1,4 +1,4 @@
-from mqtt import MQTT, BROKER, PORT, PUBTOPIC, SUBTOPIC
+from source.mqtt import MQTT, BROKER, PORT, PUBTOPIC, SUBTOPIC
 import pytest
 from unittest.mock import patch, MagicMock
 from paho.mqtt import client as mqtt_client

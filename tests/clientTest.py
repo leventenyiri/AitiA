@@ -6,8 +6,8 @@ import json
 from datetime import datetime
 import pytz
 import numpy as np
-from app import App
-from utils import System, CPUTemperature
+from source.app import App
+from source.utils import System, CPUTemperature
 
 
 @pytest.fixture

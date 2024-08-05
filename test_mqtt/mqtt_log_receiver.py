@@ -2,7 +2,7 @@
 
 from paho.mqtt import client as mqtt_client
 import logging
-from static_config import BROKER, PORT, USERNAME, PASSWORD, LOGGING_TOPIC, QOS
+from source.static_config import BROKER, PORT, USERNAME, PASSWORD, LOGGING_TOPIC, QOS
 
 # Configure logging
 logging.basicConfig(level=logging.INFO,

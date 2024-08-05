@@ -1,4 +1,4 @@
-from camera import Camera
+from source.camera import Camera
 import unittest
 from unittest.mock import patch, MagicMock
 
