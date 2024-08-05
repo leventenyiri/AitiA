@@ -8,7 +8,6 @@ setup(
     author_email='info@effective-range.com',
     packages=find_packages(where='AitiA'),
     package_dir={'': 'AitiA'},
-    scripts=['main.py'],
     install_requires=['pytest',
                       'PyYAML>=6.0',
                       'pillow',
