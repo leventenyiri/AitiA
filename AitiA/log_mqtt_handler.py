@@ -6,7 +6,7 @@ from static_config import LOGGING_TOPIC
 
 class MQTTHandler(logging.Handler):
     def __init__(self):
-        from AitiA.mqtt import MQTT
+        from mqtt import MQTT
         super().__init__s()
         self.mqtt_client = MQTT()
         self.mqtt_client.connect()

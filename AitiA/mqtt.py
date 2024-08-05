@@ -39,7 +39,7 @@ class MQTT:
         error message is set.
         """
         def on_message(client, userdata, msg):
-            from AitiA.app_config import Config
+            from app_config import Config
             try:
                 # Parse the JSON message
                 config_data = json.loads(msg.payload)
