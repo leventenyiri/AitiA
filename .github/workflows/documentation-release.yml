@@ -25,7 +25,7 @@ jobs:
       - run: pip install pdoc
       # ADJUST THIS: build your documentation into docs/.
       # We use a custom build script for pdoc itself, ideally you just run `pdoc -o docs/ ...` here.
-      - run:  pdoc --output-dir docs AitiA/app_config.py AitiA/camera.py AitiA/mqtt.py AitiA/schedule.py AitiA/system.py AitiA/utils.py AitiA/app.py AitiA/log_mqtt_handler.py AitiA/main.py
+      - run:  pdoc --output-dir docs AitiA
 
       - uses: actions/upload-pages-artifact@v3
         with:
