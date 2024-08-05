@@ -14,6 +14,7 @@ from AitiA.system import System, RTC
 from AitiA.utils import log_execution_time
 from AitiA.static_config import MINIMUM_WAIT_TIME, IMAGETOPIC, CONFIGTOPIC
 from AitiA.schedule import Schedule
+__docformat__ = "numpy"
 
 
 class App:
