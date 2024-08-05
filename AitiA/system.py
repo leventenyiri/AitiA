@@ -3,9 +3,6 @@ import logging
 from datetime import datetime
 import pytz
 import time
-import os
-import fcntl
-import struct
 try:
     from gpiozero import CPUTemperature
 except ImportError:
