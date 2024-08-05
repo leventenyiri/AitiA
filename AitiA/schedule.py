@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import os
 import json
 import logging
-from AitiA.static_config import SHUTDOWN_THRESHOLD, DEFAULT_BOOT_SHUTDOWN_TIME, MAXIMUM_WAIT_TIME
+from static_config import SHUTDOWN_THRESHOLD, DEFAULT_BOOT_SHUTDOWN_TIME, MAXIMUM_WAIT_TIME
 
 
 class Schedule:

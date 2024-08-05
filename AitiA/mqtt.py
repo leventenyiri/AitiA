@@ -1,7 +1,7 @@
 import logging
 import time
 import shutil
-from AitiA.static_config import BROKER, SUBTOPIC, PORT, QOS, TEMP_CONFIG_PATH, CONFIG_PATH, USERNAME, PASSWORD
+from static_config import BROKER, SUBTOPIC, PORT, QOS, TEMP_CONFIG_PATH, CONFIG_PATH, USERNAME, PASSWORD
 try:
     from paho.mqtt import client as mqtt_client
 except ImportError:

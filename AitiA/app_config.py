@@ -1,8 +1,8 @@
 import logging
 import json
 import re
-from AitiA.mqtt import MQTT
-from AitiA.static_config import CONFIGTOPIC, MINIMUM_WAIT_TIME, MAXIMUM_WAIT_TIME
+from mqtt import MQTT
+from static_config import CONFIGTOPIC, MINIMUM_WAIT_TIME, MAXIMUM_WAIT_TIME
 
 
 class Config:

@@ -1,6 +1,6 @@
-from AitiA.app import App
-from AitiA.utils import Logger
-from AitiA.static_config import LOG_CONFIG_PATH, CONFIG_PATH
+from app import App
+from utils import Logger
+from static_config import LOG_CONFIG_PATH, CONFIG_PATH
 import logging
 import sys
 

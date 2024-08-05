@@ -5,7 +5,7 @@ try:
 except ImportError:
     Picamera2 = MagicMock()
     controls = MagicMock()
-from AitiA.utils import log_execution_time
+from utils import log_execution_time
 import logging
 
 
