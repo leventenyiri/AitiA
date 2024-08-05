@@ -4,6 +4,7 @@ import logging.config
 import yaml
 import os
 from functools import wraps
+import log_mqtt_handler
 
 
 def log_execution_time(operation_name=None):
@@ -37,6 +38,7 @@ class Logger:
             with open(self.filepath, 'r') as f:
                 config = yaml.safe_load(f)
             logging.config.dictConfig(config)
+            logging.handlers.MQTTHandler = log_mqtt_handler.MQTTHandler
 
             logging.info("Logging started")
         except Exception as e:
