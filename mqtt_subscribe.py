@@ -8,7 +8,7 @@ import io
 from datetime import datetime
 from dateutil import parser
 import pytz
-from AitiA.static_config import BROKER
+from AitiA import BROKER
 
 start_time = None
 

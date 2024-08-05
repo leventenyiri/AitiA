@@ -1,6 +1,6 @@
 import json
 from paho.mqtt import client as mqtt_client
-from AitiA.static_config import BROKER
+from AitiA import BROKER
 
 broker = BROKER
 port = 1883
