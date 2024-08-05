@@ -8,5 +8,3 @@ from .schedule import *
 from .system import *
 from .utils import *
 from .static_config import *
-
-__docformat__ = "numpy"
