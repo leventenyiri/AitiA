@@ -152,7 +152,6 @@ class MQTT:
     def publish(self, message, topic):
         try:
             msg_info = self.client.publish(topic, message, qos=self.qos)
-
             msg_info.wait_for_publish()
 
         except Exception:

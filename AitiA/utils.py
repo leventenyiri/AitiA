@@ -40,5 +40,5 @@ class Logger:
 
             logging.info("Logging started")
         except Exception as e:
-            logging.error(e)
+            print(e)
             exit(1)
