@@ -1,4 +1,4 @@
-from source.utils import Logger, RTC
+from AitiA.utils import Logger, RTC
 import pytest
 import logging
 from datetime import datetime
@@ -6,7 +6,7 @@ import pytz
 import unittests
 import subprocess
 from unittest.mock import patch, mock_open, MagicMock
-from source.static_config import LOG_CONFIG_PATH
+from AitiA.static_config import LOG_CONFIG_PATH
 
 
 @pytest.fixture

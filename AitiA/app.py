@@ -7,13 +7,13 @@ from PIL import Image
 import pybase64
 from datetime import datetime, time
 import numpy as np
-from source.mqtt import MQTT
-from source.camera import Camera
-from source.app_config import Config
-from source.system import System, RTC
-from source.utils import log_execution_time
-from source.static_config import MINIMUM_WAIT_TIME, IMAGETOPIC, CONFIGTOPIC
-from source.schedule import Schedule
+from AitiA.mqtt import MQTT
+from AitiA.camera import Camera
+from AitiA.app_config import Config
+from AitiA.system import System, RTC
+from AitiA.utils import log_execution_time
+from AitiA.static_config import MINIMUM_WAIT_TIME, IMAGETOPIC, CONFIGTOPIC
+from AitiA.schedule import Schedule
 
 
 class App:

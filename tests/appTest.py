@@ -3,10 +3,10 @@ import json
 import logging
 from unittest.mock import patch, mock_open, call
 import numpy as np
-from source.app import App
-from source.camera import Camera
-from source.mqtt import MQTT
-from source.static_config import CONFIG_PATH
+from AitiA.app import App
+from AitiA.camera import Camera
+from AitiA.mqtt import MQTT
+from AitiA.static_config import CONFIG_PATH
 
 
 # Need to make tests for config.json: checking the validity of the config data

@@ -1,4 +1,4 @@
-from source.camera import Camera
+from AitiA.camera import Camera
 import unittest
 from unittest.mock import patch, MagicMock
 

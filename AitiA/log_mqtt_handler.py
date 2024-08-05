@@ -1,13 +1,13 @@
 import logging
 import threading
 from queue import Queue, Empty
-from source.static_config import LOGGING_TOPIC
+from AitiA.static_config import LOGGING_TOPIC
 
 
 class MQTTHandler(logging.Handler):
     def __init__(self):
-        from source.mqtt import MQTT
-        super().__init__()
+        from AitiA.mqtt import MQTT
+        super().__init__s()
         self.mqtt_client = MQTT()
         self.mqtt_client.connect()
         self.log_queue = Queue()

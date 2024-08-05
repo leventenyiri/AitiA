@@ -1,5 +1,5 @@
 from paho.mqtt import client as mqtt_client
-from source.static_config import BROKER, CONFIGTOPIC, PORT
+from AitiA.static_config import BROKER, CONFIGTOPIC, PORT
 
 broker = BROKER
 port = PORT

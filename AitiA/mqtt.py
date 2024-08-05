@@ -1,7 +1,7 @@
 import logging
 import time
 import shutil
-from source.static_config import BROKER, SUBTOPIC, PORT, QOS, TEMP_CONFIG_PATH, CONFIG_PATH, USERNAME, PASSWORD
+from AitiA.static_config import BROKER, SUBTOPIC, PORT, QOS, TEMP_CONFIG_PATH, CONFIG_PATH, USERNAME, PASSWORD
 try:
     from paho.mqtt import client as mqtt_client
 except ImportError:
@@ -39,7 +39,7 @@ class MQTT:
         error message is set.
         """
         def on_message(client, userdata, msg):
-            from source.app_config import Config
+            from AitiA.app_config import Config
             try:
                 # Parse the JSON message
                 config_data = json.loads(msg.payload)
