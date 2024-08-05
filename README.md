@@ -55,6 +55,7 @@ Documentation:  https://leventenyiri.github.io/AitiA/
   - Logging through MQTT ✅
   - setting numpy docstring format to pdoc
   - adding __init.py__ as main page for documentation
+  - implement functionality that ensures, that below a certain battery percentage, the current from the solar panel must be large enough to charge the battery(make the period larger if necessary)
     
 - [ ] **Effective Range dependencies**
   - RTC wake up API
