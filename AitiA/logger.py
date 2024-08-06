@@ -1,10 +1,10 @@
 import logging
 import logging.config
-import logging.handlers
 import yaml
 import os
 import threading
 from queue import Queue, Empty
+from multiprocessing.pool import ThreadPool
 from .static_config import LOGGING_TOPIC
 
 
@@ -13,20 +13,9 @@ class Logger(logging.Handler):
         super().__init__()
         self.filepath = filepath
         self.log_queue = Queue()
-        self.log_event = threading.Event()
-        self.publish_thread = threading.Thread(target=self.publish_loop)
-        # self.publish_thread.daemon = True
-        self.run = False
-        logging.info("Logger initialized")
-
-    def start_mqtt_logging(self):
-        logging.info("MQTT logging is about to start")
-        from .mqtt import MQTT
-        self.mqtt = MQTT()
-        self.mqtt.connect()
-        self.run = True
-        self.publish_thread.start()
-        logging.info("MQTT logging started")
+        self.mqtt = None
+        self.start_event = threading.Event()
+        self.pool = ThreadPool()
 
     def start_logging(self):
         try:
@@ -35,17 +24,10 @@ class Logger(logging.Handler):
             with open(self.filepath, 'r') as f:
                 config = yaml.safe_load(f)
             logging.config.dictConfig(config)
-
-            """ # Manually create and add the MQTT handler
-            mqtt_handler = MQTTHandler()
-            mqtt_handler.setLevel(logging.DEBUG)
-            formatter = logging.Formatter('%(asctime)s -%(name)s - %(levelname)s - %(message)s')
-            mqtt_handler.setFormatter(formatter)
             # Add the MQTT handler to the root logger
-            logging.getLogger().addHandler(mqtt_handler)
-            print("Log config from dict has loaded")
-            """
+            logging.getLogger().addHandler(self.create_handler())
             logging.info("Logging started")
+
         except ImportError as e:
             print(f"Import error: {e}")
             print("This might be due to missing modules or incorrect import statements.")
@@ -61,34 +43,49 @@ class Logger(logging.Handler):
             traceback.print_exc()
             exit(1)
 
+    def create_handler(self):
+        # Manually create and add the MQTT handler
+        self.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        self.setFormatter(formatter)
+        return self
+
+    def start_mqtt_logging(self):
+        from .mqtt import MQTT
+        self.mqtt = MQTT()
+        self.mqtt.connect()
+        self.start_event.set()
+        print("MQTT logging started")
+
     def emit(self, record):
         try:
-            # This format is needed
             msg = self.format(record)
             self.log_queue.put(msg)
-            if self.run:
-                self.log_event.set()
+            print(f"Queue number increased: {self.log_queue.qsize()}")
+            if self.start_event.is_set():
+                self.pool.apply_async(self.publish_loop, args=(msg, LOGGING_TOPIC))
         except Exception as e:
-            print(f"Error in MQTTHandler emit: {e}")
-            exit(1)
+            print(f"Error in Logger emit: {e}")
 
-    def publish_loop(self):
-        logging.info("Publish thread started")
-        while self.run:
-            while self.log_event.is_set():
-                try:
-                    msg = self.log_queue.get(timeout=1)
-                    self.mqtt.client.publish(msg, LOGGING_TOPIC)
-                except Empty:
-                    self.log_event.clear()
-                except Exception as e:
-                    print(f"Error in MQTTHandler publish loop: {e}")
-                    exit(1)
-
-            self.log_event.wait(4)
+    def publish_loop(self, msg, topic):
+        while not self.log_queue.empty():
+            try:
+                msg = self.log_queue.get(timeout=1)
+                print(f"Queue number decreased: {self.log_queue.qsize()}")
+                self.mqtt.client.publish(topic, msg)
+            except Empty:
+                return
+            except Exception as e:
+                print(f"Error in Logger publish loop: {e}")
 
     def close(self):
-        # self.run = False
-        # self.publish_thread.join(timeout=6)
-        # self.mqtt.disconnect()
+        super().close()
+
+    def disconnect_mqtt(self):
+        print("Closing logger")
+        self.start_event.clear()
+        self.pool.close()
+        self.pool.join()
+        if self.mqtt.is_connected():
+            self.mqtt.disconnect()
         super().close()

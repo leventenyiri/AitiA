@@ -23,7 +23,7 @@ def on_connect(client, userdata, flags, rc, properties=None):
 def on_message(client, userdata, msg):
 
     log_entry = msg.payload.decode()
-    logging.info(f"Received log: {log_entry}")
+    print(log_entry)
 
     # You can add additional processing here, such as storing logs in a file or database
 

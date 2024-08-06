@@ -85,7 +85,7 @@ class MQTT:
 
         self.client.on_connect = on_connect
         self.client.username_pw_set(USERNAME, PASSWORD)
-        self.client.enable_logger()
+        # self.client.enable_logger()
 
         def on_disconnect(client, userdata, disconnect_flags, reason_code, properties=None):
             if reason_code == 0:
@@ -113,7 +113,7 @@ class MQTT:
         self.client.on_disconnect = on_disconnect
         self.client.on_connect_fail = on_connect_fail
         self.client.username_pw_set(USERNAME, PASSWORD)
-        self.client.enable_logger()
+        self.client.disable_logger()
 
         network_connect_counter = 0
         # Making sure the network is up before trying to connect

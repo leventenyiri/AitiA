@@ -165,7 +165,7 @@ class App:
 
             if not self.mqtt.client.is_connected():
                 self.connect_mqtt()
-                logging.info("MQTT logger not started, attempting to start...")
+            if self.logger.mqtt is None:
                 self.logger.start_mqtt_logging()
 
             self.mqtt.publish(message, IMAGETOPIC)
@@ -179,9 +179,8 @@ class App:
             self.run()
 
     def acknowledge_config(self) -> None:
-        self.lock.acquire()
-        message: str = self.mqtt.config_confirm_message
-        self.lock.release()
+        with self.lock:
+            message: str = self.mqtt.config_confirm_message
         self.mqtt.publish(message, CONFIGTOPIC)
         logging.info("\nConfig received and acknowledged\n")
         self.mqtt.reset_config_received_event()

@@ -30,11 +30,10 @@ def main():
         logging.info(f"Exit code in main: {e.code}\n Exiting the application because: {e}")
         logging.info()
         app.mqtt.disconnect()
-        logger.close()
+        logger.disconnect_mqtt()
         sys.exit(e.code)
 
 
 if __name__ == "__main__":
     main()
-
-    logging.info("Application has stopped\n")
+    print("Application stopped")
