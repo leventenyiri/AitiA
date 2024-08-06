@@ -2,7 +2,7 @@
 
 from paho.mqtt import client as mqtt_client
 import logging
-from AitiA import BROKER, PORT, USERNAME, PASSWORD, LOGGING_TOPIC, QOS
+from AitiA.static_config import BROKER, PORT, USERNAME, PASSWORD, LOGGING_TOPIC, QOS
 
 # Configure logging
 logging.basicConfig(level=logging.INFO,

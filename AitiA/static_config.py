@@ -5,9 +5,10 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 LOG_CONFIG_PATH = os.path.join(SCRIPT_DIR, 'log_config.yaml')
 CONFIG_PATH = os.path.join(SCRIPT_DIR, 'config.json')
 TEMP_CONFIG_PATH = os.path.join(SCRIPT_DIR, 'temp_config.json')
+STATE_FILE_PATH = os.path.join(SCRIPT_DIR, 'state_file.json')
 
 # MQTT Configuration
-BROKER = "debian.local"
+BROKER = "192.168.0.160"
 PORT = 1883
 IMAGETOPIC = "mqtt/rpi/image"
 CONFIGTOPIC = "er-edge/confirm"

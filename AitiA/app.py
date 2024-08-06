@@ -7,21 +7,23 @@ from PIL import Image
 import pybase64
 from datetime import datetime, time
 import numpy as np
-from mqtt import MQTT
-from camera import Camera
-from app_config import Config
-from system import System, RTC
-from utils import log_execution_time
-from static_config import MINIMUM_WAIT_TIME, IMAGETOPIC, CONFIGTOPIC
-from schedule import Schedule
+from .mqtt import MQTT
+from .camera import Camera
+from .app_config import Config
+from .system import System, RTC
+from .utils import log_execution_time
+from .static_config import MINIMUM_WAIT_TIME, IMAGETOPIC, CONFIGTOPIC
+from .schedule import Schedule
+from .logger import Logger
 
 
 class App:
-    def __init__(self, config_path: str) -> None:
+    def __init__(self, config_path: str, logger: Logger) -> None:
         self.config = Config(config_path)
         self.camera = Camera(self.config.data)
         self.mqtt = MQTT()
         self.schedule = Schedule(period=self.config.data["period"])
+        self.logger = logger
         self.lock = threading.Lock()
 
     def working_time_check(self) -> None:
@@ -163,6 +165,8 @@ class App:
 
             if not self.mqtt.client.is_connected():
                 self.connect_mqtt()
+                logging.info("MQTT logger not started, attempting to start...")
+                self.logger.start_mqtt_logging()
 
             self.mqtt.publish(message, IMAGETOPIC)
 

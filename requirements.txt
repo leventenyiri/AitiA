@@ -12,3 +12,4 @@ pillow
 python-dateutil
 pytz
 pdocs
+pybase64

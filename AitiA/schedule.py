@@ -1,13 +1,14 @@
-from datetime import datetime, timedelta
+from datetime import datetime
+from datetime import timedelta
 import os
 import json
 import logging
-from static_config import SHUTDOWN_THRESHOLD, DEFAULT_BOOT_SHUTDOWN_TIME, MAXIMUM_WAIT_TIME
+from .static_config import SHUTDOWN_THRESHOLD, DEFAULT_BOOT_SHUTDOWN_TIME, MAXIMUM_WAIT_TIME, STATE_FILE_PATH
 
 
 class Schedule:
     def __init__(self, period):
-        self.state_file = "state_file.json"
+        self.state_file = STATE_FILE_PATH
         self.period = period
         self.max_boot_time = MAXIMUM_WAIT_TIME
         self.shutdown_threshold = SHUTDOWN_THRESHOLD
@@ -51,10 +52,14 @@ class Schedule:
         if os.path.exists(self.state_file):
             with open(self.state_file, 'r') as f:
                 state = json.load(f)
+                logging.info("Opened state file")
             self.boot_shutdown_time = state.get('boot_shutdown_time')
             self.last_shutdown_time = state.get('last_shutdown_time')
+            logging.info("Loaded boot and shutdown time from state file: boot_shutdown_time")
         else:
-            self.boot_shutdown_time = DEFAULT_BOOT_SHUTDOWN_TIME  # This will get overwritten on the first shutdown-wake sequence
+            logging.info("No state file found")
+            # This will get overwritten on the first shutdown-wake sequence
+            self.boot_shutdown_time = DEFAULT_BOOT_SHUTDOWN_TIME
             self.last_shutdown_time = None
 
     def save_boot_state(self):

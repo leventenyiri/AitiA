@@ -1,6 +1,6 @@
-from app import App
-from utils import Logger
-from static_config import LOG_CONFIG_PATH, CONFIG_PATH
+from .app import App
+from .logger import Logger
+from .static_config import LOG_CONFIG_PATH, CONFIG_PATH
 import logging
 import sys
 
@@ -8,11 +8,11 @@ import sys
 def main():
     # Configuring and starting the logging
     logger = Logger(LOG_CONFIG_PATH)
-    logger.start()
+    logger.start_logging()
     logging.info("Application started")
 
     # Instantiating the Camera and MQTT objects with the provided configuration file
-    app = App(CONFIG_PATH)
+    app = App(CONFIG_PATH, logger)
     app.start()
 
     try:
@@ -27,8 +27,10 @@ def main():
             app.run()
 
     except SystemExit as e:
-        logging.info(f"Exit code in main: {e.code}")
+        logging.info(f"Exit code in main: {e.code}\n Exiting the application because: {e}")
+        logging.info()
         app.mqtt.disconnect()
+        logger.close()
         sys.exit(e.code)
 
 
