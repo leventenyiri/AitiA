@@ -1,4 +1,5 @@
 import os
+import logging
 
 # Configuration file paths
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -8,7 +9,7 @@ TEMP_CONFIG_PATH = os.path.join(SCRIPT_DIR, 'temp_config.json')
 STATE_FILE_PATH = os.path.join(SCRIPT_DIR, 'state_file.json')
 
 # MQTT Configuration
-BROKER = "192.168.0.160"
+BROKER = "192.168.0.103"
 PORT = 1883
 IMAGETOPIC = "mqtt/rpi/image"
 CONFIGTOPIC = "er-edge/confirm"
@@ -25,3 +26,4 @@ MAXIMUM_WAIT_TIME = 10800  # 3 hours in seconds
 
 # Log configuration
 LOGGING_TOPIC = "er-edge/logging"
+LOG_LEVEL = logging.DEBUG

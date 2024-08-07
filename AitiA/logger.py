@@ -5,7 +5,7 @@ import os
 import threading
 from queue import Queue, Empty
 from multiprocessing.pool import ThreadPool
-from .static_config import LOGGING_TOPIC
+from .static_config import LOGGING_TOPIC, LOG_LEVEL
 
 
 class Logger(logging.Handler):
@@ -25,7 +25,7 @@ class Logger(logging.Handler):
                 config = yaml.safe_load(f)
             logging.config.dictConfig(config)
             # Add the MQTT handler to the root logger
-            logging.getLogger().addHandler(self.create_handler())
+            self.create_handler()
             logging.info("Logging started")
 
         except ImportError as e:
@@ -45,10 +45,10 @@ class Logger(logging.Handler):
 
     def create_handler(self):
         # Manually create and add the MQTT handler
-        self.setLevel(logging.DEBUG)
+        self.setLevel(LOG_LEVEL)
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         self.setFormatter(formatter)
-        return self
+        logging.getLogger().addHandler(self)
 
     def start_mqtt_logging(self):
         from .mqtt import MQTT

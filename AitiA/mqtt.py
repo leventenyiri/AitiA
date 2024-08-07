@@ -117,8 +117,8 @@ class MQTT:
 
         network_connect_counter = 0
         # Making sure the network is up before trying to connect
-        while not self.is_network_available():
-            logging.info("Waiting for network to become available...")
+        while not self.is_broker_available():
+            logging.info("Waiting for broker to become available...")
             time.sleep(0.5)
             network_connect_counter += 1
             if network_connect_counter == 20:
@@ -130,7 +130,7 @@ class MQTT:
 
         return self.client
 
-    def is_network_available(self):
+    def is_broker_available(self):
         """
         Check if the network is available by trying to connect to the MQTT broker.
 

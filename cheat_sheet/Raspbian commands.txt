@@ -11,10 +11,12 @@ transfer file:
     transferring multiple files at once: scp ~/Dev/AitiA/{app.py,config.py,utils.py} rpizero:/home/admin/APPLICATION
     scp ~/Dev/AitiA/{app.py,app_config.py,main.py,mqtt.py,run_script.sh,schedule.py,system.py,static_config.py,utils.py,log_mqtt_handler.py,log_config.yaml} rpizero:/home/admin/APPLICATION
     
-    scp ~/AitiA/AitiA/{app.py,app_config.py,main.py,mqtt.py,schedule.py,system.py,static_config.py,utils.py,__init__.py,config.json,log_config.yaml,log_mqtt_handler.py,camera.py} admin@192.168.0.181:/home/admin/APP
+    scp ~/AitiA/AitiA/{app.py,app_config.py,main.py,mqtt.py,schedule.py,system.py,static_config.py,utils.py,__init__.py,config.json,log_config.yaml,logger.py,camera.py,state_file.json} admin@192.168.0.101:/home/admin/AitiA
     
 delete: rm -r filename
 
 enable daemon: sudo systemctl enable client.service
 
 network interface restart: sudo ip link set wlan0 down && sudo ip link set wla0 up
+
+running the program: python3 -m AitiA.main
