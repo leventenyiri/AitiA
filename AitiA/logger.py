@@ -78,9 +78,6 @@ class Logger(logging.Handler):
             except Exception as e:
                 print(f"Error in Logger publish loop: {e}")
 
-    def close(self):
-        super().close()
-
     def disconnect_mqtt(self):
         print("Closing logger")
         self.start_event.clear()

@@ -154,7 +154,7 @@ class RTC:
             # Parse the timestamp while ignoring the weekday and timezone
             timestamp = datetime.strptime(timestamp_str, "%a %Y-%m-%d %H:%M:%S")
             # Localize to UTC
-            timestamp = pytz.UTC.localize(timestamp)
+            timestamp = pytz.UTC.localize(timestamp, None)
             return timestamp.isoformat()
         except Exception as e:
             logging.error(f"Error parsing timestamp: {e}")

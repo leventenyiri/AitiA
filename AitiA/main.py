@@ -28,7 +28,6 @@ def main():
 
     except SystemExit as e:
         logging.info(f"Exit code in main: {e.code}\n Exiting the application because: {e}")
-        logging.info()
         app.mqtt.disconnect()
         logger.disconnect_mqtt()
         sys.exit(e.code)
