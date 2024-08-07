@@ -1,5 +1,5 @@
 """
-Welcome to the documentation.
+Welcome to the documentation. 🐦
 
 [Project Homepage](https://github.com/Aitia-IIOT/sentinel-mrhat-cam)
 

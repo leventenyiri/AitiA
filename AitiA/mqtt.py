@@ -12,6 +12,51 @@ import threading
 
 
 class MQTT:
+    """
+    A class to handle MQTT client operations.
+
+    This class manages the connection to an MQTT broker, publishes messages,
+    and handles incoming configuration messages.
+
+    Attributes
+    ----------
+    broker : str
+        The address of the MQTT broker.
+    subtopic : str
+        The topic to subscribe to for incoming messages.
+    port : int
+        The port number for the MQTT broker connection.
+    qos : int
+        The Quality of Service level for MQTT messages.
+    client : mqtt_client.Client
+        The MQTT client instance.
+    reconnect_counter : int
+        A counter to track reconnection attempts.
+    config_received_event : threading.Event
+        An event to signal when a new configuration is received.
+    config_confirm_message : str
+        A message to confirm the receipt of a new configuration.
+
+    Methods
+    -------
+    is_connected()
+        Check if the MQTT client is connected to the broker.
+    get_client()
+        Get the MQTT client instance.
+    init_receive()
+        Initialize the MQTT client to receive messages.
+    reset_config_received_event()
+        Reset the config_received_event.
+    connect()
+        Connect to the MQTT broker.
+    is_broker_available()
+        Check if the MQTT broker is available.
+    publish(message, topic)
+        Publish a message to a specified topic.
+    disconnect()
+        Disconnect the MQTT client from the broker.
+    """
+
     def __init__(self):
         self.broker = BROKER
         self.subtopic = SUBTOPIC
@@ -77,6 +122,17 @@ class MQTT:
         self.config_received_event.clear()
 
     def connect(self):
+        """
+        Connect to the MQTT broker.
+
+        This method sets up various callbacks for connection events and
+        attempts to establish a connection to the MQTT broker.
+
+        Returns
+        -------
+        mqtt_client.Client
+            The connected MQTT client instance.
+        """
         def on_connect(client, userdata, flags, rc, properties=None):
             if rc == 0:
                 logging.info("Connected to MQTT Broker!")
@@ -150,6 +206,21 @@ class MQTT:
             exit(1)
 
     def publish(self, message, topic):
+        """
+        Publish a message to a specified topic.
+
+        Parameters
+        ----------
+        message : str
+            The message to publish.
+        topic : str
+            The topic to publish the message to.
+
+        Raises
+        ------
+        SystemExit
+            If there's an error during publishing.
+        """
         try:
             msg_info = self.client.publish(topic, message, qos=self.qos)
             msg_info.wait_for_publish()
@@ -159,7 +230,9 @@ class MQTT:
 
     def disconnect(self):
         """
-        Disconnect the client from the MQTT broker
+        Disconnect the MQTT client from the broker.
+
+        This method stops the network loop and disconnects the client from the MQTT broker.
         """
         if self.client:
             self.client.loop_stop()

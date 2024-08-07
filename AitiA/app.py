@@ -18,7 +18,46 @@ from .logger import Logger
 
 
 class App:
+    """
+    Main application class for managing camera operations and MQTT communication.
+
+    This class handles image capture, message creation, and periodic execution of
+    tasks based on the provided configuration.
+
+    Parameters
+    ----------
+    config_path : str
+        Path to the configuration file.
+    logger : Logger
+        Logger instance for handling log messages.
+
+    Attributes
+    ----------
+    config : Config
+        Configuration object containing application settings.
+    camera : Camera
+        Camera object for capturing images.
+    mqtt : MQTT
+        MQTT client for message publishing.
+    schedule : Schedule
+        Schedule object for managing periodic tasks.
+    logger : Logger
+        Logger instance for handling log messages.
+    lock : threading.Lock
+        Lock for thread-safe operations.
+    """
+
     def __init__(self, config_path: str, logger: Logger) -> None:
+        """
+        Initialize the App with configuration and logger.
+
+        Parameters
+        ----------
+        config_path : str
+            Path to the configuration file.
+        logger : Logger
+            Logger instance for handling log messages.
+        """
         self.config = Config(config_path)
         self.camera = Camera(self.config.data)
         self.mqtt = MQTT()
@@ -109,10 +148,16 @@ class App:
 
     @log_execution_time("Starting the app")
     def start(self) -> None:
+        """
+        Start the application, initializing the schedule and camera.
+        """
         self.schedule.working_time_check(self.config.data["wakeUpTime"], self.config.data["shutDownTime"])
         self.camera.start()
 
     def connect_mqtt(self) -> None:
+        """
+        Connect to the MQTT broker and initialize message receiving.
+        """
         self.mqtt.connect()
         self.mqtt.init_receive()
 
@@ -164,6 +209,9 @@ class App:
             self.run()
 
     def acknowledge_config(self) -> None:
+        """
+        Acknowledge the receipt of a new configuration by publishing a confirmation message.
+        """
         with self.lock:
             message: str = self.mqtt.config_confirm_message
         self.mqtt.publish(message, CONFIGTOPIC)
@@ -171,6 +219,14 @@ class App:
         self.mqtt.reset_config_received_event()
 
     def run_with_time_measure(self) -> Tuple[float, datetime]:
+        """
+        Run the image capture and send process, measuring the execution time.
+
+        Returns
+        -------
+        Tuple[float, datetime]
+            A tuple containing the waiting time until the next execution and the end time.
+        """
         start_time: str = RTC.get_time()
         self.run()
         end_time: str = RTC.get_time()
