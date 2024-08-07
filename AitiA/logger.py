@@ -9,7 +9,68 @@ from .static_config import LOGGING_TOPIC, LOG_LEVEL
 
 
 class Logger(logging.Handler):
+    """
+    A custom logging handler that manages log messages and their publishing through MQTT.
+
+    This class extends the logging.Handler to provide functionality for queueing log messages,
+    publishing them via MQTT, and managing the logging process using a thread pool.
+
+    Parameters
+    ----------
+    filepath : str
+        The path to the logging configuration file.
+
+    Attributes
+    ----------
+    filepath : str
+        The path to the logging configuration file.
+    log_queue : Queue
+        A queue to store log messages.
+    mqtt : MQTT
+        An instance of the MQTT class for publishing messages.
+    start_event : threading.Event
+        An event to signal the start of MQTT logging.
+    pool : ThreadPool
+        A thread pool for asynchronous publishing of log messages.
+
+    Methods
+    -------
+    start_logging()
+        Initializes and starts the logging process.
+    create_handler()
+        Creates and adds the MQTT handler to the root logger.
+    start_mqtt_logging()
+        Initializes MQTT connection and starts MQTT logging.
+    emit(record)
+        Processes a log record, formats it, and queues it for publishing.
+    publish_loop(msg, topic)
+        Publishes queued log messages to the specified MQTT topic.
+    disconnect_mqtt()
+        Closes the logger, disconnects MQTT, and cleans up resources.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the specified log configuration file is not found.
+    ImportError
+        If there are missing modules or incorrect import statements.
+    AttributeError
+        If there are missing attributes or methods in the MQTTHandler class.
+    TypeError
+        If there are incorrect method signatures or argument types.
+    Exception
+        For any unexpected errors during logging operations.
+    """
+
     def __init__(self, filepath):
+        """
+        Initialize the Logger.
+
+        Parameters
+        ----------
+        filepath : str
+            The path to the logging configuration file.
+        """
         super().__init__()
         self.filepath = filepath
         self.log_queue = Queue()
@@ -18,6 +79,25 @@ class Logger(logging.Handler):
         self.pool = ThreadPool()
 
     def start_logging(self):
+        """
+        Initialize and start the logging process.
+
+        This method loads the logging configuration from the `log_config.yaml` file,
+        sets up the logging system, and adds the MQTT handler to the root logger.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the log configuration file is not found.
+        ImportError
+            If there are missing modules or incorrect import statements.
+        AttributeError
+            If there are missing attributes or methods in the MQTTHandler class.
+        TypeError
+            If there are incorrect method signatures or argument types.
+        Exception
+            For any unexpected errors during the logging setup.
+        """
         try:
             if not os.path.exists(self.filepath):
                 raise FileNotFoundError(f"Log configuration file not found: {self.filepath}")
@@ -44,13 +124,24 @@ class Logger(logging.Handler):
             exit(1)
 
     def create_handler(self):
-        # Manually create and add the MQTT handler
+        """
+        Create and add the MQTT handler to the root logger.
+
+        This method sets up the logging level, formatter, and adds the current
+        instance as a handler to the root logger.
+        """
         self.setLevel(LOG_LEVEL)
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         self.setFormatter(formatter)
         logging.getLogger().addHandler(self)
 
     def start_mqtt_logging(self):
+        """
+        Initialize MQTT connection and start MQTT logging.
+
+        This method creates an instance of the MQTT class, connects to the MQTT
+        broker, and signals that MQTT logging has started.
+        """
         from .mqtt import MQTT
         self.mqtt = MQTT()
         self.mqtt.connect()
@@ -58,6 +149,23 @@ class Logger(logging.Handler):
         print("MQTT logging started")
 
     def emit(self, record):
+        """
+        Process a log record, format it, and queue it for publishing.
+
+        This method is called for each log record. It formats the record,
+        puts it in the log queue, and triggers asynchronous publishing if
+        MQTT logging has started.
+
+        Parameters
+        ----------
+        record : logging.LogRecord
+            The log record to be processed.
+
+        Raises
+        ------
+        Exception
+            If an error occurs during the emit process.
+        """
         try:
             msg = self.format(record)
             self.log_queue.put(msg)
@@ -79,6 +187,12 @@ class Logger(logging.Handler):
                 print(f"Error in Logger publish loop: {e}")
 
     def disconnect_mqtt(self):
+        """
+        Close the logger, disconnect MQTT, and clean up resources.
+
+        This method stops the thread pool, disconnects from the MQTT broker
+        if connected, and closes the logging handler.
+        """
         print("Closing logger")
         self.start_event.clear()
         self.pool.close()

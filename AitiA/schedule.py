@@ -1,9 +1,10 @@
-from datetime import datetime
+from datetime import datetime, time
 from datetime import timedelta
 import os
 import json
 import logging
 from .static_config import SHUTDOWN_THRESHOLD, DEFAULT_BOOT_SHUTDOWN_TIME, MAXIMUM_WAIT_TIME, STATE_FILE_PATH
+from .system import System, RTC
 
 
 class Schedule:
@@ -15,6 +16,39 @@ class Schedule:
         self.boot_shutdown_time = None
         self.last_shutdown_time = None
         self.load_boot_state()
+
+    def working_time_check(self, wakeUpTime, shutDownTime) -> None:
+        """
+        Checks if the current time is within the operational hours defined in the configuration.
+
+        If the current time is outside the operational hours, the system will initiate a shutdown.
+        The time is in UTC timezone.
+        """
+        wake_up_time: time = datetime.strptime(
+            wakeUpTime, "%H:%M:%S"
+        ).time()
+        shut_down_time: time = datetime.strptime(
+            shutDownTime, "%H:%M:%S"
+        ).time()
+
+        utc_time: datetime = datetime.fromisoformat(RTC.get_time())
+        current_time: time = utc_time.time()
+
+        logging.info(
+            f"wake up time is : {wake_up_time}, shutdown time is : {shut_down_time}, current time is : {current_time}"
+        )
+
+        # If e.g: wake up time = 6:00:00 and shutdown time = 20:00:00
+        if (wake_up_time < shut_down_time) and (
+            wake_up_time > current_time or current_time >= shut_down_time
+        ):
+            logging.info("Starting shutdown")
+            System.shutdown()
+
+        # If e.g: wake up time = 20:00:00 and shutdown time = 6:00:00
+        elif current_time >= shut_down_time and current_time < wake_up_time:
+            logging.info("Starting shutdown")
+            System.shutdown()
 
     def update_boot_time(self, current_time):
         if self.last_shutdown_time is None and (self.period > self.shutdown_threshold):

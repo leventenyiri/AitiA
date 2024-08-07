@@ -85,7 +85,6 @@ class MQTT:
 
         self.client.on_connect = on_connect
         self.client.username_pw_set(USERNAME, PASSWORD)
-        # self.client.enable_logger()
 
         def on_disconnect(client, userdata, disconnect_flags, reason_code, properties=None):
             if reason_code == 0:
@@ -105,6 +104,7 @@ class MQTT:
 
         def on_connect_fail(client, userdata):
             while not self.client.is_connected():
+                logging.error("Failed to connect to MQTT Broker!")
                 # Implement sleep to reduce power consumption if necessary
                 self.client.connect(self.broker, self.port)
                 time.sleep(1)

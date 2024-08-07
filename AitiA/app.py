@@ -5,7 +5,7 @@ import threading
 from typing import Dict, Any, Tuple
 from PIL import Image
 import pybase64
-from datetime import datetime, time
+from datetime import datetime
 import numpy as np
 from .mqtt import MQTT
 from .camera import Camera
@@ -25,39 +25,6 @@ class App:
         self.schedule = Schedule(period=self.config.data["period"])
         self.logger = logger
         self.lock = threading.Lock()
-
-    def working_time_check(self) -> None:
-        """
-        Checks if the current time is within the operational hours defined in the configuration.
-
-        If the current time is outside the operational hours, the system will initiate a shutdown.
-        The time is in UTC timezone.
-        """
-        wake_up_time: time = datetime.strptime(
-            self.config.data["wakeUpTime"], "%H:%M:%S"
-        ).time()
-        shut_down_time: time = datetime.strptime(
-            self.config.data["shutDownTime"], "%H:%M:%S"
-        ).time()
-
-        utc_time: datetime = datetime.fromisoformat(RTC.get_time())
-        current_time: time = utc_time.time()
-
-        logging.info(
-            f"wake up time is : {wake_up_time}, shutdown time is : {shut_down_time}, current time is : {current_time}"
-        )
-
-        # If e.g: wake up time = 6:00:00 and shutdown time = 20:00:00
-        if (wake_up_time < shut_down_time) and (
-            wake_up_time > current_time or current_time >= shut_down_time
-        ):
-            logging.info("Starting shutdown")
-            System.shutdown()
-
-        # If e.g: wake up time = 20:00:00 and shutdown time = 6:00:00
-        elif current_time >= shut_down_time and current_time < wake_up_time:
-            logging.info("Starting shutdown")
-            System.shutdown()
 
     def log_hardware_info(self, hardware_info: Dict[str, Any]) -> None:
         """
@@ -142,7 +109,7 @@ class App:
 
     @log_execution_time("Starting the app")
     def start(self) -> None:
-        self.working_time_check()
+        self.schedule.working_time_check(self.config.data["wakeUpTime"], self.config.data["shutDownTime"])
         self.camera.start()
 
     def connect_mqtt(self) -> None:
