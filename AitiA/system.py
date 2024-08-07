@@ -77,6 +77,49 @@ class System:
             logging.error(f"Failed to get battery info: {e}")
             exit(1)
 
+    @staticmethod
+    def gather_hardware_info():
+        try:
+            # Get battery info
+            battery_result = subprocess.run(
+                ['cat', '/sys/class/power_supply/bq2562x-battery/uevent'],
+                stdout=subprocess.PIPE, check=True
+            )
+            battery_info = battery_result.stdout.decode('utf-8')
+
+            # Get charger info
+            charger_result = subprocess.run(
+                ['cat', '/sys/class/power_supply/bq2562x-charger/uevent'],
+                stdout=subprocess.PIPE, check=True
+            )
+            charger_info = charger_result.stdout.decode('utf-8')
+
+            # Parse the information
+            battery_data = dict(line.split("=") for line in battery_info.strip().split("\n"))
+            charger_data = dict(line.split("=") for line in charger_info.strip().split("\n"))
+
+            # Get CPU temperature
+            cpu_temp = System.get_cpu_temperature()
+
+            # Prepare the log data
+            log_data = {
+                "timestamp": datetime.now().isoformat(),
+                "cpu_temp": cpu_temp,
+                "battery_percentage": int(battery_data.get("POWER_SUPPLY_CAPACITY", "0")),
+                "battery_voltage_now": int(battery_data.get("POWER_SUPPLY_VOLTAGE_NOW", "0")) / 1000000,
+                "battery_voltage_avg": int(battery_data.get("POWER_SUPPLY_VOLTAGE_AVG", "0")) / 1000000,
+                "battery_current_now": int(battery_data.get("POWER_SUPPLY_CURRENT_NOW", "0")) / 1000000,
+                "battery_current_avg": int(battery_data.get("POWER_SUPPLY_CURRENT_AVG", "0")) / 1000000,
+                "charger_voltage_now": int(charger_data.get("POWER_SUPPLY_VOLTAGE_NOW", "0")) / 1000000,
+                "charger_current_now": int(charger_data.get("POWER_SUPPLY_CURRENT_NOW", "0")) / 1000000,
+            }
+
+            return log_data
+
+        except subprocess.CalledProcessError as e:
+            logging.error(f"Failed to gather hardware info: {e}")
+            return None
+
 
 class RTC:
     @staticmethod

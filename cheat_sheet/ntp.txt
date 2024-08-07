@@ -15,5 +15,3 @@ Lépések:
 Ha csintalankodik:
     restart network interface: sudo ip link set wlan0 down && sudo ip link set wlan0 up
 
-Network beállítása:
-    sudo nano /etc/wpa_supplicant/wpa_supplicant.conf

@@ -59,6 +59,19 @@ class App:
             logging.info("Starting shutdown")
             System.shutdown()
 
+    def log_hardware_info(self, hardware_info: Dict[str, Any]) -> None:
+        """
+        Logs the hardware information to a file.
+
+        Parameters
+        ----------
+        hardware_info (Dict[str, Any])
+
+        """
+        log_entry = ", ".join(f"{k}={v}" for k, v in hardware_info.items())
+        with open("hardware_log.txt", "a") as log_file:
+            log_file.write(f"{log_entry}\n")
+
     @log_execution_time("Creating the json message")
     def create_message(self, image_array: np.ndarray, timestamp: str) -> str:
         """
@@ -84,6 +97,7 @@ class App:
         """
         try:
             battery_info: Dict[str, float] = System.get_battery_info()
+            hardware_info: Dict[str, Any] = System.gather_hardware_info()
             logging.info(
                 f"Battery temp: {battery_info['temperature']}°C, battery percentage: {battery_info['percentage']} %")
             message: Dict[str, Any] = {
@@ -93,6 +107,10 @@ class App:
                 "batteryTemp": battery_info["temperature"],
                 "batteryCharge": battery_info["percentage"]
             }
+
+            # Log hardware info to a file for further analysis
+            if hardware_info:
+                self.log_hardware_info(hardware_info)
 
             return json.dumps(message)
 
