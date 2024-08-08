@@ -37,7 +37,6 @@ def main():
     # Configuring and starting the logging
     logger = Logger(LOG_CONFIG_PATH)
     logger.start_logging()
-    logging.info("Application started")
 
     # Instantiating the Camera and MQTT objects with the provided configuration file
     app = App(CONFIG_PATH, logger)
@@ -59,6 +58,9 @@ def main():
         app.mqtt.disconnect()
         logger.disconnect_mqtt()
         sys.exit(e.code)
+    finally:
+        app.mqtt.disconnect()
+        logger.disconnect_mqtt()
 
 
 if __name__ == "__main__":
