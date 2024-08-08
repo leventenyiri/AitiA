@@ -12,7 +12,7 @@ from .camera import Camera
 from .app_config import Config
 from .system import System, RTC
 from .utils import log_execution_time
-from .static_config import MINIMUM_WAIT_TIME, IMAGETOPIC, CONFIGTOPIC
+from .static_config import MINIMUM_WAIT_TIME, IMAGETOPIC, CONFIGACKTOPIC
 from .schedule import Schedule
 from .logger import Logger
 
@@ -214,7 +214,7 @@ class App:
         """
         with self.lock:
             message: str = self.mqtt.config_confirm_message
-        self.mqtt.publish(message, CONFIGTOPIC)
+        self.mqtt.publish(message, CONFIGACKTOPIC)
         logging.info("\nConfig received and acknowledged\n")
         self.mqtt.reset_config_received_event()
 

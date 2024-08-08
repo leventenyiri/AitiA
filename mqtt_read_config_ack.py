@@ -1,9 +1,9 @@
 from paho.mqtt import client as mqtt_client
-from sentinel_mrhat_cam import BROKER, CONFIGTOPIC, PORT
+from sentinel_mrhat_cam import BROKER, CONFIGACKTOPIC, PORT
 
 broker = BROKER
 port = PORT
-topic = CONFIGTOPIC
+topic = CONFIGACKTOPIC
 
 
 def connect_mqtt() -> mqtt_client.Client:

@@ -1,7 +1,7 @@
 import logging
 import time
 import shutil
-from .static_config import BROKER, SUBTOPIC, PORT, QOS, TEMP_CONFIG_PATH, CONFIG_PATH, USERNAME, PASSWORD
+from .static_config import BROKER, CONFIGSUBTOPIC, PORT, QOS, TEMP_CONFIG_PATH, CONFIG_PATH, USERNAME, PASSWORD
 try:
     from paho.mqtt import client as mqtt_client
 except ImportError:
@@ -59,7 +59,7 @@ class MQTT:
 
     def __init__(self):
         self.broker = BROKER
-        self.subtopic = SUBTOPIC
+        self.subtopic = CONFIGSUBTOPIC
         self.port = PORT
         self.qos = QOS
         self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)

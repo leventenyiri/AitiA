@@ -25,7 +25,7 @@ jobs:
       - run: pip install pdoc
       # ADJUST THIS: build your documentation into docs/.
       # We use a custom build script for pdoc itself, ideally you just run `pdoc -o docs/ ...` here.
-      - run:  pdoc --output-dir docs --title "Sentinel MrHat Cam" --docformat numpy sentinel_mrhat_cam
+      - run:  pdoc --output-dir docs --docformat numpy sentinel_mrhat_cam
 
       - uses: actions/upload-pages-artifact@v3
         with:

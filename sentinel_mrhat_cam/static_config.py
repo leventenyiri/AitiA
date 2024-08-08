@@ -12,9 +12,8 @@ STATE_FILE_PATH = os.path.join(SCRIPT_DIR, 'state_file.json')
 BROKER = "debian.local"
 PORT = 1883
 IMAGETOPIC = "mqtt/rpi/image"
-# MQTT Confirmation Configuration (rename it)
-CONFIGTOPIC = "er-edge/confirm"
-SUBTOPIC = "settings/er-edge"
+CONFIGACKTOPIC = "er-edge/confirm"
+CONFIGSUBTOPIC = "settings/er-edge"
 QOS = 2
 USERNAME = "er-edge"
 PASSWORD = "admin"

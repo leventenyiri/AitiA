@@ -2,7 +2,7 @@ import logging
 import json
 import re
 from .mqtt import MQTT
-from .static_config import CONFIGTOPIC, MINIMUM_WAIT_TIME, MAXIMUM_WAIT_TIME
+from .static_config import CONFIGACKTOPIC, MINIMUM_WAIT_TIME, MAXIMUM_WAIT_TIME
 
 
 class Config:
@@ -45,7 +45,7 @@ class Config:
             logging.error(e)
             mqtt = MQTT()
             mqtt.connect()
-            mqtt.publish(f"config-nok|{str(e)}", CONFIGTOPIC)
+            mqtt.publish(f"config-nok|{str(e)}", CONFIGACKTOPIC)
             mqtt.disconnect()
 
             # Load the default config
