@@ -35,17 +35,28 @@ class Logger(logging.Handler):
 
     Methods
     -------
-    start_logging() :
+    start_logging()
+
         Initializes and starts the logging process.
-    create_handler() :
+
+    create_handler()
+
         Creates and adds the MQTT handler to the root logger.
-    start_mqtt_logging() :
+
+    start_mqtt_logging()
+
         Initializes MQTT connection and starts MQTT logging.
-    emit(record) :
+
+    emit(record)
+
         Processes a log record, formats it, and queues it for publishing.
-    publish_loop(msg, topic) :
+
+    publish_loop(msg, topic)
+
         Publishes queued log messages to the specified MQTT topic.
-    disconnect_mqtt() :
+
+    disconnect_mqtt()
+
         Closes the logger, disconnects MQTT, and cleans up resources.
 
     Raises
