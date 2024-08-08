@@ -9,9 +9,9 @@ transfer file:
     scp ~/AitiA/main.py admin@192.168.0.101:/home/admin/MQTT
     for transferring a whole folder: scp -r ~/Dev/AitiA rpizero:/home/admin/APPLICATION
     transferring multiple files at once: scp ~/Dev/AitiA/{app.py,config.py,utils.py} rpizero:/home/admin/APPLICATION
-    scp ~/Dev/AitiA/AitiA/{app.py,app_config.py,main.py,mqtt.py,schedule.py,system.py,static_config.py,utils.py,log_config.yaml,logger.py,config.json} rpizero:/home/admin/AitiA
+    scp ~/Dev/AitiA/sentinel_mrhat_cam/{app.py,app_config.py,main.py,mqtt.py,schedule.py,system.py,static_config.py,utils.py,log_config.yaml,logger.py,config.json} rpizero:/home/admin/sentinel_mrhat_cam
     
-    scp ~/AitiA/AitiA/{app.py,app_config.py,main.py,mqtt.py,schedule.py,system.py,static_config.py,utils.py,__init__.py,config.json,log_config.yaml,logger.py,camera.py,state_file.json} admin@192.168.0.101:/home/admin/AitiA
+    scp ~/AitiA/sentinel_mrhat_cam/{app.py,app_config.py,main.py,mqtt.py,schedule.py,system.py,static_config.py,utils.py,__init__.py,config.json,log_config.yaml,logger.py,camera.py,state_file.json} admin@192.168.0.101:/home/admin/sentinel_mrhat_cam
     
 delete: rm -r filename
 
