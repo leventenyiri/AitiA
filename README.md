@@ -57,6 +57,7 @@ Documentation:  https://leventenyiri.github.io/AitiA/
   - adding __init.py__ as main page for documentation ✅
   - add random delay to balance the load
   - post install daemon setup script in os image
+  - make the log messages have utc time instead of local
     
 - [ ] **Effective Range dependencies**
   - RTC wake up API
