@@ -63,7 +63,7 @@ class MQTT:
         self.port = PORT
         self.qos = QOS
         self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
-        self.reconnect_counter = 0
+        self.broker_connect_counter = 0
         self.config_received_event = threading.Event()
         self.config_confirm_message = "config-nok|Confirm message uninitialized"
 
@@ -139,55 +139,28 @@ class MQTT:
             else:
                 logging.error(f"Failed to connect, return code {rc}")
 
-        self.client.on_connect = on_connect
-        self.client.username_pw_set(USERNAME, PASSWORD)
-
-        def on_disconnect(self, client, userdata, disconnect_flags, reason_code, properties=None):
-            try:
-                if reason_code == 0:
-                    logging.info("Disconnected voluntarily.")
-                    return
-                logging.error(f"Involuntary disconnect. Reason code: {reason_code}")
-
-                self.reconnect_counter += 1
-
-                if self.reconnect_counter <= 5:
-                    logging.info(f"Trying to reconnect: {self.reconnect_counter} out of 5")
-                    time.sleep(2)
-                    self.client.reconnect()
-                else:
-                    logging.critical("Couldn't reconnect 5 times, rebooting...")
-                    exit(2)
-            except Exception as e:
-                logging.error(f"Error in on_disconnect: {e}")
-
-        def on_connect_fail(client, userdata):
-            while not self.client.is_connected():
-                logging.error("Failed to connect to MQTT Broker!")
-                # Implement sleep to reduce power consumption if necessary
-                self.client.connect(self.broker, self.port)
-                time.sleep(1)
+        # Making sure we can reach the broker before trying to connect
+        self.broker_check()
 
         self.client.on_connect = on_connect
-        self.client.on_disconnect = on_disconnect
-        self.client.on_connect_fail = on_connect_fail
         self.client.username_pw_set(USERNAME, PASSWORD)
         self.client.disable_logger()
 
-        network_connect_counter = 0
-        # Making sure the network is up before trying to connect
-        while not self.is_broker_available():
-            logging.info("Waiting for broker to become available...")
-            time.sleep(0.5)
-            network_connect_counter += 1
-            if network_connect_counter == 20:
-                logging.error("Connecting to network failed 20 times, restarting script...")
-                exit(1)
-
         self.client.connect(self.broker, self.port)
+        # Resetting the counter after a successful connection
+        self.broker_connect_counter = 0
         self.client.loop_start()
 
         return self.client
+
+    def broker_check(self):
+        while not self.is_broker_available():
+            logging.info("Waiting for broker to become available...")
+            time.sleep(0.5)
+            self.broker_connect_counter += 1
+            if self.broker_connect_counter == 20:
+                logging.error("Connecting to network failed 20 times, restarting script...")
+                exit(1)
 
     def is_broker_available(self):
         """
