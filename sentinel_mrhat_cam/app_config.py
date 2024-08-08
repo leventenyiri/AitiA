@@ -150,13 +150,21 @@ class Config:
             raise ValueError("Invalid mode specified in the config.")
 
         if new_config["mode"] == "periodic":
-            if not isinstance(new_config["period"], int):
-                raise TypeError("Period specified in the config is not an integer.")
-            if new_config["period"] < MINIMUM_WAIT_TIME:
-                raise ValueError("Period specified in the config is less than the minimum allowed wait time.")
-            if new_config["period"] > MAXIMUM_WAIT_TIME:
-                raise ValueError("Period specified in the config is more than the maximum allowed wait time.")
+            Config.validate_period()
 
+        Config.validate_time_format(new_config)
+
+    @staticmethod
+    def validate_period(new_config):
+        if not isinstance(new_config["period"], int):
+            raise TypeError("Period specified in the config is not an integer.")
+        if new_config["period"] < MINIMUM_WAIT_TIME:
+            raise ValueError("Period specified in the config is less than the minimum allowed wait time.")
+        if new_config["period"] > MAXIMUM_WAIT_TIME:
+            raise ValueError("Period specified in the config is more than the maximum allowed wait time.")
+
+    @staticmethod
+    def validate_time_format(new_config):
         # REGEX: hh:mm:ss
         time_pattern = re.compile(r'^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$')
         if bool(time_pattern.match(new_config["wakeUpTime"])) is False:
