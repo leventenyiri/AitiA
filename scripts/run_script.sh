@@ -22,7 +22,6 @@ echo "Environment variables:"
 env
 
 # Configuration
-PYTHON_SCRIPT="/home/admin/AitiA/main.py"
 RESTART_COUNT_FILE="/tmp/restart_count"
 
 # Initialize restart count
@@ -37,7 +36,7 @@ while true; do
     start_time=$(date +%s)
     echo "Starting Python script at $(date)"
     # Run the Python script
-    python3 -m AitiA.main
+    python3 -m sentinel_mrhat_cam.main
     EXIT_CODE=$?
     
     end_time=$(date +%s)

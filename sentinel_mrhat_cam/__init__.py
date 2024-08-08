@@ -3,8 +3,6 @@ Welcome to the documentation. 🐦
 
 [Project Homepage](https://github.com/Aitia-IIOT/sentinel-mrhat-cam)
 
-# Sentinel MrHat Cam
-
 ## How it works?
 
 ### Overview

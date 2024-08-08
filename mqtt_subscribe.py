@@ -8,7 +8,7 @@ import io
 from datetime import datetime
 from dateutil import parser
 import pytz
-from AitiA import BROKER
+from sentinel_mrhat_cam import BROKER
 
 start_time = None
 

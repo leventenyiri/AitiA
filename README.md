@@ -1,4 +1,4 @@
-# AitiA
+# Sentinel MrHat Cam
 
 Detecting starling swarms.
 

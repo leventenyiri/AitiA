@@ -3,7 +3,7 @@ name: Python test
 on:
   push:
     paths-ignore:
-      - './er_scripts/**'
+      - './er_packages/**'
     branches:
       - '**'
 

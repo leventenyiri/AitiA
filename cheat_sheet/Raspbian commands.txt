@@ -19,4 +19,4 @@ enable daemon: sudo systemctl enable client.service
 
 network interface restart: sudo ip link set wlan0 down && sudo ip link set wla0 up
 
-running the program: python3 -m AitiA.main
+running the program: python3 -m sentinel_mrhat_cam.main

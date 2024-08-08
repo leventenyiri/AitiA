@@ -1,13 +1,13 @@
 import json
 from paho.mqtt import client as mqtt_client
-from AitiA import BROKER
+from sentinel_mrhat_cam import BROKER
 
 broker = BROKER
 port = 1883
 topic = "settings/er-edge"
 
 # Path to your config.json file
-config_path = "AitiA/config.json"
+config_path = "sentinel_mrhat_cam/config.json"
 
 
 def connect_mqtt():
