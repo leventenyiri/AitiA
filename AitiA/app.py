@@ -227,11 +227,15 @@ class App:
         Tuple[float, datetime]
             A tuple containing the waiting time until the next execution and the end time.
         """
-        start_time: str = RTC.get_time()
-        self.run()
-        end_time: str = RTC.get_time()
-        elapsed_time: float = (datetime.fromisoformat(end_time) - datetime.fromisoformat(start_time)).total_seconds()
-        waiting_time: float = self.config.data["period"] - elapsed_time
+        try:
+            start_time: str = RTC.get_time()
+            self.run()
+            end_time: str = RTC.get_time()
+            elapsed_time: float = (datetime.fromisoformat(end_time) -
+                                   datetime.fromisoformat(start_time)).total_seconds()
+            waiting_time: float = self.config.data["period"] - elapsed_time
+        except Exception as e:
+            logging.error(f"Error in run_with_time_measure method: {e}")
         return max(waiting_time, 0), datetime.fromisoformat(end_time)
 
     def run_periodically(self) -> None:

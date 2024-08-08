@@ -7,7 +7,7 @@ port = 1883
 topic = "settings/er-edge"
 
 # Path to your config.json file
-config_path = "config.json"
+config_path = "AitiA/config.json"
 
 
 def connect_mqtt():

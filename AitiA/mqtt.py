@@ -142,21 +142,24 @@ class MQTT:
         self.client.on_connect = on_connect
         self.client.username_pw_set(USERNAME, PASSWORD)
 
-        def on_disconnect(client, userdata, disconnect_flags, reason_code, properties=None):
-            if reason_code == 0:
-                logging.info("Disconnected voluntarily.")
-                return
-            logging.error(f"Involuntary disconnect. Reason code: {reason_code}")
+        def on_disconnect(self, client, userdata, disconnect_flags, reason_code, properties=None):
+            try:
+                if reason_code == 0:
+                    logging.info("Disconnected voluntarily.")
+                    return
+                logging.error(f"Involuntary disconnect. Reason code: {reason_code}")
 
-            self.reconnect_counter += 1
+                self.reconnect_counter += 1
 
-            if self.reconnect_counter <= 5:
-                logging.info(f"Trying to reconnect: {self.reconnect_counter} out of 5")
-                time.sleep(2)  # Sleep for all reconnection attempts
-                self.client.reconnect()
-            else:
-                logging.critical("Couldn't reconnect 5 times, rebooting...")
-                exit(2)
+                if self.reconnect_counter <= 5:
+                    logging.info(f"Trying to reconnect: {self.reconnect_counter} out of 5")
+                    time.sleep(2)
+                    self.client.reconnect()
+                else:
+                    logging.critical("Couldn't reconnect 5 times, rebooting...")
+                    exit(2)
+            except Exception as e:
+                logging.error(f"Error in on_disconnect: {e}")
 
         def on_connect_fail(client, userdata):
             while not self.client.is_connected():

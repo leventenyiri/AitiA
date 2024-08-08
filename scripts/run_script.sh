@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Log file path
-LOG_FILE="/home/admin/APPLICATION/bash_script.log"
+LOG_FILE="/home/admin/bash_script.log"
 
 # Redirect all output to the log file
 exec > >(tee -a "$LOG_FILE") 2>&1
@@ -9,7 +9,7 @@ exec > >(tee -a "$LOG_FILE") 2>&1
 echo "Starting bash script at $(date)"
 
 # Set the working directory
-cd /home/admin/APPLICATION
+cd /home/admin
 echo "Current working directory: $(pwd)"
 
 # Ensure the correct Python environment is used
@@ -22,7 +22,7 @@ echo "Environment variables:"
 env
 
 # Configuration
-PYTHON_SCRIPT="/home/admin/APPLICATION/main.py"
+PYTHON_SCRIPT="/home/admin/AitiA/main.py"
 RESTART_COUNT_FILE="/tmp/restart_count"
 
 # Initialize restart count
@@ -36,9 +36,8 @@ fi
 while true; do
     start_time=$(date +%s)
     echo "Starting Python script at $(date)"
-    
     # Run the Python script
-    python3 "$PYTHON_SCRIPT"
+    python3 -m AitiA.main
     EXIT_CODE=$?
     
     end_time=$(date +%s)
