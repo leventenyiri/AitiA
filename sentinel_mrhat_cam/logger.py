@@ -62,7 +62,7 @@ class Logger(logging.Handler):
         For any unexpected errors during logging operations.
     """
 
-    def __init__(self, filepath):
+    def __init__(self, filepath: str):
         """
         Initialize the Logger.
 
@@ -78,7 +78,7 @@ class Logger(logging.Handler):
         self.start_event = threading.Event()
         self.pool = ThreadPool()
 
-    def start_logging(self):
+    def start_logging(self) -> None:
         """
         Initialize and start the logging process.
 
@@ -105,7 +105,7 @@ class Logger(logging.Handler):
                 config = yaml.safe_load(f)
             logging.config.dictConfig(config)
             # Add the MQTT handler to the root logger
-            self.create_handler()
+            self.create_mqtt_handler()
             logging.info("Logging started")
 
         except ImportError as e:
@@ -123,7 +123,7 @@ class Logger(logging.Handler):
             traceback.print_exc()
             exit(1)
 
-    def create_handler(self):
+    def create_mqtt_handler(self) -> None:
         """
         Create and add the MQTT handler to the root logger.
 
@@ -135,7 +135,7 @@ class Logger(logging.Handler):
         self.setFormatter(formatter)
         logging.getLogger().addHandler(self)
 
-    def start_mqtt_logging(self):
+    def start_mqtt_logging(self) -> None:
         """
         Initialize MQTT connection and start MQTT logging.
 
@@ -146,9 +146,8 @@ class Logger(logging.Handler):
         self.mqtt = MQTT()
         self.mqtt.connect()
         self.start_event.set()
-        print("MQTT logging started")
 
-    def emit(self, record):
+    def emit(self, record: logging.LogRecord) -> None:
         """
         Process a log record, format it, and queue it for publishing.
 
@@ -175,25 +174,43 @@ class Logger(logging.Handler):
         except Exception as e:
             print(f"Error in Logger emit: {e}")
 
-    def publish_loop(self, msg, topic):
+    def publish_loop(self, msg: str, topic: str) -> None:
+        """
+        Continuously retrieves and publishes log messages from the queue to the logging MQTT topic.
+
+        Parameters
+        ----------
+        msg : str
+            The log message to be published.
+        topic : str
+            The MQTT topic to which the log message will be published.
+
+        Returns
+        -------
+        None
+            This function does not return any value.
+        """
         while not self.log_queue.empty():
             try:
                 msg = self.log_queue.get(timeout=1)
                 print(f"Queue number decreased: {self.log_queue.qsize()}")
-                self.mqtt.client.publish(topic, msg)
+                # Do not publish if not connected
+                if self.mqtt.is_connected():
+                    self.mqtt.client.publish(topic, msg)
+                else:
+                    return
             except Empty:
                 return
             except Exception as e:
                 print(f"Error in Logger publish loop: {e}")
 
-    def disconnect_mqtt(self):
+    def disconnect_mqtt(self) -> None:
         """
         Close the logger, disconnect MQTT, and clean up resources.
 
         This method stops the thread pool, disconnects from the MQTT broker
         if connected, and closes the logging handler.
         """
-        print("Closing logger")
         self.start_event.clear()
         self.pool.close()
         self.pool.join()
