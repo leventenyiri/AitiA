@@ -56,6 +56,7 @@ Documentation:  https://leventenyiri.github.io/AitiA/
   - setting numpy docstring format to pdoc ✅
   - adding __init.py__ as main page for documentation ✅
   - add random delay to balance the load
+  - post install daemon setup script in os image
     
 - [ ] **Effective Range dependencies**
   - RTC wake up API
