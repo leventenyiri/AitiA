@@ -36,7 +36,7 @@ class Config:
             Path to the configuration file.
         """
         self.path = path
-        self.data = {}  # Empty dictionary to store the config data
+        self.data = dict()  # Empty dictionary to store the config data
         try:
             # Load the config file with validation
             self.load()
@@ -50,14 +50,13 @@ class Config:
 
             # Load the default config
             self.data.update(Config.get_default_config())
-            logging.error("Default config loaded")
+            logging.error("Loading config failed, using default config")
 
     def load(self):
         """
-        Load the configuration from the specified file.
+        Load the configuration from the `config.json` file.
 
-        This function attempts to open and read the configuration file located at the
-        specified path. If the file is successfully opened and read, the configuration
+        If the file is successfully opened and read, the configuration
         data is validated and stored in the 'data' attribute of the Config instance.
 
         If any errors occur during the loading process, appropriate error messages are
@@ -116,7 +115,7 @@ class Config:
     @staticmethod
     def validate_config(new_config):
         """
-        Validates the configuration dictionary against the default configuration and specific rules.
+        Validates the new configuration dictionary against the default configuration and checks if specific rules are fullfilled.
 
         This function checks if the provided configuration dictionary matches the expected structure
         and values. It raises appropriate exceptions if any validation checks fail.
