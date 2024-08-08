@@ -170,7 +170,7 @@ class Logger(logging.Handler):
             msg = self.format(record)
             self.log_queue.put(msg)
             print(f"Queue number increased: {self.log_queue.qsize()}")
-            if self.start_event.is_set():
+            if self.start_event.is_set() and self.mqtt.is_connected():
                 self.pool.apply_async(self.publish_loop, args=(msg, LOGGING_TOPIC))
         except Exception as e:
             print(f"Error in Logger emit: {e}")
