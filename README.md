@@ -53,16 +53,15 @@ Documentation:  https://leventenyiri.github.io/AitiA/
   - Packaging the software -> creating the Raspberry os image
   - Measuring the battery characteristics
   - Logging through MQTT ✅
-  - setting numpy docstring format to pdoc
-  - adding __init.py__ as main page for documentation
-  - implement functionality that ensures, that below a certain battery percentage, the current from the solar panel must be large enough to charge the battery(make the period larger if necessary)
+  - setting numpy docstring format to pdoc ✅
+  - adding __init.py__ as main page for documentation ✅
+  - add random delay to balance the load
     
 - [ ] **Effective Range dependencies**
   - RTC wake up API
   - shutdown API
   - battery charging driver ✅
   - 3D case and battery case
-  - battery warning-level monitoring script -> change device mode if the battery is to low
   - battery measuring scripts
 
 Roadmap:
