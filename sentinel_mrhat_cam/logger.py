@@ -142,7 +142,10 @@ class Logger(logging.Handler):
         instance as a handler to the root logger.
         """
         self.setLevel(LOG_LEVEL)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter(
+            fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S'
+        )
         self.setFormatter(formatter)
         logging.getLogger().addHandler(self)
 

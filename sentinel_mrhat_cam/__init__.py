@@ -11,7 +11,7 @@ TODO
 
 ### Messaging
 
-**Subscribe topic:** `{username}/config` 
+**Subscribe topic:** `{username}/config`
 
 ```
 {
@@ -26,7 +26,7 @@ TODO
 - The device using a default configuration in case of config errors
 - TODO more decription
 
-**Publish topic:** `{username}/confirm` 
+**Publish topic:** `{username}/confirm`
 
 `config-ok` OR `config-nok|{error desc}`
 
@@ -58,10 +58,10 @@ TODO
 """
 
 from .static_config import *
-from .system import *
-from .logger import *
-from .mqtt import *
 from .utils import *
+from .logger import *
+from .system import *
+from .mqtt import *
 from .schedule import *
 from .app_config import *
 from .camera import *
