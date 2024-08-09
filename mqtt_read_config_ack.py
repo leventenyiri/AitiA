@@ -1,9 +1,15 @@
 from paho.mqtt import client as mqtt_client
 from sentinel_mrhat_cam import BROKER, CONFIGACKTOPIC, PORT
+import logging
 
 broker = BROKER
 port = PORT
 topic = CONFIGACKTOPIC
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S',
+                    handlers=[logging.StreamHandler()])
 
 
 def connect_mqtt() -> mqtt_client.Client:
@@ -14,7 +20,7 @@ def connect_mqtt() -> mqtt_client.Client:
             print(f"Failed to connect, return code {rc}")
 
     client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
-    client.username_pw_set("er-edge-3c547181", "admin")
+    client.username_pw_set("er-edge", "admin")
     client.enable_logger()
     client.on_connect = on_connect
     client.connect(broker, port)

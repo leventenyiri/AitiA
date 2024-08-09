@@ -100,6 +100,8 @@ class MQTT:
                 # Copy the file
                 shutil.copyfile(TEMP_CONFIG_PATH, CONFIG_PATH)
                 logging.info(f"Config saved to {CONFIG_PATH}")
+
+                # Reset the reconnect counter
                 self.config_confirm_message = "config-ok"
                 # Signal the config change
                 self.config_received_event.set()

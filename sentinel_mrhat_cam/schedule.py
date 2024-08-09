@@ -24,12 +24,8 @@ class Schedule:
         If the current time is outside the operational hours, the system will initiate a shutdown.
         The time is in UTC timezone.
         """
-        wake_up_time: time = datetime.strptime(
-            wakeUpTime, "%H:%M:%S"
-        ).time()
-        shut_down_time: time = datetime.strptime(
-            shutDownTime, "%H:%M:%S"
-        ).time()
+        wake_up_time: time = datetime.strptime(wakeUpTime, "%H:%M:%S").time()
+        shut_down_time: time = datetime.strptime(shutDownTime, "%H:%M:%S").time()
 
         utc_time: datetime = datetime.fromisoformat(RTC.get_time())
         current_time: time = utc_time.time()
@@ -39,9 +35,7 @@ class Schedule:
         )
 
         # If e.g: wake up time = 6:00:00 and shutdown time = 20:00:00
-        if (wake_up_time < shut_down_time) and (
-            wake_up_time > current_time or current_time >= shut_down_time
-        ):
+        if (wake_up_time < shut_down_time) and (wake_up_time > current_time or current_time >= shut_down_time):
             logging.info("Starting shutdown")
             System.shutdown()
 
@@ -106,3 +100,16 @@ class Schedule:
                 json.dump(state, f)
         except IOError as e:
             logging.error(f"Failed to save state file: {e}")
+
+    def shutdown(self, waiting_time: float, end_time: datetime) -> None:
+        shutdown_duration = self.calculate_shutdown_duration(waiting_time)
+        wake_time = self.get_wake_time(end_time, shutdown_duration)
+
+        logging.info(f"Shutting down for {shutdown_duration} seconds")
+        try:
+            System.schedule_wakeup(wake_time)
+            self.last_shutdown_time = end_time.isoformat()
+            self.save_boot_state()
+            System.shutdown()
+        except Exception as e:
+            logging.error(f"Failed to schedule wake-up: {e}")

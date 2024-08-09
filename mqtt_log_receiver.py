@@ -25,8 +25,6 @@ def on_message(client, userdata, msg):
     log_entry = msg.payload.decode()
     print(log_entry)
 
-    # You can add additional processing here, such as storing logs in a file or database
-
 
 def connect_mqtt() -> mqtt_client.Client:
     client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)

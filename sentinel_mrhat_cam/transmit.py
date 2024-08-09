@@ -6,25 +6,21 @@ from PIL import Image
 import pybase64
 from datetime import datetime
 import numpy as np
-from .system import System, RTC
 from .utils import log_execution_time
-from .static_config import MINIMUM_WAIT_TIME, IMAGETOPIC, CONFIGACKTOPIC
+from .static_config import IMAGETOPIC
+from .system import System, RTC
 from .camera import Camera
 from .mqtt import MQTT
-from .app_config import Config
 from .schedule import Schedule
 from .logger import Logger
-import threading
 
 
 class Transmit:
     def __init__(self, camera: Camera, logger: Logger, schedule: Schedule) -> None:
-        # self.config = Config(config_path)
         self.camera = camera
         self.mqtt = MQTT()
         self.schedule = schedule
         self.logger = logger
-        self.lock = threading.Lock()
 
     def log_hardware_info(self, hardware_info: Dict[str, Any]) -> None:
         """
@@ -85,14 +81,15 @@ class Transmit:
             If an error occurs during the creation of the message.
         """
         try:
-            battery_info: Dict[str, float] = System.get_battery_info()
+            battery_info: Dict[str, Any] = System.get_battery_info()
             hardware_info: Dict[str, Any] = System.gather_hardware_info()
-            logging.info(
-                f"Battery temp: {battery_info['temperature']}°C, battery percentage: {battery_info['percentage']} %")
+            cpu_temp: float = System.get_cpu_temperature()
+
+            logging.info(f"Battery temp: {battery_info['temperature']}°C, battery percentage: {battery_info['percentage']} %, CPU temp: {cpu_temp}°C")
             message: Dict[str, Any] = {
                 "timestamp": timestamp,
                 "image": self.create_base64_image(image_array),
-                "cpuTemp": System.get_cpu_temperature(),
+                "cpuTemp": cpu_temp,
                 "batteryTemp": battery_info["temperature"],
                 "batteryCharge": battery_info["percentage"]
             }
@@ -172,7 +169,7 @@ class Transmit:
         """
         try:
             start_time: str = RTC.get_time()
-            self.run()
+            self.transmit_message()
             end_time: str = RTC.get_time()
             elapsed_time: float = (datetime.fromisoformat(end_time) -
                                    datetime.fromisoformat(start_time)).total_seconds()
@@ -180,45 +177,3 @@ class Transmit:
         except Exception as e:
             logging.error(f"Error in run_with_time_measure method: {e}")
         return max(waiting_time, 0), datetime.fromisoformat(end_time)
-
-    def transmit_message_periodically(self) -> None:
-        """
-        Periodically takes pictures and sends them over MQTT, based on the period it will
-        either shut down between sending two pictures, or just sleep within the script.
-        """
-        while True:
-            self.schedule.load_boot_state()
-            waiting_time, end_time = self.transmit_message_with_time_measure()
-            waiting_time = max(waiting_time, MINIMUM_WAIT_TIME)
-
-            message = self.schedule.update_boot_time(end_time)
-            logging.info(message)
-            self.schedule.save_boot_state()
-
-            if self.schedule.should_shutdown(waiting_time):
-                self.handle_shutdown(waiting_time, end_time)
-            elif waiting_time > 0:
-                self.handle_sleep(waiting_time)
-            else:
-                logging.warning(f"Period time is set too low. The minimum is {MINIMUM_WAIT_TIME} seconds.")
-
-    def handle_shutdown(self, waiting_time: float, end_time: datetime) -> None:
-        shutdown_duration = self.schedule.calculate_shutdown_duration(waiting_time)
-        wake_time = self.schedule.get_wake_time(end_time, shutdown_duration)
-
-        logging.info(f"Shutting down for {shutdown_duration} seconds")
-
-        try:
-            System.schedule_wakeup(wake_time)
-            self.schedule.last_shutdown_time = end_time.isoformat()
-            self.schedule.save_boot_state()
-            System.shutdown()
-        except Exception as e:
-            logging.error(f"Failed to schedule wake-up: {e}")
-
-    def handle_sleep(self, waiting_time: float) -> None:
-        logging.info(f"Sleeping for {waiting_time} seconds")
-        config_received = self.mqtt.config_received_event.wait(timeout=waiting_time)
-        if config_received:
-            self.config.load()
-            self.acknowledge_config()
