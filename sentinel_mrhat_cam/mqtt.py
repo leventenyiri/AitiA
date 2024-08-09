@@ -123,6 +123,7 @@ class MQTT:
 
     def connect(self):
         """
+
         Connect to the MQTT broker.
 
         This method sets up various callbacks for connection events and
@@ -133,25 +134,38 @@ class MQTT:
         mqtt_client.Client
             The connected MQTT client instance.
         """
-        def on_connect(client, userdata, flags, rc, properties=None):
-            if rc == 0:
-                logging.info("Connected to MQTT Broker!")
-            else:
-                logging.error(f"Failed to connect, return code {rc}")
+        try:
+            def on_connect(client, userdata, flags, rc, properties=None):
+                if rc == 0:
+                    logging.info("Connected to MQTT Broker!")
+                else:
+                    logging.error(f"Failed to connect, return code {rc}")
 
-        # Making sure we can reach the broker before trying to connect
-        self.broker_check()
+            def on_disconnect(self, client, userdata, disconnect_flags, reason_code, properties=None):
+                print("on_disconnect called")
 
-        self.client.on_connect = on_connect
-        self.client.username_pw_set(USERNAME, PASSWORD)
-        self.client.disable_logger()
+            def on_connect_fail(client, userdata):
+                print("on_connect_fail called")
 
-        self.client.connect(self.broker, self.port)
-        # Resetting the counter after a successful connection
-        self.broker_connect_counter = 0
-        self.client.loop_start()
+            # Making sure we can reach the broker before trying to connect
+            self.broker_check()
 
-        return self.client
+            self.client.on_connect = on_connect
+            self.client.on_disconnect = on_disconnect
+            self.client.on_connect_fail = on_connect_fail
+            self.client.username_pw_set(USERNAME, PASSWORD)
+            self.client.disable_logger()
+
+            self.client.connect(self.broker, self.port)
+            # Resetting the counter after a successful connection
+
+            self.broker_connect_counter = 0
+            self.client.loop_start()
+
+            return self.client
+        except Exception as e:
+            logging.error(f"Error connecting to MQTT broker: {e}")
+            exit(1)
 
     def broker_check(self):
         while not self.is_broker_available():
