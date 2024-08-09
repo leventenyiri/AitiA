@@ -22,7 +22,7 @@ class Config:
         Dictionary to store the configuration data.
     """
 
-    def __init__(self, path):
+    def __init__(self, path: str) -> None:
         """
         Initializes the Config class with the given file path.
 
@@ -52,7 +52,7 @@ class Config:
             self.data.update(Config.get_default_config())
             logging.error("Loading config failed, using default config")
 
-    def load(self):
+    def load(self) -> None:
         """
         Load the configuration from the `config.json` file.
 
@@ -94,7 +94,7 @@ class Config:
             raise
 
     @staticmethod
-    def get_default_config():
+    def get_default_config() -> dict:
         """
         Defines and returns a default configuration dictionary.
 
@@ -113,16 +113,17 @@ class Config:
         return default_config
 
     @staticmethod
-    def validate_config(new_config):
+    def validate_config(new_config) -> None:
         """
-        Validates the new configuration dictionary against the default configuration and checks if specific rules are fullfilled.
+        Validates the new configuration dictionary against the default configuration
+        and checks if specific rules are fullfilled.
 
         This function checks if the provided configuration dictionary matches the expected structure
         and values. It raises appropriate exceptions if any validation checks fail.
 
         Parameters
         ----------
-        new_config : dict
+        new_config : any
             The configuration dictionary to be validated.
 
         Raises
@@ -150,21 +151,50 @@ class Config:
             raise ValueError("Invalid mode specified in the config.")
 
         if new_config["mode"] == "periodic":
-            Config.validate_period()
+            Config.validate_period(new_config["period"])
 
         Config.validate_time_format(new_config)
 
     @staticmethod
-    def validate_period(new_config):
-        if not isinstance(new_config["period"], int):
+    def validate_period(period) -> None:
+        """
+        Validates the period value in the new configuration dictionary.
+
+        Parameters
+        ----------
+        period : any
+            The time period to be validated.
+
+        Raises
+        ------
+        TypeError
+            If the period specified in the config is not an integer.
+        ValueError
+            If the period specified in the config is less than the minimum allowed wait time,
+            or if it is more than the maximum allowed wait time.
+        """
+        if not isinstance(period, int):
             raise TypeError("Period specified in the config is not an integer.")
-        if new_config["period"] < MINIMUM_WAIT_TIME:
+        if period < MINIMUM_WAIT_TIME:
             raise ValueError("Period specified in the config is less than the minimum allowed wait time.")
-        if new_config["period"] > MAXIMUM_WAIT_TIME:
+        if period > MAXIMUM_WAIT_TIME:
             raise ValueError("Period specified in the config is more than the maximum allowed wait time.")
 
     @staticmethod
-    def validate_time_format(new_config):
+    def validate_time_format(new_config: dict) -> None:
+        """
+        Validates the wake-up and shut-down time formats in the new configuration dictionary.
+
+        Parameters
+        ----------
+        new_config : dict
+            The configuration dictionary which contains the shut-down and wake-up time.
+
+        Raises
+        ------
+        TypeError
+            If the wake-up time or shut-down time format in the config is invalid.
+        """
         # REGEX: hh:mm:ss
         time_pattern = re.compile(r'^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$')
         if bool(time_pattern.match(new_config["wakeUpTime"])) is False:
