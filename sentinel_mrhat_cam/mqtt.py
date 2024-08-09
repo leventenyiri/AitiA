@@ -141,15 +141,24 @@ class MQTT:
                 else:
                     logging.error(f"Failed to connect, return code {rc}")
 
+            def on_disconnect(self, client, userdata, disconnect_flags, reason_code, properties=None):
+                print("on_disconnect called")
+
+            def on_connect_fail(client, userdata):
+                print("on_connect_fail called")
+
             # Making sure we can reach the broker before trying to connect
             self.broker_check()
 
             self.client.on_connect = on_connect
+            self.client.on_disconnect = on_disconnect
+            self.client.on_connect_fail = on_connect_fail
             self.client.username_pw_set(USERNAME, PASSWORD)
             self.client.disable_logger()
 
             self.client.connect(self.broker, self.port)
             # Resetting the counter after a successful connection
+
             self.broker_connect_counter = 0
             self.client.loop_start()
 
