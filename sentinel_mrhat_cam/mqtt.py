@@ -215,8 +215,7 @@ class MQTT:
         """
         try:
             msg_info = self.client.publish(topic, message, qos=self.qos)
-            msg_info.wait_for_publish()
-
+            msg_info.wait_for_publish(timeout=5)
         except Exception:
             exit(1)
 

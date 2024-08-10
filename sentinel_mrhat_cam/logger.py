@@ -87,7 +87,7 @@ class Logger(logging.Handler):
         self.log_queue = Queue()
         self.mqtt = None
         self.start_event = threading.Event()
-        self.pool = ThreadPool()
+        self.pool = ThreadPool(processes=5)
 
     def start_logging(self) -> None:
         """
@@ -185,6 +185,20 @@ class Logger(logging.Handler):
             print(f"Queue number increased: {self.log_queue.qsize()}")
             if self.start_event.is_set() and self.mqtt.is_connected():
                 self.pool.apply_async(self.publish_loop, args=(msg, LOGGING_TOPIC))
+                """ while not self.log_queue.empty():
+                    try:
+                        msg = self.log_queue.get(timeout=1)
+                        print(f"Queue number decreased: {self.log_queue.qsize()}")
+                        # Do not publish if not connected
+                        if self.mqtt.is_connected():
+                            self.mqtt.client.publish(LOGGING_TOPIC, msg)
+                        else:
+                            return
+                    except Empty:
+                        return
+                    except Exception as e:
+                        print(f"Error in Logger publish loop: {e}") """
+
         except Exception as e:
             print(f"Error in Logger emit: {e}")
 
@@ -228,6 +242,6 @@ class Logger(logging.Handler):
         self.start_event.clear()
         self.pool.close()
         self.pool.join()
-        if self.mqtt.is_connected():
+        if self.mqtt is not None and self.mqtt.is_connected():
             self.mqtt.disconnect()
         super().close()

@@ -16,11 +16,11 @@ from .logger import Logger
 
 
 class Transmit:
-    def __init__(self, camera: Camera, logger: Logger, schedule: Schedule) -> None:
+    def __init__(self, camera: Camera, logger: Logger, schedule: Schedule, mqtt: MQTT) -> None:
         self.camera = camera
-        self.mqtt = MQTT()
-        self.schedule = schedule
         self.logger = logger
+        self.schedule = schedule
+        self.mqtt = mqtt
 
     def log_hardware_info(self, hardware_info: Dict[str, Any]) -> None:
         """
@@ -147,12 +147,13 @@ class Transmit:
 
             if not self.mqtt.client.is_connected():
                 self.connect_mqtt()
-                logging.info("Connecting to mqtt server inside run \n")
+                print("Connecting to mqtt server inside run \n")
             if self.logger.mqtt is None:
                 self.logger.start_mqtt_logging()
-                logging.info("Starting looger inside run \n")
+                print("Starting logger inside run \n")
 
             self.mqtt.publish(message, IMAGETOPIC)
+            print("Image sent")
 
         except Exception as e:
             logging.error(f"Error in run method: {e}")

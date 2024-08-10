@@ -55,7 +55,7 @@ class App:
         self.mqtt = MQTT()
         self.schedule = Schedule(period=self.config.data["period"])
         self.logger = logger
-        self.transmit = Transmit(self.camera, self.logger, self.schedule)
+        self.transmit = Transmit(self.camera, self.logger, self.schedule, self.mqtt)
 
     @log_execution_time("Starting the app")
     def start(self) -> None:
@@ -98,6 +98,7 @@ class App:
                     if config_received:
                         self.config.load()
                         self.acknowledge_config()
+                        self.update_values()
         except Exception as e:
             logging.error(f"An error occurred while running the periodic loop: {e}")
             import traceback
@@ -112,3 +113,8 @@ class App:
         self.mqtt.publish(message, CONFIGACKTOPIC)
         logging.info("\nConfig received and acknowledged\n")
         self.mqtt.reset_config_received_event()
+
+    def update_values(self) -> None:
+        self.schedule.working_time_check(self.config.data["wakeUpTime"], self.config.data["shutDownTime"])
+        self.schedule.period = self.config.data["period"]
+        self.camera.quality = self.config.data["quality"]
