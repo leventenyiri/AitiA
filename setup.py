@@ -8,7 +8,7 @@ setup(
     author_email='info@effective-range.com',
     packages=find_packages(where='sentinel_mrhat_cam'),
     package_dir={'': 'sentinel_mrhat_cam'},
-    scripts=['scripts/run_script.sh'],
+    scripts=['scripts/sentinel_mrhat_cam.sh'],
     install_requires=['pytest',
                       'PyYAML>=6.0',
                       'pillow',
