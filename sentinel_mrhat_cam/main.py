@@ -15,7 +15,7 @@ def main():
     The application can run in three modes:
     1. "always-on": Continuously takes pictures and sends them.
     2. "periodic": Sends images periodically based on the configured schedule.
-    3. "single-shot": Takes one picture, sends it, and then shuts down the pi.
+    3. "single-shot": Takes one picture, sends it, and then exits the script.
 
     The function handles the initialization of logging, creates the App instance
     with the provided configuration, and manages the main execution loop based
@@ -49,7 +49,7 @@ def main():
         # The app is sending the images periodically
         elif app.config.data['mode'] == "periodic":
             app.run_periodically()
-        # The app takes one picture then shuts down
+        # The app takes one picture then exit
         elif app.config.data['mode'] == "single-shot":
             app.run()
 

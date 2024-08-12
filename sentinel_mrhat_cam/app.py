@@ -3,7 +3,7 @@ from .mqtt import MQTT
 from .camera import Camera
 from .app_config import Config
 from .utils import log_execution_time
-from .static_config import CONFIGACKTOPIC, MINIMUM_WAIT_TIME
+from .static_config import CONFIGACKTOPIC
 from .schedule import Schedule
 from .logger import Logger
 from .transmit import Transmit
@@ -13,8 +13,9 @@ class App:
     """
     Main application class for managing camera operations and MQTT communication.
 
-    This class handles image capture, message creation, and periodic execution of
-    tasks based on the provided configuration.
+    This class handles the image capture, message creation and sending, and periodic execution of
+    the tasks based on the provided configuration. Based on the provided configuration,
+    the application either sleeps or shuts down the device between the image captures.
 
     Parameters
     ----------
@@ -30,13 +31,13 @@ class App:
     camera : Camera
         Camera object for capturing images.
     mqtt : MQTT
-        MQTT client for message publishing.
+        MQTT client for message publishing and receiving.
     schedule : Schedule
-        Schedule object for managing periodic tasks.
+        Schedule the running of the application, and handle the shut down timing.
     logger : Logger
         Logger instance for handling log messages.
-    lock : threading.Lock
-        Lock for thread-safe operations.
+    transmit : Transmit
+        Transmitter object for creating and sending messages.
     """
 
     def __init__(self, config_path: str, logger: Logger) -> None:
@@ -60,23 +61,52 @@ class App:
     @log_execution_time("Starting the app")
     def start(self) -> None:
         """
-        Start the application, initializing the schedule and camera.
+        Check if the current time is in the range of the working hours specified in the
+        config file and start the camera.
         """
         self.schedule.working_time_check(self.config.data["wakeUpTime"], self.config.data["shutDownTime"])
         self.camera.start()
 
     @log_execution_time("Taking a picture and sending it")
     def run(self) -> None:
+        """
+        Captures and sends an image, then exits the script.
+        """
         self.transmit.transmit_message()
 
     def run_always(self) -> None:
+        """
+        Taking pictures and sending them over MQTT ASAP and forever.
+        """
         while True:
             self.run()
 
     def run_periodically(self) -> None:
         """
         Periodically takes pictures and sends them over MQTT, based on the period it will
-        either shut down between sending two pictures, or just sleep within the script.
+        either shut down between sending two pictures, or just wait within the script.
+
+        This method runs an infinite loop that periodically captures and transmits images based on the
+        application's configuration. It checks for a new configuration update before each iteration
+        and updates the application's settings if necessary. The method determines whether the device 
+        should shut down or sleep between image captures based on the time elapsed during transmission 
+        and the configured period.
+
+        Workflow
+        --------
+        - Check if a new configuration has been received by the MQTT client.
+        - If a new configuration is detected, update the application's settings and acknowledge the receipt.
+        - Capture an image and transmit it via MQTT.
+        - Measure the time taken to complete the transmission.
+        - Determine whether the device should shut down or simply wait for the remainder of the period 
+        based on the transmission time.
+        - If a shutdown is required, manage boot data, initiate the shutdown, and log relevant information.
+        - If no shutdown is needed, wait for the remaining time or until a new configuration is received.
+
+        Raises
+        ------
+        SystemExit
+            If an exception occurs during the periodic loop, the application will log the error and exit.
         """
         try:
             while True:
@@ -107,12 +137,32 @@ class App:
         self.mqtt.reset_config_received_event()
 
     def update_values(self) -> None:
+        """
+        Update the application's operational parameters based on the latest configuration data.
+
+        Configuration Parameters
+        ------------------------
+        - `wakeUpTime` and `shutDownTime`: Define the working hours during which the application is active.
+        - `period`: Determines the interval between consecutive image captures and transmissions.
+        - `quality`: Sets the quality of images captured by the camera.
+        """
         self.schedule.working_time_check(self.config.data["wakeUpTime"], self.config.data["shutDownTime"])
         self.schedule.period = self.config.data["period"]
         self.camera.quality = self.config.data["quality"]
 
     def check_config_received_event(self, config_received: bool) -> None:
-        # If a new configuration was received, update the app's configuration and acknowledge it
+        """
+        Check if a new configuration has been received and update the application accordingly.
+
+        This method is responsible for detecting when a new configuration has been received via MQTT. 
+        If a new configuration is detected, the application reloads its settings, acknowledges the 
+        receipt of the configuration, and updates its operational parameters to reflect the changes.
+
+        Parameters
+        ----------
+        config_received : bool
+            A boolean flag indicating whether a new configuration has been received.
+        """
         if config_received:
             self.config.load()
             self.acknowledge_config()

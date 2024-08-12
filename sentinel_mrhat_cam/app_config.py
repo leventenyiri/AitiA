@@ -7,7 +7,7 @@ from .static_config import CONFIGACKTOPIC, MINIMUM_WAIT_TIME, MAXIMUM_WAIT_TIME
 
 class Config:
     """
-    A class to handle configuration loading, validation, and management.
+    A class to handle configuration loading and validation.
 
     Parameters
     ----------

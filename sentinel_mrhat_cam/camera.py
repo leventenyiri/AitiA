@@ -65,7 +65,7 @@ class Camera:
 
     def start(self):
         """
-        Configures and starts the camera with the specified settings.
+        Configures and starts the camera with the settings from the config file.
 
         This function sets up the camera configuration based on the width and height
         attributes, applies the quality setting, and sets the autofocus mode to continuous.
