@@ -3,11 +3,20 @@ Welcome to the documentation. 🐦
 
 [Project Homepage](https://github.com/Aitia-IIOT/sentinel-mrhat-cam)
 
-## How it works?
+## Overview
 
-### Overview
+The device consists of a Raspberry Pi Zero 2W, a Hat by Effective-Range™, a camera, a battery and a solar panel. Its function is taking pictures periodically and sending them through mqtt. The period, mode and working time is configurable by sending a config file to the device.
 
-TODO
+#### Period 
+How often the images will be taken.
+
+#### Mode
+Either **one-shot** (take one picture, send it, then shut down), **always-on** (taking and sending them as fast as it can without break), and **periodic** (taking and sending pictures with a given period). In production only the **periodic** mode will be used.
+
+About where to send the config, see the **Messaging** section.
+
+The end product will come in a water and dust-proof case with wifi antenna and IP68 rated button, currently the prototype is in an electrical box, originally rated IP68, but a hole had to be drilled for the USB cable, so using duct tape around the area is recommended if you plan on using it in the rain.
+![Hole in case](https://github.com/bnyitrai03/rpizero_storage/blob/main/IMG_20240812_150035613.jpg?raw=true)
 
 ## Login
 #### Example of ssh using ip address:
@@ -44,7 +53,7 @@ Once you have successfully connected to the device you will know its name, you c
 ssh admin@er-edge-16b9ac84.local
 ```
 
-#### Example of ssh using key based [login](https://github.com/EffectiveRange/devc-effectiverange/wiki/Configuring-SSH-targets):
+#### Example of ssh using [key based login](https://github.com/EffectiveRange/devc-effectiverange/wiki/Configuring-SSH-targets):
 In the linked tutorial the name the Host myhost, you can name it however you like.
 ```bash
 ssh myhost
@@ -108,7 +117,7 @@ The green LED on the Raspberry shows whether its on or off.
 On the HAT there are 3 LED-s. If one blue LED is on, then it means its running off of the battery. If two blue LED-s are on, it means that it receives power through the USB-C port.
 The green LED on the HAT is on, if the battery is being charged.
 
-### Messaging
+## Messaging
 
 **Subscribe topic:** `{username}/config`
 
