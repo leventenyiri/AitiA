@@ -50,6 +50,47 @@ In the linked tutorial the name the Host myhost, you can name it however you lik
 ssh myhost
 ```
 
+## Running the script
+
+By default the script is running automatically as soon as the device has booted up. This is thanks to a daemon, which is starting a bash script on boot. The bash script starts the python script, handles additional logging, and restarts the script or the device based on exit codes from the python script.
+
+If you dont want the script to start on boot, then you have to disable the daemon responsible for that.
+
+```bash
+sudo systemctl disable run-script.service
+
+sudo reboot
+```
+
+To make it start on boot:
+
+```bash
+sudo systemctl enable run-script.service
+
+sudo reboot
+```
+
+You can also start the script manually.
+
+Make sure you are in the home/admin folder.
+```bash
+cd
+```
+Then run the bash script.
+```bash
+bash run_script.sh
+```
+
+As its running itt will create a bash_log.txt and a hardware_log.txt file in the home/admin folder on the Pi. The bash_log contains information about whats happening within the script and the hardware_log, as the name suggests lets us know about specifics of the hardware, like CPU temperature and battery voltage... 
+
+If for some reason you want to run the python script straight up, you can do that too.
+```bash
+python3 -m sentinel_mrhat_cam.main
+```
+
+Be aware, that this way you will miss out on the bash_log and the hardware_log, it will also not handle the cases where the script exits with an exit code.
+
+
 ### Messaging
 
 **Subscribe topic:** `{username}/config`
