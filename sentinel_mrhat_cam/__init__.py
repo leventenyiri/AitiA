@@ -179,6 +179,22 @@ Example log messages:
 - Logs will be sent to this topic. 
 - The level of the log messages we want to send can be set using the `LOG_LEVEL` variable in **static_config.py**. Currently it is set to `DEBUG`.
 
+## Scheduling
+
+To accurately send the pictures with the given period, we have to measure the runtime of the script, and take it into account. We also need to know how much time it takes to shut down and boot up.
+
+To do this, we need the date of the last time the device has shut down, so that after waking up we can calculate how much time has passed. We have to write these values into a file, since its important that it persists between shutdown cycles. We call this file state_file.json, here is an example of it:
+```json
+{
+    "boot_shutdown_time": 15.0,
+    "last_shutdown_time": "2024-08-06T09:26:48+00:00"
+}
+```
+Currently this file **HAS TO EXIST** before you run the program because of a bug we have yet to fix, in the end product it wont be needed before the first run, the script will create it.
+
+The next time the device wakes up, it will read the values from this file, it will use the `last_shutdown_time`, along with the `period` from the config and the runtime of the script to decide how long it has to be shut down. It will also update the last_shutdown_time when it shuts down, so it can be used in the next iteration.
+
+
 ## Hardware
 
 ![Prototype Schematic](https://github.com/bnyitrai03/rpizero_storage/blob/main/Protot%C3%ADpus%20rajz%20V1.3.png?raw=true)
