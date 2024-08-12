@@ -113,3 +113,9 @@ class Schedule:
             System.shutdown()
         except Exception as e:
             logging.error(f"Failed to schedule wake-up: {e}")
+
+    def manage_boot_data(self, end_time: datetime) -> None:
+        self.load_boot_state()
+        message = self.update_boot_time(end_time)
+        logging.info(message)
+        self.save_boot_state()

@@ -80,29 +80,22 @@ class App:
         """
         try:
             while True:
-                self.schedule.load_boot_state()
-                waiting_time, end_time = self.transmit.transmit_message_with_time_measure()
-                waiting_time = max(waiting_time, MINIMUM_WAIT_TIME)
+                # Check if a new configuration has been received
+                config_received = self.mqtt.config_received_event.is_set()
+                self.check_config_received_event(config_received)
 
-                message = self.schedule.update_boot_time(end_time)
-                logging.info(message)
-                self.schedule.save_boot_state()
+                # Send an image and measure how long it took to send
+                waiting_time, end_time = self.transmit.transmit_message_with_time_measure()
 
                 if self.schedule.should_shutdown(waiting_time):
+                    self.schedule.manage_boot_data(end_time)
                     self.schedule.shutdown(waiting_time, end_time)
-                elif waiting_time > 0:
+                else:
                     logging.info(f"Sleeping for {waiting_time} seconds")
                     config_received = self.mqtt.config_received_event.wait(timeout=waiting_time)
 
-                    # If a new configuration was received, update the app's configuration and acknowledge it
-                    if config_received:
-                        self.config.load()
-                        self.acknowledge_config()
-                        self.update_values()
         except Exception as e:
             logging.error(f"An error occurred while running the periodic loop: {e}")
-            import traceback
-            traceback.print_exc()
             exit(1)
 
     def acknowledge_config(self) -> None:
@@ -111,10 +104,17 @@ class App:
         """
         message = self.mqtt.config_confirm_message
         self.mqtt.publish(message, CONFIGACKTOPIC)
-        logging.info("\nConfig received and acknowledged\n")
         self.mqtt.reset_config_received_event()
 
     def update_values(self) -> None:
         self.schedule.working_time_check(self.config.data["wakeUpTime"], self.config.data["shutDownTime"])
         self.schedule.period = self.config.data["period"]
         self.camera.quality = self.config.data["quality"]
+
+    def check_config_received_event(self, config_received: bool) -> None:
+        # If a new configuration was received, update the app's configuration and acknowledge it
+        if config_received:
+            self.config.load()
+            self.acknowledge_config()
+            self.update_values()
+            logging.info("\nUpdated configuration\n")

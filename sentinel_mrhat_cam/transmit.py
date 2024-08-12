@@ -7,7 +7,7 @@ import pybase64
 from datetime import datetime
 import numpy as np
 from .utils import log_execution_time
-from .static_config import IMAGETOPIC
+from .static_config import IMAGETOPIC, MINIMUM_WAIT_TIME
 from .system import System, RTC
 from .camera import Camera
 from .mqtt import MQTT
@@ -85,7 +85,8 @@ class Transmit:
             hardware_info: Dict[str, Any] = System.gather_hardware_info()
             cpu_temp: float = System.get_cpu_temperature()
 
-            logging.info(f"Battery temp: {battery_info['temperature']}°C, battery percentage: {battery_info['percentage']} %, CPU temp: {cpu_temp}°C")
+            logging.info(
+                f"Battery temp: {battery_info['temperature']}°C, battery percentage: {battery_info['percentage']} %, CPU temp: {cpu_temp}°C")
             message: Dict[str, Any] = {
                 "timestamp": timestamp,
                 "image": self.create_base64_image(image_array),
@@ -177,4 +178,4 @@ class Transmit:
             waiting_time: float = self.schedule.period - elapsed_time
         except Exception as e:
             logging.error(f"Error in run_with_time_measure method: {e}")
-        return max(waiting_time, 0), datetime.fromisoformat(end_time)
+        return max(waiting_time, MINIMUM_WAIT_TIME), datetime.fromisoformat(end_time)

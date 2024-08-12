@@ -119,19 +119,8 @@ class Logger(logging.Handler):
             self.create_mqtt_handler()
             logging.info("Logging started")
 
-        except ImportError as e:
-            print(f"Import error: {e}")
-            print("This might be due to missing modules or incorrect import statements.")
-        except AttributeError as e:
-            print(f"Attribute error: {e}")
-            print("This might be due to missing attributes or methods in the MQTTHandler class.")
-        except TypeError as e:
-            print(f"Type error: {e}")
-            print("This might be due to incorrect method signatures or argument types.")
         except Exception as e:
-            print(f"Unexpected error: {e}")
-            import traceback
-            traceback.print_exc()
+            print(f"Error loading log config: {e}")
             exit(1)
 
     def create_mqtt_handler(self) -> None:

@@ -247,14 +247,16 @@ class RTC:
             True if synchronization is successful, False otherwise.
         """
         for retry in range(max_retries):
-            time.sleep(delay)
             lines = RTC.get_timedatectl()
             is_synced = RTC.find_line(lines, "System clock synchronized:")
             if is_synced == "yes":
                 return True
             logging.warning(f"Failed to sync system to NTP, retrying ({retry+1}/{max_retries})")
+            time.sleep(delay)
             delay *= 2
-        return False
+
+        logging.error("Failed to sync system to NTP after maximum retries")
+        exit(1)
 
     @staticmethod
     def convert_timestamp(timestamp_str):
@@ -352,14 +354,6 @@ class RTC:
             # Get all the lines from timedatectl output
             lines = RTC.get_timedatectl()
 
-            """  # Check if system clock synchronized to the NTP servers
-            is_synced = RTC.find_line(lines, "System clock synchronized:")
-            if is_synced == "no":
-                # Try to sync system clock to the NTP servers again
-                if not RTC.sync_system_to_ntp():
-                    logging.error("Couldn't sync system clock to the NTP servers, current time is not correct.")
-                    exit(1) """
-
             # Get the RTC time
             rtc_time_line = RTC.find_line(lines, "RTC time:")
             rtc_datetime = RTC.convert_timestamp(rtc_time_line)
@@ -370,6 +364,7 @@ class RTC:
 
             # If the RTC time is different from the system clock, sync the RTC
             if rtc_datetime != utc_datetime:
+                RTC.sync_system_to_ntp()
                 RTC.sync_RTC_to_system()
 
             return utc_datetime
