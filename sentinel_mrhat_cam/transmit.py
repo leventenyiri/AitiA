@@ -144,17 +144,12 @@ class Transmit:
         try:
             message: str = self.get_message()
 
-            logging.info("Inside run, after getting message \n")
-
             if not self.mqtt.client.is_connected():
                 self.connect_mqtt()
-                print("Connecting to mqtt server inside run \n")
             if self.logger.mqtt is None:
                 self.logger.start_mqtt_logging()
-                print("Starting logger inside run \n")
 
             self.mqtt.publish(message, IMAGETOPIC)
-            print("Image sent")
 
         except Exception as e:
             logging.error(f"Error in run method: {e}")

@@ -259,7 +259,7 @@ class RTC:
         exit(1)
 
     @staticmethod
-    def convert_timestamp(timestamp_str):
+    def convert_timestamp(timestamp_str) -> str:
         """
         Convert a timestamp string to ISO 8601 format.
 
@@ -364,8 +364,14 @@ class RTC:
 
             # If the RTC time is different from the system clock, sync the RTC
             if rtc_datetime != utc_datetime:
-                RTC.sync_system_to_ntp()
-                RTC.sync_RTC_to_system()
+                # Convert strings to datetime objects
+                rtc = datetime.fromisoformat(rtc_datetime)
+                utc = datetime.fromisoformat(utc_datetime)
+                # Calculate the time difference in seconds
+                time_diff = abs((utc - rtc).total_seconds())
+                if time_diff > 2:
+                    RTC.sync_system_to_ntp()
+                    RTC.sync_RTC_to_system()
 
             return utc_datetime
 
