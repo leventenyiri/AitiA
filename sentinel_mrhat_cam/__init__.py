@@ -91,6 +91,23 @@ python3 -m sentinel_mrhat_cam.main
 Be aware, that this way you will miss out on the bash_log and the hardware_log, it will also not handle the cases where the script exits with an exit code.
 
 
+## Power management
+
+Currently, if you want to charge the battery you have to first fully disconnect the power (no USB cable, no battery connected), and then first connect the battery and then plug in the USB cable. The order matters here!
+
+Alternatively, you can shut down the device with the following command:
+```bash
+sudo shutdown -h now
+```
+The green LED on the Raspberry (not the HAT!) will blink 10 times (can take a bit of time for it to start blinking), it will shut down after. Once it has fully shut down **pressing the button** will wake it up, and if the USB cable and the battery are both connected it will be charging.(TODO, insert picture of button)
+
+In case of the button malfunctioning, simply pull out and plug in the USB cable.
+
+#### Meaning of LED-s
+The green LED on the Raspberry shows whether its on or off.
+On the HAT there are 3 LED-s. If one blue LED is on, then it means its running off of the battery. If two blue LED-s are on, it means that it receives power through the USB-C port.
+The green LED on the HAT is on, if the battery is being charged.
+
 ### Messaging
 
 **Subscribe topic:** `{username}/config`
