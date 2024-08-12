@@ -57,7 +57,7 @@ By default the script is running automatically as soon as the device has booted 
 If you dont want the script to start on boot, then you have to disable the daemon responsible for that.
 
 ```bash
-sudo systemctl disable run-script.service
+sudo systemctl disable sentinel_mrhat_cam.service
 
 sudo reboot
 ```
@@ -65,7 +65,7 @@ sudo reboot
 To make it start on boot:
 
 ```bash
-sudo systemctl enable run-script.service
+sudo systemctl enable sentinel_mrhat_cam.service
 
 sudo reboot
 ```
@@ -78,7 +78,7 @@ cd
 ```
 Then run the bash script.
 ```bash
-bash run_script.sh
+bash sentinel_mrhat_cam.sh
 ```
 
 As its running itt will create a bash_log.txt and a hardware_log.txt file in the home/admin folder on the Pi. The bash_log contains information about whats happening within the script and the hardware_log, as the name suggests lets us know about specifics of the hardware, like CPU temperature and battery voltage... 
