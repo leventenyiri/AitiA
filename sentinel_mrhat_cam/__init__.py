@@ -117,32 +117,43 @@ The green LED on the Raspberry shows whether its on or off.
 On the HAT there are 3 LED-s. If one blue LED is on, then it means its running off of the battery. If two blue LED-s are on, it means that it receives power through the USB-C port.
 The green LED on the HAT is on, if the battery is being charged.
 
+
 ## Messaging
 
-**Subscribe topic:** `{username}/config`
+You can edit the ip address of the broker, the port and the QOS level in the **static_config.py** file. The names of the mqtt topics can also be found here, along with other constants.
 
-```
+Each device will have a unique name and topic for receiving the config. E.g: for one device the topic where the config is sent may look like this: **settings/er-edge-16b9ac84**, for another it may look like this: **settings/er-edge-1169bc8a**. In the examples below we will simply use **er-edge** as the username.
+
+**Subscribe topic:** `config/er-edge`
+
+The defaul config.json message:
+
+```json
 {
-    "quality":"3K",
-    "mode":"periodic",
-    "period":60, // in sec
-    "wakeUpTime":"06:00:00", // UTC
-    "shutDownTime":"19:00:00" // UTC
+     "quality": "3K",
+     "mode": "periodic",
+     "period": 15,
+     "wakeUpTime": "06:59:31",
+     "shutDownTime": "22:00:00"
 }
 ```
 
-- The device using a default configuration in case of config errors
-- TODO more decription
+- In case there is something wrong with the received config, the default will be used.
+- If the `period` in the config is smaller than the `SHUTDOWN_THRESHOLD` in the **static_config.py** file, then the device will never shut down, it will just wait inside the script when necessary. If its bigger, it will shut down for the appropriate amount of time between taking and sending pictures.
 
-**Publish topic:** `{username}/confirm`
+**Publish topic:** `er-edge/confirm`
 
 `config-ok` OR `config-nok|{error desc}`
 
-- TODO description
+- Once a config.json file is sent to the device, a message will be sent back to this topic.
+- If everything was fine, it will send a `config-ok` message.
+- If something went wrong it will send a `config-nok` followed by the description of the problem.
 
-**Publish topic:** `{username}/image`
+**Publish topic:** `mqtt/rpi/image`
 
-```
+Example message:
+
+```json
 {
      "timestamp":"2024-07-11T18:52:05.179690+00:00",
      "image":"/9j/4AAQSkZJRgABAQAAAQAB...."
@@ -152,13 +163,21 @@ The green LED on the HAT is on, if the battery is being charged.
 }
 ```
 
-- TODO description
+- Along with the image we also send a timestamp (ISO8601), and a few hardware values.
 
-**Publish topic:** `{username}/log`
+**Publish topic:** `er-edge/logging`
 
-`log record text`
+Example log messages:
+```bash
+2024-08-12 16:27:55 - root - INFO - Image capture time: (capture) took 0.118763 seconds
+2024-08-12 16:27:55 - root - INFO - Battery temp: 23.4°C, battery percentage: 90 %, CPU temp: 54.768°C
+2024-08-12 16:27:56 - root - INFO - Creating the json message (create_message) took 0.386625 seconds
+2024-08-12 16:27:56 - root - INFO - Taking a picture and sending it (transmit_message) took 0.734755 seconds
+2024-08-12 16:27:56 - root - INFO - Sleeping for 9.0 seconds
+```
 
-- TODO descriptions
+- Logs will be sent to this topic. 
+- The level of the log messages we want to send can be set using the `LOG_LEVEL` variable in **static_config.py**. Currently it is set to `DEBUG`.
 
 ## Hardware
 
