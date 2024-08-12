@@ -16,7 +16,7 @@ Either **one-shot** (take one picture, send it, then shut down), **always-on** (
 About where to send the config, see the **Messaging** section.
 
 The end product will come in a water and dust-proof case with wifi antenna and IP68 rated button, currently the prototype is in an electrical box, originally rated IP68, but a hole had to be drilled for the USB cable, so using duct tape around the area is recommended if you plan on using it in the rain.
-![Hole in case](https://github.com/bnyitrai03/rpizero_storage/blob/main/IMG_20240812_150035613.jpg?raw=true)
+![Hole in case](https://github.com/bnyitrai03/rpizero_storage/blob/main/HoleInBox.jpg?raw=true)
 
 ## Login
 #### Example of ssh using ip address:
