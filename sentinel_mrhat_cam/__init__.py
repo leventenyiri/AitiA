@@ -9,6 +9,47 @@ Welcome to the documentation. 🐦
 
 TODO
 
+## Login
+#### Example of ssh using ip address:
+Connect the device to the PC using the USB-C port on the Hat and use a program like PuTTY to communicate through serial port. Check the device manager to see which COM port the device uses. Inside PuTTY it should look like this:
+
+![Image of PuTTY](https://github.com/bnyitrai03/rpizero_storage/blob/main/PuTTY.png?raw=true)
+
+(On windows for the serial line just write COM...)
+
+Baud rate: 115200
+
+Click on Open, click inside the window and press Enter. After a while it will ask for the username and the password, during testing: 
+
+Password: admin
+
+Username: admin
+
+![Image of login](https://github.com/bnyitrai03/rpizero_storage/blob/main/PuTTY_Login.png?raw=true)
+
+Write hostname -I, and you will get the ip address.
+
+![Hostname](https://github.com/bnyitrai03/rpizero_storage/blob/main/PuTTY_Hostname.png?raw=true)
+
+You can now log in using this ip address like so:
+
+```bash
+ssh admin@192.168.0.103
+```
+
+#### Example of ssh using mDNS:
+
+Once you have successfully connected to the device you will know its name, you can also use this to log in, you just have to put .local after the name.
+```bash
+ssh admin@er-edge-16b9ac84.local
+```
+
+#### Example of ssh using key based [login](https://github.com/EffectiveRange/devc-effectiverange/wiki/Configuring-SSH-targets):
+In the linked tutorial the name the Host myhost, you can name it however you like.
+```bash
+ssh myhost
+```
+
 ### Messaging
 
 **Subscribe topic:** `{username}/config`
