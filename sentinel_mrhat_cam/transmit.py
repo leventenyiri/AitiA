@@ -49,6 +49,9 @@ class Transmit:
         str
             The base64-encoded string representation of the JPEG image.
         """
+        # If there was an error during image capture, return an error message
+        if image_array is None:
+            return "Error: Image data is None"
 
         image: Image.Image = Image.fromarray(image_array)
         image_bytes: io.BytesIO = io.BytesIO()

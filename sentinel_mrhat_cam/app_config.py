@@ -57,7 +57,7 @@ class Config:
         Load the configuration from the `config.json` file.
 
         If the file is successfully opened and read, the configuration
-        data is validated and stored in the 'data' attribute of the Config instance.
+        data is validated and stored in the `data` attribute of the Config instance.
 
         If any errors occur during the loading process, appropriate error messages are
         logged, and the function raises the encountered exception.
@@ -116,7 +116,7 @@ class Config:
     def validate_config(new_config) -> None:
         """
         Validates the new configuration dictionary against the default configuration
-        and checks if specific rules are fullfilled.
+        and checks if specific rules are fulfilled.
 
         This function checks if the provided configuration dictionary matches the expected structure
         and values. It raises appropriate exceptions if any validation checks fail.

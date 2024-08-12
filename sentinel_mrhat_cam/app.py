@@ -167,4 +167,4 @@ class App:
             self.config.load()
             self.acknowledge_config()
             self.update_values()
-            logging.info("\nUpdated configuration\n")
+            logging.info("Updated configuration")

@@ -7,11 +7,13 @@ except ImportError:
     controls = MagicMock()
 from .utils import log_execution_time
 import logging
+import numpy as np
 
 
 class Camera:
     """
-    A class to represent and manage the arducam 16 mpx autofocus camera.
+    A class to represent and manage the arducam imx519 autofocus camera.
+    https://www.uctronics.com/arducam-imx519-autofocus-camera-module-for-raspberry-pi.html
 
     Parameters
     ----------
@@ -21,7 +23,7 @@ class Camera:
     Attributes
     ----------
     quality : int
-        The quality setting for image capture, with a default value of 95.
+        The quality setting for the image capture, with a default value of 95. Values range from 1 to 95.
     cam : Picamera2
         The camera object, Picamera2 instance.
     width : int
@@ -63,7 +65,7 @@ class Camera:
             self.height = 1440
             logging.error(f"Invalid quality specified: {config['quality']}. Defaulting to 3K quality.")
 
-    def start(self):
+    def start(self) -> None:
         """
         Configures and starts the camera with the settings from the config file.
 
@@ -82,17 +84,18 @@ class Camera:
         self.cam.start(show_preview=False)
 
     @log_execution_time("Image capture time:")
-    def capture(self):
+    def capture(self) -> np.ndarray:
         """
         Captures an image from the camera and returns it as numpy array.
-
-        This function captures an image using the camera's current settings and returns
-        the image data as a numpy array.
 
         Returns
         -------
         ndarray
             The captured image as a numpy array.
         """
-        image = self.cam.capture_array()
+        try:
+            image = self.cam.capture_array()
+        except Exception as e:
+            logging.error(f"Error during image capture: {e}")
+            return None
         return image

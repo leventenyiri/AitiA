@@ -21,9 +21,9 @@ class MQTT:
     Attributes
     ----------
     broker : str
-        The address of the MQTT broker.
+        The IPv4 address of the MQTT broker.
     subtopic : str
-        The topic to subscribe to for incoming messages.
+        The topic to subscribe to for the incoming configuration file.
     port : int
         The port number for the MQTT broker connection.
     qos : int
@@ -37,24 +37,12 @@ class MQTT:
     config_confirm_message : str
         A message to confirm the receipt of a new configuration.
 
-    Methods
-    -------
-    is_connected()
-        Check if the MQTT client is connected to the broker.
-    get_client()
-        Get the MQTT client instance.
-    init_receive()
-        Initialize the MQTT client to receive messages.
-    reset_config_received_event()
-        Reset the config_received_event.
-    connect()
-        Connect to the MQTT broker.
-    is_broker_available()
-        Check if the MQTT broker is available.
-    publish(message, topic)
-        Publish a message to a specified topic.
-    disconnect()
-        Disconnect the MQTT client from the broker.
+    Notes
+    ------
+    - The MQTT broker connection is retried up to 20 times upon failure.
+    - This class requires the `paho-mqtt` library to be installed.
+    - Some methods may raise exceptions if there are connection or publishing errors.
+    - The class uses configuration values from a `static_config` module, which should be present in the same package.
     """
 
     def __init__(self):
@@ -73,12 +61,15 @@ class MQTT:
     def get_client(self):
         return self.client
 
+    def reset_config_received_event(self):
+        self.config_received_event.clear()
+
     def init_receive(self):
         """
-        Initializes the MQTT client to receive messages on the subscribed topic and process them.
+        Initializes the MQTT client to receive the config file.
 
-        This function sets up the MQTT client's `on_message` callback to handle incoming messages.
-        When a message is received, it attempts to parse the message as JSON, validate the configuration,
+        This function sets up the MQTT client's `on_message` callback to handle the incoming config.
+        When a config is received, it attempts to parse it as a JSON, validate it,
         and save it to a temporary file. If successful, the configuration is copied to the final
         configuration path, and a confirmation message is set. If an error occurs, an appropriate
         error message is set.
@@ -88,44 +79,31 @@ class MQTT:
             try:
                 # Parse the JSON message
                 config_data = json.loads(msg.payload)
-                logging.info("Starting config validation...")
                 Config.validate_config(config_data)
 
                 # Write the validated JSON to the temp file
                 with open(TEMP_CONFIG_PATH, "w") as temp_config:
                     json.dump(config_data, temp_config, indent=4)
 
-                logging.info(f"Received config to {TEMP_CONFIG_PATH}")
-
                 # Copy the file
                 shutil.copyfile(TEMP_CONFIG_PATH, CONFIG_PATH)
                 logging.info(f"Config saved to {CONFIG_PATH}")
-
-                # Reset the reconnect counter
                 self.config_confirm_message = "config-ok"
-                # Signal the config change
-                self.config_received_event.set()
 
             except json.JSONDecodeError as e:
                 self.config_confirm_message = f"config-nok|Invalid JSON received: {e}"
                 logging.error(f"Invalid JSON received: {e}")
-                # Signal the config change
-                self.config_received_event.set()
             except Exception as e:
                 self.config_confirm_message = f"config-nok| {e}"
                 logging.error(f"Error processing message: {e}")
-                # Signal the config change
+            finally:
                 self.config_received_event.set()
 
         self.client.on_message = on_message
         self.client.subscribe(self.subtopic)
 
-    def reset_config_received_event(self):
-        self.config_received_event.clear()
-
     def connect(self):
         """
-
         Connect to the MQTT broker.
 
         This method sets up various callbacks for connection events and
@@ -160,11 +138,10 @@ class MQTT:
 
             self.client.connect(self.broker, self.port)
             # Resetting the counter after a successful connection
-
             self.broker_connect_counter = 0
             self.client.loop_start()
-
             return self.client
+
         except Exception as e:
             logging.error(f"Error connecting to MQTT broker: {e}")
             exit(1)

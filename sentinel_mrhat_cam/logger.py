@@ -25,50 +25,16 @@ class Logger(logging.Handler):
     filepath : str
         The path to the logging configuration file.
     log_queue : Queue
-        A queue to store log messages.
+        A queue to buffer log messages while there is no connection to the broker.
     mqtt : MQTT
-        An instance of the MQTT class for publishing messages.
+        An instance of the MQTT class for publishing log messages.
     start_event : threading.Event
         An event to signal the start of MQTT logging.
     pool : ThreadPool
         A thread pool for asynchronous publishing of log messages.
 
-    Methods
-    -------
-    start_logging()
-
-        Initializes and starts the logging process.
-
-    create_handler()
-
-        Creates and adds the MQTT handler to the root logger.
-
-    start_mqtt_logging()
-
-        Initializes MQTT connection and starts MQTT logging.
-
-    emit(record)
-
-        Processes a log record, formats it, and queues it for publishing.
-
-    publish_loop(msg, topic)
-
-        Publishes queued log messages to the specified MQTT topic.
-
-    disconnect_mqtt()
-
-        Closes the logger, disconnects MQTT, and cleans up resources.
-
     Raises
     ------
-    FileNotFoundError
-        If the specified log configuration file is not found.
-    ImportError
-        If there are missing modules or incorrect import statements.
-    AttributeError
-        If there are missing attributes or methods in the MQTTHandler class.
-    TypeError
-        If there are incorrect method signatures or argument types.
     Exception
         For any unexpected errors during logging operations.
     """
@@ -91,21 +57,13 @@ class Logger(logging.Handler):
 
     def start_logging(self) -> None:
         """
-        Initialize and start the logging process.
+        Start the logging process.
 
         This method loads the logging configuration from the `log_config.yaml` file,
         sets up the logging system, and adds the MQTT handler to the root logger.
 
         Raises
         ------
-        FileNotFoundError
-            If the log configuration file is not found.
-        ImportError
-            If there are missing modules or incorrect import statements.
-        AttributeError
-            If there are missing attributes or methods in the MQTTHandler class.
-        TypeError
-            If there are incorrect method signatures or argument types.
         Exception
             For any unexpected errors during the logging setup.
         """
@@ -174,19 +132,6 @@ class Logger(logging.Handler):
             print(f"Queue number increased: {self.log_queue.qsize()}")
             if self.start_event.is_set() and self.mqtt.is_connected():
                 self.pool.apply_async(self.publish_loop, args=(msg, LOGGING_TOPIC))
-                """ while not self.log_queue.empty():
-                    try:
-                        msg = self.log_queue.get(timeout=1)
-                        print(f"Queue number decreased: {self.log_queue.qsize()}")
-                        # Do not publish if not connected
-                        if self.mqtt.is_connected():
-                            self.mqtt.client.publish(LOGGING_TOPIC, msg)
-                        else:
-                            return
-                    except Empty:
-                        return
-                    except Exception as e:
-                        print(f"Error in Logger publish loop: {e}") """
 
         except Exception as e:
             print(f"Error in Logger emit: {e}")
@@ -206,6 +151,14 @@ class Logger(logging.Handler):
         -------
         None
             This function does not return any value.
+
+        Raises
+        ------
+        Empty
+            If the queue is empty and no message is available within the specified timeout.
+            There are no more messages to send.
+        Exception
+            For any other unexpected exceptions that occur during the process.
         """
         while not self.log_queue.empty():
             try:
