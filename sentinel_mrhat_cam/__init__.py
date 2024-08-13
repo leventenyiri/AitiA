@@ -12,10 +12,12 @@ Welcome to the documentation. 🐦
 
 [![Coverage badge](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=coverage&query=%24.message&url=https%3A%2F%2Fraw.githubusercontent.com%2Fleventenyiri%2FAitiA%2Fpython-coverage-comment-action-data%2Fendpoint.json)](https://htmlpreview.github.io/?https://github.com/leventenyiri/AitiA/blob/python-coverage-comment-action-data/htmlcov/index.html)
 
+<br><br>
+
 ## Overview
 
 The device consists of a Raspberry Pi Zero 2W,  MrHat by [Effective-Range™](https://effective-range.com), a camera📸, a battery🔋 and a solar panel☀️.
-Its function is taking pictures periodically and sending them through mqtt. The period, mode and working time is configurable by sending a config file to the device.
+Its function is taking pictures periodically and sending them through MQTT. The period, mode and working time is configurable by sending a config file to the device.
 
 #### Period
 How often the images will be taken.
@@ -258,7 +260,7 @@ If you measure the data while the device does not receive any power through the 
 
 <br><br><br><br>
 
-## Hardware
+## Hardware 📟
 
 ![Prototype Schematic](https://github.com/bnyitrai03/rpizero_storage/blob/main/Protot%C3%ADpus%20rajz%20V1.3.png?raw=true)
 
