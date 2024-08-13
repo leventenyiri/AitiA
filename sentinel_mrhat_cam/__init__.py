@@ -5,9 +5,9 @@ Welcome to the documentation. 🐦
 
 ## Overview
 
-The device consists of a Raspberry Pi Zero 2W, a Hat by Effective-Range™, a camera, a battery and a solar panel. Its function is taking pictures periodically and sending them through mqtt. The period, mode and working time is configurable by sending a config file to the device.
+The device consists of a Raspberry Pi Zero 2W, a Hat by [Effective-Range™](https://effective-range.com), a camera, a battery and a solar panel. Its function is taking pictures periodically and sending them through mqtt. The period, mode and working time is configurable by sending a config file to the device.
 
-#### Period 
+#### Period
 How often the images will be taken.
 
 #### Mode
@@ -17,6 +17,8 @@ About where to send the config, see the **Messaging** section.
 
 The end product will come in a water and dust-proof case with wifi antenna and IP68 rated button, currently the prototype is in an electrical box, originally rated IP68, but a hole had to be drilled for the USB cable, so using duct tape around the area is recommended if you plan on using it in the rain.
 ![Hole in case](https://github.com/bnyitrai03/rpizero_storage/blob/main/HoleInBox.jpg?raw=true)
+
+<div class="spacing"></div>
 
 ## Login
 #### Example of ssh using ip address:

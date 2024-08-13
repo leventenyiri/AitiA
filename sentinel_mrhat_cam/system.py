@@ -17,21 +17,6 @@ class System:
     This class contains static methods for system operations such as shutdown,
     reboot, scheduling wake-up, and gathering hardware information.
 
-    Methods
-    -------
-    shutdown()
-        Shuts down the system.
-    reboot()
-        Reboots the system.
-    schedule_wakeup(wake_time)
-        Schedule a system wake-up at a specified time.
-    get_cpu_temperature()
-        Get the current CPU temperature.
-    get_battery_info()
-        Get information about the battery status.
-    gather_hardware_info()
-        Gather comprehensive hardware information.
-
     Notes
     -----
     - The class interacts with hardware components and raises exceptions if unable to access them.
@@ -277,20 +262,6 @@ class RTC:
     This class provides static methods for syncing the system time with NTP servers,
     syncing the RTC with the system time, and retrieving the current time.
 
-    Methods
-    -------
-    sync_RTC_to_system()
-        Synchronize the RTC to the system clock.
-    sync_system_to_ntp(max_retries=5, delay=2)
-        Synchronize the system clock to NTP servers.
-    convert_timestamp(timestamp_str)
-        Convert a timestamp string to ISO 8601 format.
-    get_timedatectl()
-        Get output from the `timedatectl` command.
-    find_line(lines, target_string)
-        Find and return a specific line from timedatectl output.
-    get_time()
-        Get the current time, ensuring synchronization with NTP and RTC.
     """
     @staticmethod
     def sync_RTC_to_system() -> None:
