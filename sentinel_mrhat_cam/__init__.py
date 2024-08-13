@@ -22,6 +22,35 @@ The end product will come in a water and dust-proof case with wifi antenna and I
 <br><br><br>
 
 ## Login
+
+First configure which network the Pi connects to. Brought to you by EffectiveRange™, the **WifiManager** lets you do just that! 
+
+When you power on the device, if it cannot connect to any network, it will pop up as a wifi that you can connect to. Connect to it, it will take you to a page, where you can input the SSID and password of your network. To communicate with the device via **ssh**, make sure you are connected to the **same network** as the Pi!
+
+Alternatively, you can also configure the network manually if you prefer.
+```bash
+sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+```
+Example:
+```bash
+network={
+        ssid="TMIT_C1_2_4"
+        psk="example_password"
+        disabled=0
+        priority=0
+}
+network={
+        ssid="OnePlus"
+        psk="dogdogdog"
+        disabled=0
+        priority=1
+}
+```
+
+Here, a higher number means higher priority, so in this example, if both OnePlus and TMIT_C1_2_4 are available, it will connect to OnePlus. 
+
+By the way, what the **WifiManager** does, is that every time you configure a network through it, it writes it into this file with a higher priority than the last one.
+
 #### Example of ssh using ip address:
 Connect the device to the PC using the USB-C port on the Hat and use a program like PuTTY to communicate through serial port. Check the device manager to see which COM port the device uses. Inside PuTTY it should look like this:
 
@@ -31,9 +60,10 @@ Connect the device to the PC using the USB-C port on the Hat and use a program l
 
 Baud rate: 115200
 
-Click on Open, click inside the window and press Enter. After a while it will ask for the username and the password, during testing:
+Click on Open, click inside the window and press Enter. After a while it will ask for the username and the password, during testing: 
 
 Password: admin
+
 Username: admin
 
 ![Image of login](https://github.com/bnyitrai03/rpizero_storage/blob/main/PuTTY_Login.png?raw=true)
