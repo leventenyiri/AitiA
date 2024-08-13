@@ -237,6 +237,18 @@ The next time the device wakes up, it will read the values from this file, it wi
 
 <br><br><br><br>
 
+## Gathering data
+
+While the device is running, its collecting data about the hardware. This data is logged into the `hardware_log.txt` file in the home/admin directory on the Pi.
+
+If you want to visualize this data, use this [matlab script](https://github.com/leventenyiri/Hardware_data_visualizer).
+
+Currently, because of a faulty driver, you have to measure the consumption and the charging data separately, because when its charging (even if its charging with 1mA and the device is consuming 400mA), the battery current will just show 0mA (when in reality it should show -399mA).
+
+If you measure the data while the device does not receive any power through the USB-C port however, you will get an accurate reading. Just keep in mind that if you are measuring data about charging, the consumption data will probably be off by quite a bit.
+
+<br><br><br><br>
+
 ## Hardware
 
 ![Prototype Schematic](https://github.com/bnyitrai03/rpizero_storage/blob/main/Protot%C3%ADpus%20rajz%20V1.3.png?raw=true)
