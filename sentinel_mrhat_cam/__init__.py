@@ -1,4 +1,5 @@
 """
+<br>
 Welcome to the documentation. 🐦
 
 [Project Homepage](https://github.com/Aitia-IIOT/sentinel-mrhat-cam)
@@ -8,12 +9,12 @@ Welcome to the documentation. 🐦
 The device consists of a Raspberry Pi Zero 2W,  MrHat by [Effective-Range™](https://effective-range.com), a camera📸, a battery🔋 and a solar panel☀️. Its function is taking pictures periodically and sending them through mqtt. The period, mode and working time is configurable by sending a config file to the device.
 
 #### Period
-How often the images will be taken.
+How often the images will be taken.⏱️
 
 #### Mode
 Either **one-shot** (take one picture, send it, then shut down), **always-on** (taking and sending them as fast as it can without break), and **periodic** (taking and sending pictures with a given period). In production only the **periodic** mode will be used.
 
-About where to send the config, see the **Messaging** section.
+About where to send the config, see the [Messaging](https://leventenyiri.github.io/AitiA/sentinel_mrhat_cam.html#messaging) section.
 
 The end product will come in a water and dust-proof case with wifi antenna and IP68 rated button, currently the prototype is in an electrical box, originally rated IP68, but a hole had to be drilled for the USB cable, so using duct tape around the area is recommended if you plan on using it in the rain.
 ![Hole in case](https://github.com/bnyitrai03/rpizero_storage/blob/main/HoleInBox.jpg?raw=true)
@@ -30,10 +31,9 @@ Connect the device to the PC using the USB-C port on the Hat and use a program l
 
 Baud rate: 115200
 
-Click on Open, click inside the window and press Enter. After a while it will ask for the username and the password, during testing: 
+Click on Open, click inside the window and press Enter. After a while it will ask for the username and the password, during testing:
 
 Password: admin
-
 Username: admin
 
 ![Image of login](https://github.com/bnyitrai03/rpizero_storage/blob/main/PuTTY_Login.png?raw=true)
@@ -60,6 +60,8 @@ In the linked tutorial the name the Host myhost, you can name it however you lik
 ```bash
 ssh myhost
 ```
+
+<br><br><br>
 
 ## Running the script
 
@@ -101,6 +103,7 @@ python3 -m sentinel_mrhat_cam.main
 
 Be aware, that this way you will miss out on the bash_log and the hardware_log, it will also not handle the cases where the script exits with an exit code.
 
+<br><br><br>
 
 ## Power management
 
@@ -119,10 +122,11 @@ The green LED on the Raspberry shows whether its on or off.
 On the HAT there are 3 LED-s. If one blue LED is on, then it means its running off of the battery. If two blue LED-s are on, it means that it receives power through the USB-C port.
 The green LED on the HAT is on, if the battery is being charged.
 
+<br><br><br>
 
 ## Messaging
 
-You can edit the ip address of the broker, the port and the QOS level in the **static_config.py** file. The names of the mqtt topics can also be found here, along with other constants.
+You can edit the ip address of the broker, the port and the QoS level in the [static_config.py](https://leventenyiri.github.io/AitiA/sentinel_mrhat_cam/static_config.html) file. The names of the mqtt topics can also be found here, along with other constants.
 
 Each device will have a unique name and topic for receiving the config. E.g: for one device the topic where the config is sent may look like this: **settings/er-edge-16b9ac84**, for another it may look like this: **settings/er-edge-1169bc8a**. In the examples below we will simply use **er-edge** as the username.
 
@@ -141,7 +145,7 @@ The defaul config.json message:
 ```
 
 - In case there is something wrong with the received config, the default will be used.
-- If the `period` in the config is smaller than the `SHUTDOWN_THRESHOLD` in the **static_config.py** file, then the device will never shut down, it will just wait inside the script when necessary. If its bigger, it will shut down for the appropriate amount of time between taking and sending pictures.
+- If the `period` in the config is smaller than the `SHUTDOWN_THRESHOLD` in the [static_config.py](https://leventenyiri.github.io/AitiA/sentinel_mrhat_cam/static_config.html) file, then the device will never shut down, it will just wait inside the script when necessary. If its bigger, it will shut down for the appropriate amount of time between taking and sending pictures.
 
 **Publish topic:** `er-edge/confirm`
 
@@ -179,7 +183,9 @@ Example log messages:
 ```
 
 - Logs will be sent to this topic. 
-- The level of the log messages we want to send can be set using the `LOG_LEVEL` variable in **static_config.py**. Currently it is set to `DEBUG`.
+- The level of the log messages we want to send can be set using the `LOG_LEVEL` variable in [static_config.py](https://leventenyiri.github.io/AitiA/sentinel_mrhat_cam/static_config.html). Currently it is set to `DEBUG`.
+
+<br><br><br>
 
 ## Scheduling
 
@@ -196,6 +202,7 @@ Currently this file **HAS TO EXIST** before you run the program because of a bug
 
 The next time the device wakes up, it will read the values from this file, it will use the `last_shutdown_time`, along with the `period` from the config and the runtime of the script to decide how long it has to be shut down. It will also update the last_shutdown_time when it shuts down, so it can be used in the next iteration.
 
+<br><br><br>
 
 ## Hardware
 
