@@ -16,7 +16,37 @@ from .logger import Logger
 
 
 class Transmit:
+    """
+    A class responsible for capturing images, encoding them, and transmitting
+    these images with some extra telemetry over an MQTT connection.
+
+    Attributes
+    ----------
+    camera : Camera
+        An instance of the Camera class used to capture images.
+    logger : Logger
+        An instance of the Logger class used for logging information.
+    schedule : Schedule
+        An instance of the Schedule class used to manage operation schedules.
+    mqtt : MQTT
+        An instance of the MQTT class used to handle MQTT communication.
+    """
     def __init__(self, camera: Camera, logger: Logger, schedule: Schedule, mqtt: MQTT) -> None:
+        """
+        Initializes the Transmit class with instances of Camera, Logger,
+        Schedule, and MQTT classes.
+
+        Parameters
+        ----------
+        camera : Camera
+            An instance of the Camera class used to capture images.
+        logger : Logger
+            An instance of the Logger class used for logging information.
+        schedule : Schedule
+            An instance of the Schedule class used to manage transmission schedules.
+        mqtt : MQTT
+            An instance of the MQTT class used to handle MQTT communication.
+        """
         self.camera = camera
         self.logger = logger
         self.schedule = schedule
@@ -24,12 +54,14 @@ class Transmit:
 
     def log_hardware_info(self, hardware_info: Dict[str, Any]) -> None:
         """
-        Logs the hardware information to a file.
+        Logs the provided hardware information to a file.
+        This file will be the input of a Matlab script which plots the system metrics.
 
         Parameters
         ----------
-        hardware_info (Dict[str, Any])
-
+        hardware_info : Dict[str, Any]
+            A dictionary containing hardware information such as CPU temperature,
+            battery temperature, and other system metrics.
         """
         log_entry = ", ".join(f"{k}={v}" for k, v in hardware_info.items())
         with open("hardware_log.txt", "a") as log_file:
@@ -39,6 +71,11 @@ class Transmit:
         """
         Converts a numpy array representing an image into a base64-encoded JPEG string.
 
+        This method is used to transform raw image data, stored as a numpy array.
+        The image data is first converted into a PIL Image object,
+        then encoded into JPEG format, and finally converted into a base64 string
+        for transmission.
+
         Parameters
         ----------
         image_array : numpy.ndarray
@@ -47,11 +84,25 @@ class Transmit:
         Returns
         -------
         str
-            The base64-encoded string representation of the JPEG image.
+            The base64-encoded string representation of the JPEG image. This string
+            can be used in the JSON message, which requires text-based image encoding.
+
+        Raises
+        ------
+        ValueError
+            If the input image_array is not in a valid format that can be converted
+            into a JPEG image.
+
+        Notes
+        -----
+        - If the provided image array is `None`, then there was an error with the camera during the
+        image capture proccess. Since the connection to the MQTT broker is not established yet,
+        the image capturing function will provide `None` as the return value.
+        This way we can log the error through MQTT when it connects.
         """
         # If there was an error during image capture, return an error message
         if image_array is None:
-            return "Error: Image data is None"
+            return "Error: Camera was unable to capture the image."
 
         image: Image.Image = Image.fromarray(image_array)
         image_bytes: io.BytesIO = io.BytesIO()
@@ -63,25 +114,33 @@ class Transmit:
     @log_execution_time("Creating the json message")
     def create_message(self, image_array: np.ndarray, timestamp: str) -> str:
         """
-        Creates a JSON message containing image data, timestamp, CPU temperature, battery temperature,
-        and battery charge percentage.
+        Creates a JSON message containing image data, timestamp, CPU temperature,
+        battery temperature, and battery charge percentage.
 
         Parameters
         ----------
         image_array : numpy.ndarray
-            The image data as a numpy array.
+            The image data as a numpy array. This data is converted into a base64-encoded
+            JPEG string before being included in the JSON message.
         timestamp : str
             The timestamp in ISO 8601 format.
 
         Returns
         -------
         str
-            A JSON string containing the image data and system information.
+            The whole JSON message as a string.
 
         Raises
         ------
         Exception
-            If an error occurs during the creation of the message.
+            If any error occurs during the process of creating the message, such as
+            failing to retrieve system information or converting the image to base64.
+            The exception is logged, and the error is re-raised.
+
+        Notes
+        -----
+        - The function also logs additional hardware information to a separate file for further analysis.
+        - This method is decorated with `@log_execution_time`, which logs the time taken to execute the method.
         """
         try:
             battery_info: Dict[str, Any] = System.get_battery_info()
@@ -89,7 +148,7 @@ class Transmit:
             cpu_temp: float = System.get_cpu_temperature()
 
             logging.info(
-                f"Battery temp: {battery_info['temperature']}°C, battery percentage: {battery_info['percentage']} %, CPU temp: {cpu_temp}°C")
+                f"Battery temp: {battery_info['temperature']}°C, percentage: {battery_info['percentage']} %, CPU temp: {cpu_temp}°C")
             message: Dict[str, Any] = {
                 "timestamp": timestamp,
                 "image": self.create_base64_image(image_array),
@@ -117,14 +176,15 @@ class Transmit:
 
     def get_message(self) -> str:
         """
-        Captures an image using the camera, retrieves the current timestamp, and creates a JSON message containing
-        the image data and system information.
+        This method integrates the process of capturing an image, obtaining the
+        current system time, and gathering additional system data into a single
+        JSON message.
 
         Returns
         -------
         str
             A JSON string containing the image data, timestamp, CPU temperature, battery temperature,
-            and battery charge percentage.
+            and battery charge percentage as a string.
         """
         image_raw: np.ndarray = self.camera.capture()
         timestamp: str = RTC.get_time()
@@ -134,15 +194,28 @@ class Transmit:
     @log_execution_time("Taking a picture and sending it")
     def transmit_message(self) -> None:
         """
-        Captures an image, creates a message with the image data, timestamp, CPU temperature,
-        battery temperature, and battery charge percentage, and sends it over MQTT.
+        Sends the message over MQTT.
 
-        If the MQTT client is not connected, it will attempt to connect in a blocking way.
+        This method orchestrates the entire process of capturing an image, gathering
+        system data, creating a message, and transmitting it to a predefined MQTT topic.
+        If the MQTT client is not already connected, the method attempts to establish
+        the connection in a blocking manner to ensure the message is sent successfully.
 
         Raises
         ------
         Exception
-            If an error occurs during the execution of the function.
+            If any error occurs during the process, whether it be in capturing the image,
+            creating the message, or transmitting it via MQTT. The exception is logged,
+            and the error is re-raised.
+
+        Notes
+        -----
+        - The method ensures that the MQTT client is connected before attempting to
+        publish the message.
+        - If MQTT logging is not already initialized, the method triggers its start
+        to ensure that all communication is logged appropriately.
+        - This method is decorated with `@log_execution_time`, which logs the time
+        taken to execute the method.
         """
         try:
             message: str = self.get_message()
@@ -160,12 +233,16 @@ class Transmit:
 
     def transmit_message_with_time_measure(self) -> Tuple[float, datetime]:
         """
-        Run the image capture and send process, measuring the execution time.
+        Run the `transmit_message` method while timing how long it takes to complete.
+        The total elapsed time is then used to calculate how long the system should wait
+        before the next execution, ensuring that the image sending happens acording to `period`.
 
         Returns
         -------
         Tuple[float, datetime]
-            A tuple containing the waiting time until the next execution and the end time.
+            - float: The waiting time (in seconds) until the next execution, which
+            is the `period` minus the elapsed time.
+            - datetime: The ending time of the transmiting process, represented as a datetime object.
         """
         try:
             start_time: str = RTC.get_time()
