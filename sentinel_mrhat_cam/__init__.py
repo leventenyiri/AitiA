@@ -23,6 +23,26 @@ The end product will come in a water and dust-proof case with wifi antenna and I
 
 <br><br><br><br>
 
+## Power management
+
+Currently, if you want to charge the battery you have to first fully disconnect the power (no USB cable, no battery connected), and then first connect the battery and then plug in the USB cable. The order matters here!
+
+Alternatively, you can shut down the device with the following command:
+```bash
+sudo shutdown -h now
+```
+The green LED on the Raspberry (not the HAT!) will blink 10 times (can take a bit of time for it to start blinking), it will shut down after. Once it has fully shut down **pressing the button** will wake it up, and if the USB cable and the battery are both connected it will be charging.(TODO, insert picture of button)
+
+In case of the button malfunctioning, simply pull out and plug in the USB cable.
+
+#### Meaning of LED-s
+The green LED on the Raspberry shows whether its on or off.
+On the HAT there are 3 LED-s. If one blue LED is on, then it means its running off of the battery. If two blue LED-s are on, it means that it receives power through the USB-C port.
+The green LED on the HAT is on, if the battery is being charged.
+
+<br><br><br><br>
+
+
 ## Login
 
 First configure which network the Pi connects to. The [Effective-Range™](https://effective-range.com) **WifiManager** lets you do just that!
@@ -138,25 +158,6 @@ Be aware, that this way you will miss out on the bash_log and the hardware_log, 
 
 <br><br><br><br>
 
-## Power management
-
-Currently, if you want to charge the battery you have to first fully disconnect the power (no USB cable, no battery connected), and then first connect the battery and then plug in the USB cable. The order matters here!
-
-Alternatively, you can shut down the device with the following command:
-```bash
-sudo shutdown -h now
-```
-The green LED on the Raspberry (not the HAT!) will blink 10 times (can take a bit of time for it to start blinking), it will shut down after. Once it has fully shut down **pressing the button** will wake it up, and if the USB cable and the battery are both connected it will be charging.(TODO, insert picture of button)
-
-In case of the button malfunctioning, simply pull out and plug in the USB cable.
-
-#### Meaning of LED-s
-The green LED on the Raspberry shows whether its on or off.
-On the HAT there are 3 LED-s. If one blue LED is on, then it means its running off of the battery. If two blue LED-s are on, it means that it receives power through the USB-C port.
-The green LED on the HAT is on, if the battery is being charged.
-
-<br><br><br><br>
-
 ## Messaging
 
 You can edit the ip address of the broker, the port and the QoS level in the [static_config.py](https://leventenyiri.github.io/AitiA/sentinel_mrhat_cam/static_config.html) file. The names of the mqtt topics can also be found here, along with other constants.
@@ -234,6 +235,18 @@ To do this, we need the date of the last time the device has shut down, so that 
 Currently this file **HAS TO EXIST** before you run the program because of a bug we have yet to fix, in the end product it wont be needed before the first run, the script will create it.
 
 The next time the device wakes up, it will read the values from this file, it will use the `last_shutdown_time`, along with the `period` from the config and the runtime of the script to decide how long it has to be shut down. It will also update the last_shutdown_time when it shuts down, so it can be used in the next iteration.
+
+<br><br><br><br>
+
+## Gathering data
+
+While the device is running, its collecting data about the hardware. This data is logged into the `hardware_log.txt` file in the home/admin directory on the Pi.
+
+If you want to visualize this data, use this [matlab script](https://github.com/leventenyiri/Hardware_data_visualizer).
+
+Currently, because of a faulty driver, you have to measure the consumption and the charging data separately, because when its charging (even if its charging with 1mA and the device is consuming 400mA), the battery current will just show 0mA (when in reality it should show -399mA).
+
+If you measure the data while the device does not receive any power through the USB-C port however, you will get an accurate reading. Just keep in mind that if you are measuring data about charging, the consumption data will probably be off by quite a bit.
 
 <br><br><br><br>
 
