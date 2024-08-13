@@ -41,14 +41,27 @@ Alternatively, you can shut down the device with the following command:
 ```bash
 sudo shutdown -h now
 ```
-The green LED on the Raspberry (not the HAT!) will blink 10 times (can take a bit of time for it to start blinking), it will shut down after. Once it has fully shut down **pressing the button** will wake it up, and if the USB cable and the battery are both connected it will be charging.(TODO, insert picture of button)
+The green LED on the Raspberry (not the HAT!) will blink 10 times (can take a bit of time for it to start blinking), it will shut down after. Once it has fully shut down **pressing the button** will wake it up, and if the USB cable and the battery are both connected it will be charging.
+
+![Button](https://github.com/bnyitrai03/rpizero_storage/blob/main/Button.jpg?raw=true)
 
 In case of the button malfunctioning, simply pull out and plug in the USB cable.
 
 #### Meaning of LED-s
 The green LED on the Raspberry shows whether its on or off.
-On the HAT there are 3 LED-s. If one blue LED is on, then it means its running off of the battery. If two blue LED-s are on, it means that it receives power through the USB-C port.
-The green LED on the HAT is on, if the battery is being charged.
+
+![PiLED](https://github.com/bnyitrai03/rpizero_storage/blob/main/PiLED.jpg?raw=true)
+
+
+On the HAT there are 3 LED-s. If one blue LED is on, then it means its running off of the battery.
+![1LED](https://github.com/bnyitrai03/rpizero_storage/blob/main/1LED.jpg?raw=true)
+If two blue LED-s are on, it means that it receives power through the USB-C port.
+
+![2LED](https://github.com/bnyitrai03/rpizero_storage/blob/main/2LED.jpg?raw=true)
+
+The green LED on the HAT is also on, if the battery is being charged.
+
+![3LED](https://github.com/bnyitrai03/rpizero_storage/blob/main/3LED.jpg?raw=true)
 
 <br><br><br><br>
 
@@ -58,7 +71,7 @@ The green LED on the HAT is on, if the battery is being charged.
 First configure which network the Pi connects to. The [Effective-Range™](https://effective-range.com) **WifiManager** lets you do just that!
 
 When you power on the device, if it cannot connect to any network, it will become an available network that you can connect to.
-I this case connect to it, then it will take you to a page, where you can input the SSID and password of the network that you want the Pi to connect to.
+Connect to it, it will then take you to a page, where you can input the SSID and password of the network that you want the Pi to connect to.
 To communicate with the device via **ssh**, make sure you are connected to the **same network** as the Pi!
 
 Alternatively, you can also configure the network manually if you prefer.
@@ -263,6 +276,10 @@ If you measure the data while the device does not receive any power through the 
 ## Hardware 📟
 
 ![Prototype Schematic](https://github.com/bnyitrai03/rpizero_storage/blob/main/Protot%C3%ADpus%20rajz%20V1.3.png?raw=true)
+
+![DeviceWithSolarPanel](https://github.com/bnyitrai03/rpizero_storage/blob/main/DeviceWithSolarPanel.jpg?raw=true)
+
+![StandaloneDevice](https://github.com/bnyitrai03/rpizero_storage/blob/main/StandaloneDevice.jpg?raw=true)
 
 ### Components
 
