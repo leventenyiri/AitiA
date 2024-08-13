@@ -88,8 +88,8 @@ class App:
 
         This method runs an infinite loop that periodically captures and transmits images based on the
         application's configuration. It checks for a new configuration update before each iteration
-        and updates the application's settings if necessary. The method determines whether the device 
-        should shut down or sleep between image captures based on the time elapsed during transmission 
+        and updates the application's settings if necessary. The method determines whether the device
+        should shut down or sleep between image captures based on the time elapsed during transmission
         and the configured period.
 
         Workflow
@@ -98,7 +98,7 @@ class App:
         - If a new configuration is detected, update the application's settings and acknowledge the receipt.
         - Capture an image and transmit it via MQTT.
         - Measure the time taken to complete the transmission.
-        - Determine whether the device should shut down or simply wait for the remainder of the period 
+        - Determine whether the device should shut down or simply wait for the remainder of the period
         based on the transmission time.
         - If a shutdown is required, manage boot data, initiate the shutdown, and log relevant information.
         - If no shutdown is needed, wait for the remaining time or until a new configuration is received.
@@ -154,8 +154,8 @@ class App:
         """
         Check if a new configuration has been received and update the application accordingly.
 
-        This method is responsible for detecting when a new configuration has been received via MQTT. 
-        If a new configuration is detected, the application reloads its settings, acknowledges the 
+        This method is responsible for detecting when a new configuration has been received via MQTT.
+        If a new configuration is detected, the application reloads its settings, acknowledges the
         receipt of the configuration, and updates its operational parameters to reflect the changes.
 
         Parameters

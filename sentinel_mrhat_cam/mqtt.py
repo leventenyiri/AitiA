@@ -41,7 +41,6 @@ class MQTT:
     ------
     - The MQTT broker connection is retried up to 20 times upon failure.
     - This class requires the `paho-mqtt` library to be installed.
-    - Some methods may raise exceptions if there are connection or publishing errors.
     - The class uses configuration values from a `static_config` module, which should be present in the same package.
     """
 
@@ -55,16 +54,13 @@ class MQTT:
         self.config_received_event = threading.Event()
         self.config_confirm_message = "config-nok|Confirm message uninitialized"
 
-    def is_connected(self):
+    def is_connected(self) -> bool:
         return self.client.is_connected() if self.client else False
 
-    def get_client(self):
-        return self.client
-
-    def reset_config_received_event(self):
+    def reset_config_received_event(self) -> None:
         self.config_received_event.clear()
 
-    def init_receive(self):
+    def init_receive(self) -> None:
         """
         Initializes the MQTT client to receive the config file.
 
@@ -146,7 +142,40 @@ class MQTT:
             logging.error(f"Error connecting to MQTT broker: {e}")
             exit(1)
 
-    def broker_check(self):
+    def broker_check(self) -> None:
+        """
+        Continuously checks the connection to the MQTT broker until it becomes available.
+
+        This method repeatedly checks the availability of the MQTT broker by calling the
+        `is_broker_available` method. It uses a counter to track the number of connection attempts.
+
+        The process flow is as follows:
+        - Wait for 0.5 seconds between each connection attempt.
+        - Increment the connection attempt counter after each wait period.
+        - If the connection is not established within 20 attempts, log an error and terminate the program.
+
+        Attributes:
+        ----------
+        broker_connect_counter : int
+            A counter that tracks the number of attempts made to connect to the broker.
+            It is incremented with each failed attempt.
+
+        Methods:
+        -------
+        is_broker_available() -> bool:
+            Checks if the MQTT broker is available by attempting a socket connection.
+
+        Logs:
+        -----
+        Logs the following messages:
+        - INFO: Indicates that the connection attempt is in progress.
+        - ERROR: If the broker is not available after 20 attempts, it logs an error before exiting.
+
+        Raises:
+        -------
+        SystemExit:
+            Terminates the script if the broker connection fails 20 times.
+        """
         while not self.is_broker_available():
             logging.info("Waiting for broker to become available...")
             time.sleep(0.5)
@@ -155,15 +184,35 @@ class MQTT:
                 logging.error("Connecting to network failed 20 times, restarting script...")
                 exit(1)
 
-    def is_broker_available(self):
+    def is_broker_available(self) -> bool:
         """
-        Check if the network is available by trying to connect to the MQTT broker.
+        Checks if the MQTT broker is reachable by attempting to establish a socket connection.
+
+        This method tries to create a TCP connection to the MQTT broker using the `socket` module.
+        If the connection is successful, it returns `True`, indicating that the broker is available.
+        If an `OSError` is raised (typically due to network issues or the broker being down),
+        the method returns `False`. Any other unexpected exception results in logging the error
+        and exiting the script.
+
+        Methods:
+        -------
+        socket.create_connection((host, port), timeout) -> socket:
+            Attempts to create a connection to the broker.
+
+        Logs:
+        -----
+        Logs the following message:
+        - ERROR: Logs any unexpected error during the connection attempt before terminating the script.
 
         Returns:
-            bool: True if the network is available, False otherwise.
+        -------
+        bool:
+            `True` if the broker is available, `False` otherwise.
 
         Raises:
-        Exception: If an error occurs during the network check.
+        -------
+        SystemExit:
+            Exits the script if an unexpected error occurs during the connection attempt.
         """
         try:
             socket.create_connection((BROKER, PORT), timeout=5)
@@ -174,21 +223,35 @@ class MQTT:
             logging.error(f"Error during creating connection: {e}")
             exit(1)
 
-    def publish(self, message, topic):
+    def publish(self, message, topic) -> None:
         """
-        Publish a message to a specified topic.
+        Publishes a message to a specified MQTT topic.
 
-        Parameters
+        This method sends a message to the MQTT broker to be published on a specified topic.
+        It uses the MQTT client to publish the message with QoS = 2.
+        The method waits for the message (max 5 seconds) to be published and handles any errors that might occur during
+        the publishing process.
+
+        Parameters:
         ----------
         message : str
-            The message to publish.
-        topic : str
-            The topic to publish the message to.
+            The payload to be published to the MQTT topic.
 
-        Raises
-        ------
-        SystemExit
-            If there's an error during publishing.
+        topic : str
+            The topic string to which the message should be published.
+
+        Methods:
+        -------
+        client.publish(topic, message, qos) -> MQTTMessageInfo:
+            Sends a message to the broker on the specified topic.
+
+        msg_info.wait_for_publish(timeout) -> None:
+            Blocks until the message publishing is acknowledged or the 5 second time limit is met.
+
+        Raises:
+        -------
+        SystemExit:
+            Exits the script if an error occurs during the publishing process.
         """
         try:
             msg_info = self.client.publish(topic, message, qos=self.qos)
