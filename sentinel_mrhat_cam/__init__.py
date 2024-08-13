@@ -4,6 +4,14 @@ Welcome to the documentation. 🐦
 
 [Project Homepage](https://github.com/Aitia-IIOT/sentinel-mrhat-cam)
 
+[![website](https://github.com/leventenyiri/AitiA/actions/workflows/documentation-release.yml/badge.svg)](https://github.com/leventenyiri/AitiA/actions/workflows/documentation-release.yml)
+
+[![Python release](https://github.com/leventenyiri/AitiA/actions/workflows/python-release.yml/badge.svg)](https://github.com/leventenyiri/AitiA/actions/workflows/python-release.yml)
+
+[![Python test](https://github.com/leventenyiri/AitiA/actions/workflows/python-test.yml/badge.svg)](https://github.com/leventenyiri/AitiA/actions/workflows/python-test.yml)
+
+[![Coverage badge](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=coverage&query=%24.message&url=https%3A%2F%2Fraw.githubusercontent.com%2Fleventenyiri%2FAitiA%2Fpython-coverage-comment-action-data%2Fendpoint.json)](https://htmlpreview.github.io/?https://github.com/leventenyiri/AitiA/blob/python-coverage-comment-action-data/htmlcov/index.html)
+
 ## Overview
 
 The device consists of a Raspberry Pi Zero 2W,  MrHat by [Effective-Range™](https://effective-range.com), a camera📸, a battery🔋 and a solar panel☀️.
