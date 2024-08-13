@@ -19,11 +19,11 @@ About where to send the config, see the [Messaging](https://leventenyiri.github.
 The end product will come in a water and dust-proof case with wifi antenna and IP68 rated button, currently the prototype is in an electrical box, originally rated IP68, but a hole had to be drilled for the USB cable, so using duct tape around the area is recommended if you plan on using it in the rain.
 ![Hole in case](https://github.com/bnyitrai03/rpizero_storage/blob/main/HoleInBox.jpg?raw=true)
 
-<br><br><br>
+<br><br><br><br>
 
 ## Login
 
-First configure which network the Pi connects to. Brought to you by EffectiveRange™, the **WifiManager** lets you do just that! 
+First configure which network the Pi connects to. Brought to you by [Effective-Range™](https://effective-range.com), the **WifiManager** lets you do just that!
 
 When you power on the device, if it cannot connect to any network, it will pop up as a wifi that you can connect to. Connect to it, it will take you to a page, where you can input the SSID and password of your network. To communicate with the device via **ssh**, make sure you are connected to the **same network** as the Pi!
 
@@ -91,7 +91,7 @@ In the linked tutorial the name the Host myhost, you can name it however you lik
 ssh myhost
 ```
 
-<br><br><br>
+<br><br><br><br>
 
 ## Running the script
 
@@ -133,7 +133,7 @@ python3 -m sentinel_mrhat_cam.main
 
 Be aware, that this way you will miss out on the bash_log and the hardware_log, it will also not handle the cases where the script exits with an exit code.
 
-<br><br><br>
+<br><br><br><br>
 
 ## Power management
 
@@ -152,7 +152,7 @@ The green LED on the Raspberry shows whether its on or off.
 On the HAT there are 3 LED-s. If one blue LED is on, then it means its running off of the battery. If two blue LED-s are on, it means that it receives power through the USB-C port.
 The green LED on the HAT is on, if the battery is being charged.
 
-<br><br><br>
+<br><br><br><br>
 
 ## Messaging
 
@@ -215,7 +215,7 @@ Example log messages:
 - Logs will be sent to this topic. 
 - The level of the log messages we want to send can be set using the `LOG_LEVEL` variable in [static_config.py](https://leventenyiri.github.io/AitiA/sentinel_mrhat_cam/static_config.html). Currently it is set to `DEBUG`.
 
-<br><br><br>
+<br><br><br><br>
 
 ## Scheduling
 
@@ -232,7 +232,7 @@ Currently this file **HAS TO EXIST** before you run the program because of a bug
 
 The next time the device wakes up, it will read the values from this file, it will use the `last_shutdown_time`, along with the `period` from the config and the runtime of the script to decide how long it has to be shut down. It will also update the last_shutdown_time when it shuts down, so it can be used in the next iteration.
 
-<br><br><br>
+<br><br><br><br>
 
 ## Hardware
 
