@@ -10,7 +10,7 @@ The device consists of a Raspberry Pi Zero 2W,  MrHat by [Effective-Range™](ht
 Its function is taking pictures periodically and sending them through mqtt. The period, mode and working time is configurable by sending a config file to the device.
 
 #### Period
-How often the images will be taken.⏱️
+How often the images will be taken.
 
 #### Mode
 Either **one-shot** (take one picture, send it, then shut down), **always-on** (taking and sending them as fast as it can without break), and **periodic** (taking and sending pictures with a given period).
@@ -23,7 +23,7 @@ The end product will come in a water and dust-proof case with wifi antenna and I
 
 <br><br><br><br>
 
-## Power management
+## Power management ⚡
 
 Currently, if you want to charge the battery you have to first fully disconnect the power (no USB cable, no battery connected), and then first connect the battery and then plug in the USB cable. The order matters here!
 
@@ -43,7 +43,7 @@ The green LED on the HAT is on, if the battery is being charged.
 <br><br><br><br>
 
 
-## Login
+## Login 🔐
 
 First configure which network the Pi connects to. The [Effective-Range™](https://effective-range.com) **WifiManager** lets you do just that!
 
@@ -116,7 +116,7 @@ ssh myhost
 
 <br><br><br><br>
 
-## Running the script
+## Running the script 🚀
 
 By default the script is running automatically as soon as the device has booted up. This is thanks to a daemon, which is starting a bash script on boot. The bash script starts the python script, handles additional logging, and restarts the script or the device based on exit codes from the python script.
 
@@ -158,7 +158,7 @@ Be aware, that this way you will miss out on the bash_log and the hardware_log, 
 
 <br><br><br><br>
 
-## Messaging
+## Messaging 💬
 
 You can edit the ip address of the broker, the port and the QoS level in the [static_config.py](https://leventenyiri.github.io/AitiA/sentinel_mrhat_cam/static_config.html) file. The names of the mqtt topics can also be found here, along with other constants.
 
@@ -221,7 +221,7 @@ Example log messages:
 
 <br><br><br><br>
 
-## Scheduling
+## Scheduling ⏱️
 
 To accurately send the pictures with the given period, we have to measure the runtime of the script, and take it into account. We also need to know how much time it takes to shut down and boot up.
 
@@ -238,7 +238,7 @@ The next time the device wakes up, it will read the values from this file, it wi
 
 <br><br><br><br>
 
-## Gathering data
+## Gathering data 📊
 
 While the device is running, its collecting data about the hardware. This data is logged into the `hardware_log.txt` file in the home/admin directory on the Pi.
 
