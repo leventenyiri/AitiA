@@ -127,7 +127,7 @@ Then run the bash script.
 bash sentinel_mrhat_cam.sh
 ```
 
-As its running itt will create a bash_log.txt and a hardware_log.txt file in the home/admin folder on the Pi. The bash_log contains information about whats happening within the script and the hardware_log, as the name suggests lets us know about specifics of the hardware, like CPU temperature and battery voltage... 
+As its running itt will create a bash_log.txt and a hardware_log.txt file in the home/admin folder on the Pi. The bash_log contains information about whats happening within the script and the hardware_log, as the name suggests lets us know about specifics of the hardware, like CPU temperature and battery voltage...
 
 If for some reason you want to run the python script straight up, you can do that too.
 ```bash
@@ -215,7 +215,7 @@ Example log messages:
 2024-08-12 16:27:56 - root - INFO - Sleeping for 9.0 seconds
 ```
 
-- Logs will be sent to this topic. 
+- Logs will be sent to this topic.
 - The level of the log messages we want to send can be set using the `LOG_LEVEL` variable in [static_config.py](https://leventenyiri.github.io/AitiA/sentinel_mrhat_cam/static_config.html). Currently it is set to `DEBUG`.
 
 <br><br><br><br>
@@ -242,7 +242,10 @@ The next time the device wakes up, it will read the values from this file, it wi
 ![Prototype Schematic](https://github.com/bnyitrai03/rpizero_storage/blob/main/Protot%C3%ADpus%20rajz%20V1.3.png?raw=true)
 
 ### Components
+
 - **Single-Board Computer**: [Raspberry Pi Zero 2 W](https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/)
+
+- **Raspbery extension Hat**: [MrHAT](https://effective-range.com/hardware/mrhat/)
 
 - **Camera module**: [Arducam IMX519 PDAF&CDAF Autofocus Camera Module](https://www.arducam.com/product/imx519-autofocus-camera-module-for-raspberry-pi-arducam-b0371/)
 
