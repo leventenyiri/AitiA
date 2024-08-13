@@ -6,13 +6,15 @@ Welcome to the documentation. 🐦
 
 ## Overview
 
-The device consists of a Raspberry Pi Zero 2W,  MrHat by [Effective-Range™](https://effective-range.com), a camera📸, a battery🔋 and a solar panel☀️. Its function is taking pictures periodically and sending them through mqtt. The period, mode and working time is configurable by sending a config file to the device.
+The device consists of a Raspberry Pi Zero 2W,  MrHat by [Effective-Range™](https://effective-range.com), a camera📸, a battery🔋 and a solar panel☀️.
+Its function is taking pictures periodically and sending them through mqtt. The period, mode and working time is configurable by sending a config file to the device.
 
 #### Period
 How often the images will be taken.⏱️
 
 #### Mode
-Either **one-shot** (take one picture, send it, then shut down), **always-on** (taking and sending them as fast as it can without break), and **periodic** (taking and sending pictures with a given period). In production only the **periodic** mode will be used.
+Either **one-shot** (take one picture, send it, then shut down), **always-on** (taking and sending them as fast as it can without break), and **periodic** (taking and sending pictures with a given period).
+In production only the **periodic** mode will be used.
 
 About where to send the config, see the [Messaging](https://leventenyiri.github.io/AitiA/sentinel_mrhat_cam.html#messaging) section.
 
@@ -23,9 +25,11 @@ The end product will come in a water and dust-proof case with wifi antenna and I
 
 ## Login
 
-First configure which network the Pi connects to. Brought to you by [Effective-Range™](https://effective-range.com), the **WifiManager** lets you do just that!
+First configure which network the Pi connects to. The [Effective-Range™](https://effective-range.com) **WifiManager** lets you do just that!
 
-When you power on the device, if it cannot connect to any network, it will pop up as a wifi that you can connect to. Connect to it, it will take you to a page, where you can input the SSID and password of your network. To communicate with the device via **ssh**, make sure you are connected to the **same network** as the Pi!
+When you power on the device, if it cannot connect to any network, it will become an available network that you can connect to.
+I this case connect to it, then it will take you to a page, where you can input the SSID and password of the network that you want the Pi to connect to.
+To communicate with the device via **ssh**, make sure you are connected to the **same network** as the Pi!
 
 Alternatively, you can also configure the network manually if you prefer.
 ```bash
@@ -47,9 +51,9 @@ network={
 }
 ```
 
-Here, a higher number means higher priority, so in this example, if both OnePlus and TMIT_C1_2_4 are available, it will connect to OnePlus. 
+Here, a higher number means higher priority, so in this example, if both OnePlus and TMIT_C1_2_4 are available, it will connect to OnePlus.
 
-By the way, what the **WifiManager** does, is that every time you configure a network through it, it writes it into this file with a higher priority than the last one.
+What the **WifiManager** does, is that every time you configure a network through it, it writes it into this file with a higher priority than the last one.
 
 #### Example of ssh using ip address:
 Connect the device to the PC using the USB-C port on the Hat and use a program like PuTTY to communicate through serial port. Check the device manager to see which COM port the device uses. Inside PuTTY it should look like this:
@@ -60,10 +64,9 @@ Connect the device to the PC using the USB-C port on the Hat and use a program l
 
 Baud rate: 115200
 
-Click on Open, click inside the window and press Enter. After a while it will ask for the username and the password, during testing: 
+Click on Open, click inside the window and press Enter. After a while it will ask for the username and the password, during testing:
 
 Password: admin
-
 Username: admin
 
 ![Image of login](https://github.com/bnyitrai03/rpizero_storage/blob/main/PuTTY_Login.png?raw=true)
@@ -237,6 +240,17 @@ The next time the device wakes up, it will read the values from this file, it wi
 ## Hardware
 
 ![Prototype Schematic](https://github.com/bnyitrai03/rpizero_storage/blob/main/Protot%C3%ADpus%20rajz%20V1.3.png?raw=true)
+
+### Components
+- **Single-Board Computer**: [Raspberry Pi Zero 2 W](https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/)
+
+- **Camera module**: [Arducam IMX519 PDAF&CDAF Autofocus Camera Module](https://www.arducam.com/product/imx519-autofocus-camera-module-for-raspberry-pi-arducam-b0371/)
+
+- **Solar Panel**: [Reolink Solar Panel 2](https://www.bestmarkt.hu/reolink-rlsolpbb2-kulteri-okos-kamera-usb-napelem-p853135)
+
+- **SD card**: [SanDisk microSDHC Ultra 32GB](https://www.alza.hu/sandisk-microsdhc-ultra-32gb-sd-adapter-d6250713.htm?kampan=arukereso_hu_prislusenstvi-pro-it-tv_pametove-karty_microsdhc/xc_dt807j2f2b1b&utm_source=arukereso_hu&utm_medium=product&utm_campaign=arukereso_hu_prislusenstvi-pro-it-tv_pametove-karty_microsdhc/xc_dt807j2f2b1b&aku=324206e06a9b4d5089a463dab6911ac6)
+
+- **Battery**: [Samsung INR21700-53G Li-Ion Cell](https://github.com/bnyitrai03/rpizero_storage/blob/main/(INR21700-53G1)%20Cell%20Specification_General%20Ver.1.2_(non-tube)(1).pdf)
 """
 
 from .static_config import *
