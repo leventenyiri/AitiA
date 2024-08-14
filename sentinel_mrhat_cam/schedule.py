@@ -9,12 +9,12 @@ from .system import System, RTC
 
 class Schedule:
     """
-
     Helps manage the scheduling of operations in the app.py module. Its only used in the run_periodically method, where its important that
     we keep the given period between sending pictures. For this we have to measure the runtime of the script, how much time it takes for the device
     to shut down, and boot up. To know this we have to keep track of the last shutdown time, so we can calculate it.
 
     Attributes:
+    -----------
         state_file : str
             Path to the file storing the boot state.
         period : float
@@ -72,7 +72,7 @@ class Schedule:
             logging.info("Starting shutdown")
             System.shutdown()
 
-    def update_boot_time(self, current_time):
+    def update_boot_time(self, current_time) -> str:
         """
         Update the boot time based on the current time and last shutdown time.
 
@@ -107,7 +107,7 @@ class Schedule:
         else:
             return f"Long shutdown detected (duration: {boot_time} seconds). Not updating boot time. Current_time is :{current_time}, last_shutdown is: {last_shutdown}"
 
-    def should_shutdown(self, waiting_time):
+    def should_shutdown(self, waiting_time) -> bool:
         """
         Determine if the system should shut down based on the waiting time.
 
@@ -123,7 +123,7 @@ class Schedule:
         """
         return waiting_time > self.shutdown_threshold
 
-    def calculate_shutdown_duration(self, waiting_time):
+    def calculate_shutdown_duration(self, waiting_time) -> float:
         """
         Calculate the duration for which the system should be shut down.
 
@@ -140,7 +140,7 @@ class Schedule:
         shutdown_duration = waiting_time - self.boot_shutdown_time
         return max(shutdown_duration, 0)
 
-    def get_wake_time(self, current_time, shutdown_duration):
+    def get_wake_time(self, current_time, shutdown_duration) -> datetime:
         """
         Calculate the time at which the system should wake up.
 
@@ -158,7 +158,7 @@ class Schedule:
         """
         return current_time + timedelta(seconds=shutdown_duration)
 
-    def load_boot_state(self):
+    def load_boot_state(self) -> None:
         """
         Load the boot state from the state file.
 
@@ -178,7 +178,7 @@ class Schedule:
             self.boot_shutdown_time = DEFAULT_BOOT_SHUTDOWN_TIME
             self.last_shutdown_time = None
 
-    def save_boot_state(self):
+    def save_boot_state(self) -> None:
         """
         Save the current boot state to the state file.
 
