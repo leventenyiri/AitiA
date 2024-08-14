@@ -29,7 +29,15 @@ In production only the **periodic** mode will be used.
 About where to send the config, see the [Messaging](https://leventenyiri.github.io/AitiA/sentinel_mrhat_cam.html#messaging) section.
 
 The end product will come in a water and dust-proof case with wifi antenna and IP68 rated button, currently the prototype is in an electrical box, originally rated IP68, but a hole had to be drilled for the USB cable, so using duct tape around the area is recommended if you plan on using it in the rain.
+
 ![Hole in case](https://github.com/bnyitrai03/rpizero_storage/blob/main/HoleInBox.jpg?raw=true)
+
+<br><br><br><br>
+
+## Raspbian Image installation 🛠️
+
+The device comes with the OS installed on the SD card already, but if there is an update or bug fix, [this guide](https://github.com/EffectiveRange/raspbian-image-repository?tab=readme-ov-file#install-your-custom-images-to-an-sd-card) should be followed to upgrade the OS to the new image.
+The image installation guide is made by [Effective-Range™](https://effective-range.com).
 
 <br><br><br><br>
 
@@ -41,7 +49,7 @@ Alternatively, you can shut down the device with the following command:
 ```bash
 sudo shutdown -h now
 ```
-The green LED on the Raspberry (not the HAT!) will blink 10 times (can take a bit of time for it to start blinking), it will shut down after. Once it has fully shut down **pressing the button** will wake it up, and if the USB cable and the battery are both connected it will be charging.
+The green LED on the Raspberry (not the **MrHAT**!) will blink 10 times (can take a bit of time for it to start blinking), it will shut down after. Once it has fully shut down **pressing the button** will wake it up, and if the USB cable and the battery are both connected it will be charging.
 
 ![Button](https://github.com/bnyitrai03/rpizero_storage/blob/main/Button.jpg?raw=true)
 
@@ -53,14 +61,14 @@ The green LED on the Raspberry shows whether its on or off.
 ![PiLED](https://github.com/bnyitrai03/rpizero_storage/blob/main/PiLED.jpg?raw=true)
 
 
-On the HAT there are 3 LED-s. If one blue LED is on, then it means its running off of the battery.
+On the **MrHAT** there are 3 LED-s. If one blue LED is on, then it means its running off of the battery.
 ![1LED](https://github.com/bnyitrai03/rpizero_storage/blob/main/1LED.jpg?raw=true)
 
 If two blue LED-s are on, it means that it receives power through the USB-C port.
 
 ![2LED](https://github.com/bnyitrai03/rpizero_storage/blob/main/2LED.jpg?raw=true)
 
-The green LED on the HAT is also on, if the battery is being charged.
+The green LED on the **MrHAT** is also on, if the battery is being charged.
 
 ![3LED](https://github.com/bnyitrai03/rpizero_storage/blob/main/3LED.jpg?raw=true)
 
@@ -72,7 +80,9 @@ The green LED on the HAT is also on, if the battery is being charged.
 First configure which network the Pi connects to. The [Effective-Range™](https://effective-range.com) **WifiManager** lets you do just that!
 
 When you power on the device, if it cannot connect to any network, it will become an available network that you can connect to.
-Connect to it, it will then take you to a page, where you can input the SSID and password of the network that you want the Pi to connect to.
+Connect to it, then it will take you to a page, where you can input the SSID and password of the network that you want the Pi to connect to.
+Here you can [learn more](https://github.com/EffectiveRange/wifi-manager) about the **WifiManager**.
+
 To communicate with the device via **ssh**, make sure you are connected to the **same network** as the Pi!
 
 Alternatively, you can also configure the network manually if you prefer.
@@ -100,7 +110,7 @@ Here, a higher number means higher priority, so in this example, if both OnePlus
 What the **WifiManager** does, is that every time you configure a network through it, it writes it into this file with a higher priority than the last one.
 
 #### Example of ssh using ip address:
-Connect the device to the PC using the USB-C port on the Hat and use a program like PuTTY to communicate through serial port. Check the device manager to see which COM port the device uses. Inside PuTTY it should look like this:
+Connect the device to the PC using the USB-C port on the **MrHAT** and use a program like PuTTY to communicate through serial port. Check the device manager to see which COM port the device uses. Inside PuTTY it should look like this:
 
 ![Image of PuTTY](https://github.com/bnyitrai03/rpizero_storage/blob/main/PuTTY.png?raw=true)
 
@@ -110,8 +120,9 @@ Baud rate: 115200
 
 Click on Open, click inside the window and press Enter. After a while it will ask for the username and the password, during testing:
 
-Password: admin
 Username: admin
+
+Password: admin
 
 ![Image of login](https://github.com/bnyitrai03/rpizero_storage/blob/main/PuTTY_Login.png?raw=true)
 
@@ -141,6 +152,10 @@ ssh myhost
 <br><br><br><br>
 
 ## Running the script 🚀
+Before running the script make sure that the Pi can synchronize with an NTP server, or you have to set the correct datetime manually!
+```bash
+sudo date -s "2024-08-14 15:57:40"
+```
 
 By default the script is running automatically as soon as the device has booted up. This is thanks to a daemon, which is starting a bash script on boot. The bash script starts the python script, handles additional logging, and restarts the script or the device based on exit codes from the python script.
 
@@ -209,7 +224,7 @@ The defaul config.json message:
 
 `config-ok` OR `config-nok|{error desc}`
 
-- Once a config.json file is sent to the device, a message will be sent back to this topic.
+- Once a `config.json` file is sent to the device, a message will be sent back to this topic.
 - If everything was fine, it will send a `config-ok` message.
 - If something went wrong it will send a `config-nok` followed by the description of the problem.
 
@@ -249,16 +264,14 @@ Example log messages:
 
 To accurately send the pictures with the given period, we have to measure the runtime of the script, and take it into account. We also need to know how much time it takes to shut down and boot up.
 
-To do this, we need the date of the last time the device has shut down, so that after waking up we can calculate how much time has passed. We have to write these values into a file, since its important that it persists between shutdown cycles. We call this file state_file.json, here is an example of it:
+To do this, we need the date of the last time the device has shut down, so that after waking up we can calculate how much time has passed. We have to write these values into a file, to make them persist between shutdown cycles. We call this file `state_file.json`, here is an example of it:
 ```json
 {
     "boot_shutdown_time": 15.0,
     "last_shutdown_time": "2024-08-06T09:26:48+00:00"
 }
 ```
-Currently this file **HAS TO EXIST** before you run the program because of a bug we have yet to fix, in the end product it wont be needed before the first run, the script will create it.
-
-The next time the device wakes up, it will read the values from this file, it will use the `last_shutdown_time`, along with the `period` from the config and the runtime of the script to decide how long it has to be shut down. It will also update the last_shutdown_time when it shuts down, so it can be used in the next iteration.
+The next time the device wakes up, it will read the values from this file, it will use the `last_shutdown_time`, along with the `period` from the config and the runtime of the script to decide how long it has to be shut down. It will also update the `last_shutdown_time` when it shuts down, so it can be used in the next iteration.
 
 <br><br><br><br>
 
@@ -289,12 +302,6 @@ If you measure the data while the device does not receive any power through the 
 - **Raspbery extension Hat**: [MrHAT](https://effective-range.com/hardware/mrhat/)
 
 - **Camera module**: [Arducam IMX519 PDAF&CDAF Autofocus Camera Module](https://www.arducam.com/product/imx519-autofocus-camera-module-for-raspberry-pi-arducam-b0371/)
-
-- **Solar Panel**: [Reolink Solar Panel 2](https://www.bestmarkt.hu/reolink-rlsolpbb2-kulteri-okos-kamera-usb-napelem-p853135)
-
-- **SD card**: [SanDisk microSDHC Ultra 32GB](https://www.alza.hu/sandisk-microsdhc-ultra-32gb-sd-adapter-d6250713.htm?kampan=arukereso_hu_prislusenstvi-pro-it-tv_pametove-karty_microsdhc/xc_dt807j2f2b1b&utm_source=arukereso_hu&utm_medium=product&utm_campaign=arukereso_hu_prislusenstvi-pro-it-tv_pametove-karty_microsdhc/xc_dt807j2f2b1b&aku=324206e06a9b4d5089a463dab6911ac6)
-
-- **Battery**: [Samsung INR21700-53G Li-Ion Cell](https://github.com/bnyitrai03/rpizero_storage/blob/main/(INR21700-53G1)%20Cell%20Specification_General%20Ver.1.2_(non-tube)(1).pdf)
 """
 
 from .static_config import *
