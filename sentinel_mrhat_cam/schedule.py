@@ -17,7 +17,7 @@ class Schedule:
     Attributes:
         state_file : str
             Path to the file storing the boot state.
-        period : float)
+        period : float
             The period between operations.
         max_boot_time : float
             Maximum allowed boot time.

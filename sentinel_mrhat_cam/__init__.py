@@ -55,6 +55,7 @@ The green LED on the Raspberry shows whether its on or off.
 
 On the HAT there are 3 LED-s. If one blue LED is on, then it means its running off of the battery.
 ![1LED](https://github.com/bnyitrai03/rpizero_storage/blob/main/1LED.jpg?raw=true)
+
 If two blue LED-s are on, it means that it receives power through the USB-C port.
 
 ![2LED](https://github.com/bnyitrai03/rpizero_storage/blob/main/2LED.jpg?raw=true)
