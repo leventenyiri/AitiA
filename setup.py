@@ -7,7 +7,6 @@ setup(
     author='Ferenc Nandor Janky, Attila Gombos, Nyiri Levente, Nyitrai Bence',
     author_email='info@effective-range.com',
     packages=find_packages(),
-    package_dir={'': 'sentinel_mrhat_cam'},
     scripts=['scripts/sentinel_mrhat_cam.sh'],
     install_requires=['pytest',
                       'PyYAML>=6.0',
