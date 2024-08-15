@@ -28,14 +28,17 @@ if  `period` > **SHUTDOWN_THRESHOLD** :
     The device shuts down in between picture taking.
 """
 SHUTDOWN_THRESHOLD = 70
+
 """
 This is the default time in seconds that, the he Pi takes to shutdown, and then to boot again.
 """
 DEFAULT_BOOT_SHUTDOWN_TIME = 30
+
 """
 This is the minimum value for `period` in seconds.
 """
 MINIMUM_WAIT_TIME = 5
+
 """
 This is the maximum value for `period` in seconds.
 """

@@ -6,7 +6,7 @@ Welcome to the documentation. 🐦
 
 [![website](https://github.com/leventenyiri/AitiA/actions/workflows/documentation-release.yml/badge.svg)](https://github.com/leventenyiri/AitiA/actions/workflows/documentation-release.yml)
 
-[![Python release](https://github.com/leventenyiri/AitiA/actions/workflows/python-release.yml/badge.svg)](https://github.com/leventenyiri/AitiA/actions/workflows/python-release.yml)
+[![Python release](https://github.com/Aitia-IIOT/sentinel-mrhat-cam/actions/workflows/python-release.yml/badge.svg)](https://github.com/Aitia-IIOT/sentinel-mrhat-cam/actions/workflows/python-release.yml)
 
 [![Python test](https://github.com/leventenyiri/AitiA/actions/workflows/python-test.yml/badge.svg)](https://github.com/leventenyiri/AitiA/actions/workflows/python-test.yml)
 
