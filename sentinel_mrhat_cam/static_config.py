@@ -20,10 +20,26 @@ USERNAME = "er-edge"
 PASSWORD = "admin"
 
 # App configuration
-SHUTDOWN_THRESHOLD = 70  # in seconds
-DEFAULT_BOOT_SHUTDOWN_TIME = 30  # in seconds
-MINIMUM_WAIT_TIME = 5  # in seconds
-MAXIMUM_WAIT_TIME = 10800  # 3 hours in seconds
+"""
+if  `period` < **SHUTDOWN_THRESHOLD** :
+    The device won't shut down, instead it will wait in the script.
+
+if  `period` > **SHUTDOWN_THRESHOLD** :
+    The device shuts down in between picture taking.
+"""
+SHUTDOWN_THRESHOLD = 70
+"""
+This is the default time in seconds that, the he Pi takes to shutdown, and then to boot again.
+"""
+DEFAULT_BOOT_SHUTDOWN_TIME = 30
+"""
+This is the minimum value for `period` in seconds.
+"""
+MINIMUM_WAIT_TIME = 5
+"""
+This is the maximum value for `period` in seconds.
+"""
+MAXIMUM_WAIT_TIME = 10800
 
 # Log configuration
 LOGGING_TOPIC = "er-edge/logging"
