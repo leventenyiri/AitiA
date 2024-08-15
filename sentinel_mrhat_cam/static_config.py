@@ -33,6 +33,7 @@ SHUTDOWN_THRESHOLD = 70
 This is the default time in seconds that, the he Pi takes to shutdown, and then to boot again.
 """
 DEFAULT_BOOT_SHUTDOWN_TIME = 30
+TIME_TO_BOOT_AND_SHUTDOWN = 60
 
 """
 This is the minimum value for `period` in seconds.

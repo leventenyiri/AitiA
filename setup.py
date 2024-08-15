@@ -7,7 +7,7 @@ setup(
     author='Ferenc Nandor Janky, Attila Gombos, Nyiri Levente, Nyitrai Bence',
     author_email='info@effective-range.com',
     packages=find_packages(),
-    scripts=['scripts/sentinel_mrhat_cam.sh'],
+    scripts=['scripts/sentinel_mrhat_cam.sh', 'scripts/daemon.sh'],
     install_requires=['pytest',
                       'PyYAML>=6.0',
                       'pillow',

@@ -31,6 +31,7 @@ class Transmit:
     mqtt : MQTT
         An instance of the MQTT class used to handle MQTT communication.
     """
+
     def __init__(self, camera: Camera, logger: Logger, schedule: Schedule, mqtt: MQTT) -> None:
         """
         Initializes the Transmit class with instances of Camera, Logger,
@@ -253,4 +254,4 @@ class Transmit:
             waiting_time: float = self.schedule.period - elapsed_time
         except Exception as e:
             logging.error(f"Error in run_with_time_measure method: {e}")
-        return max(waiting_time, MINIMUM_WAIT_TIME), datetime.fromisoformat(end_time)
+        return max(waiting_time, MINIMUM_WAIT_TIME)

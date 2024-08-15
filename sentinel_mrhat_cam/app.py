@@ -7,6 +7,8 @@ from .static_config import CONFIGACKTOPIC
 from .schedule import Schedule
 from .logger import Logger
 from .transmit import Transmit
+from .system import RTC, System
+from datetime import datetime
 
 
 class App:
@@ -115,11 +117,13 @@ class App:
                 self.check_config_received_event(config_received)
 
                 # Send an image and measure how long it took to send
-                waiting_time, end_time = self.transmit.transmit_message_with_time_measure()
+                waiting_time = self.transmit.transmit_message_with_time_measure()
 
                 if self.schedule.should_shutdown(waiting_time):
-                    self.schedule.manage_boot_data(end_time)
-                    self.schedule.shutdown(waiting_time, end_time)
+                    shutdown_time = self.schedule.calculate_shutdown_duration(waiting_time)
+                    wake_time = self.schedule.get_wake_time(shutdown_time)
+                    System.schedule_wakeup(wake_time)
+                    System.shutdown()
                 else:
                     logging.info(f"Sleeping for {waiting_time} seconds")
                     config_received = self.mqtt.config_received_event.wait(timeout=waiting_time)
