@@ -302,6 +302,10 @@ If you measure the data while the device does not receive any power through the 
 - **Raspbery extension Hat**: [MrHAT](https://effective-range.com/hardware/mrhat/)
 
 - **Camera module**: [Arducam IMX519 PDAF&CDAF Autofocus Camera Module](https://www.arducam.com/product/imx519-autofocus-camera-module-for-raspberry-pi-arducam-b0371/)
+
+- **Solar Panel**: [Reolink Solar Panel 2](https://www.bestmarkt.hu/reolink-rlsolpbb2-kulteri-okos-kamera-usb-napelem-p853135)
+
+- **SD card**: [SanDisk microSDHC Ultra 32GB](https://www.alza.hu/sandisk-microsdhc-ultra-32gb-sd-adapter-d6250713.htm?kampan=arukereso_hu_prislusenstvi-pro-it-tv_pametove-karty_microsdhc/xc_dt807j2f2b1b&utm_source=arukereso_hu&utm_medium=product&utm_campaign=arukereso_hu_prislusenstvi-pro-it-tv_pametove-karty_microsdhc/xc_dt807j2f2b1b&aku=324206e06a9b4d5089a463dab6911ac6)
 """
 
 from .static_config import *
