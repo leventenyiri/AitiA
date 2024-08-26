@@ -7,8 +7,7 @@ from .static_config import CONFIGACKTOPIC
 from .schedule import Schedule
 from .logger import Logger
 from .transmit import Transmit
-from .system import RTC, System
-from datetime import datetime
+from .system import System
 
 
 class App:
