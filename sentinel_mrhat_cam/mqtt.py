@@ -178,7 +178,7 @@ class MQTT:
         """
         while not self.is_broker_available():
             logging.info("Waiting for broker to become available...")
-            time.sleep(0.5)
+            time.sleep(1)
             self.broker_connect_counter += 1
             if self.broker_connect_counter == 20:
                 logging.error("Connecting to network failed 20 times, restarting script...")

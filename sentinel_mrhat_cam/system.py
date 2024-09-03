@@ -59,11 +59,20 @@ class System:
             # wake_timestamp = int(wake_time.timestamp())
 
             # Construct the rtcwake command
-            cmd = [
-                'sudo', 'mrhat-rtcwake',
-                '-d', 'rtc0',  # Use RTC0 device
-                '-s', str(wake_time)
-            ]
+            if isinstance(wake_time, time):
+                cmd = [
+                    'sudo', 'mrhat-rtcwake',
+                    '-d', 'rtc0',  # Use RTC0 device
+                    '-t', f"$(%s -d 'today {str(wake_time)}')"
+                ]
+            elif isinstance(wake_time, (int, float)):
+                cmd = [
+                    'sudo', 'mrhat-rtcwake',
+                    '-d', 'rtc0',  # Use RTC0 device
+                    '-s', str(wake_time)
+                ]
+            else:
+                raise ValueError("wake_time must be a datetime object, int, or float")
 
             # Execute the command
             result = subprocess.run(cmd, check=True, capture_output=True, text=True)

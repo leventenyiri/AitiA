@@ -111,6 +111,7 @@ class App:
         """
         try:
             while True:
+                self.schedule.working_time_check(self.config.data["wakeUpTime"], self.config.data["shutDownTime"])
                 # Check if a new configuration has been received
                 config_received = self.mqtt.config_received_event.is_set()
                 self.check_config_received_event(config_received)
@@ -152,7 +153,6 @@ class App:
         - `period`: Determines the interval between consecutive image captures and transmissions.
         - `quality`: Sets the quality of images captured by the camera.
         """
-        self.schedule.working_time_check(self.config.data["wakeUpTime"], self.config.data["shutDownTime"])
         self.schedule.period = self.config.data["period"]
         self.camera.quality = self.config.data["quality"]
 

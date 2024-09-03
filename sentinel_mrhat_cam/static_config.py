@@ -9,7 +9,7 @@ TEMP_CONFIG_PATH = os.path.join(SCRIPT_DIR, 'temp_config.json')
 STATE_FILE_PATH = os.path.join(SCRIPT_DIR, 'state_file.json')
 
 # MQTT Configuration
-BROKER = "192.168.0.105"
+BROKER = "192.168.59.13"
 # BROKER = "192.168.0.102"
 PORT = 1883
 IMAGETOPIC = "mqtt/rpi/image"
@@ -27,7 +27,7 @@ if  `period` < **SHUTDOWN_THRESHOLD** :
 if  `period` > **SHUTDOWN_THRESHOLD** :
     The device shuts down in between picture taking.
 """
-SHUTDOWN_THRESHOLD = 70
+SHUTDOWN_THRESHOLD = 40
 
 """
 This is the default time in seconds that, the he Pi takes to shutdown, and then to boot again.
