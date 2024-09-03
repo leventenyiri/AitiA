@@ -1,4 +1,5 @@
-1. sudo apt install pip, upower
+1. pip packages install
 2. libcamera: https://docs.arducam.com/Raspberry-Pi-Camera/Native-camera/Libcamera-User-Guide/#for-arducam-16mp64mp-autofocus-camera
-3. copy setup.py -> install it
-4. copy source files: app.py  camera.py  client.py  config.json  log_config.yaml  mqtt.py  static_config.py  utils.py system.py
+3. sudo nano /etc/systemd/system.conf -> DefaultTimeoutStopSec=20s
+4. moving the source code with scp
+5. create daemon
