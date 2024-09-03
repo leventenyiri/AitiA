@@ -56,15 +56,13 @@ class System:
         """
         try:
             # Convert wake_time to Unix timestamp
-            wake_timestamp = int(wake_time.timestamp())
+            # wake_timestamp = int(wake_time.timestamp())
 
             # Construct the rtcwake command
             cmd = [
-                'sudo', 'rtcwake',
+                'sudo', 'mrhat-rtcwake',
                 '-d', 'rtc0',  # Use RTC0 device
-                '-m', 'no',    # Don't actually suspend, just set the alarm
-                '-t', str(wake_timestamp),
-                '-u'  # Use UTC time
+                '-s', str(wake_time)
             ]
 
             # Execute the command

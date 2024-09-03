@@ -3,6 +3,7 @@ from datetime import timedelta
 import logging
 from .static_config import TIME_TO_BOOT_AND_SHUTDOWN, SHUTDOWN_THRESHOLD
 from .system import System, RTC
+import pytz
 
 
 class Schedule:
@@ -66,7 +67,7 @@ class Schedule:
         shutdown_duration = waiting_time - TIME_TO_BOOT_AND_SHUTDOWN
         return max(shutdown_duration, 0)
 
-    def get_wake_time(self, current_time, shutdown_duration) -> datetime:
+    def get_wake_time(self, shutdown_duration) -> datetime:
         """
         Calculate the time at which the system should wake up.
 
@@ -82,6 +83,13 @@ class Schedule:
         datetime
             The time at which the system should wake up.
         """
+        current_time_str = RTC.get_time()
+        current_time = datetime.fromisoformat(current_time_str)
+
+        # Ensure the datetime is timezone-aware
+        if current_time.tzinfo is None:
+            current_time = pytz.UTC.localize(current_time)
+
         return current_time + timedelta(seconds=shutdown_duration)
 
     def working_time_check(self, wakeUpTime, shutDownTime) -> None:

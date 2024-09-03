@@ -9,7 +9,7 @@ TEMP_CONFIG_PATH = os.path.join(SCRIPT_DIR, 'temp_config.json')
 STATE_FILE_PATH = os.path.join(SCRIPT_DIR, 'state_file.json')
 
 # MQTT Configuration
-BROKER = "debian.local"
+BROKER = "192.168.0.105"
 # BROKER = "192.168.0.102"
 PORT = 1883
 IMAGETOPIC = "mqtt/rpi/image"
@@ -33,7 +33,7 @@ SHUTDOWN_THRESHOLD = 70
 This is the default time in seconds that, the he Pi takes to shutdown, and then to boot again.
 """
 DEFAULT_BOOT_SHUTDOWN_TIME = 30
-TIME_TO_BOOT_AND_SHUTDOWN = 60
+TIME_TO_BOOT_AND_SHUTDOWN = 20
 
 """
 This is the minimum value for `period` in seconds.
