@@ -1,5 +1,7 @@
-1. pip packages install
-2. libcamera: https://docs.arducam.com/Raspberry-Pi-Camera/Native-camera/Libcamera-User-Guide/#for-arducam-16mp64mp-autofocus-camera
-3. sudo nano /etc/systemd/system.conf -> DefaultTimeoutStopSec=20s
-4. moving the source code with scp
-5. create daemon
+1. sudo apt update
+2. pip packages install
+3. camera driver: https://docs.arducam.com/Raspberry-Pi-Camera/Native-camera/16MP-IMX519/
+4. camera overlay: /boot/config.txt -> dtoverlay=imx519
+4. sudo nano /etc/systemd/system.conf -> DefaultTimeoutStopSec=20s
+5. moving the source code with scp
+6. create daemon
