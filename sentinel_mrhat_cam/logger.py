@@ -78,7 +78,6 @@ class Logger(logging.Handler):
             logging.info("Logging started")
 
         except Exception as e:
-            print(f"Error loading log config: {e}")
             exit(1)
 
     def create_mqtt_handler(self) -> None:
@@ -129,7 +128,6 @@ class Logger(logging.Handler):
         try:
             msg = self.format(record)
             self.log_queue.put(msg)
-            print(f"Queue number increased: {self.log_queue.qsize()}")
             if self.start_event.is_set() and self.mqtt.is_connected():
                 self.pool.apply_async(self.publish_loop, args=(msg, LOGGING_TOPIC))
 
@@ -163,7 +161,6 @@ class Logger(logging.Handler):
         while not self.log_queue.empty():
             try:
                 msg = self.log_queue.get(timeout=1)
-                print(f"Queue number decreased: {self.log_queue.qsize()}")
                 # Do not publish if not connected
                 if self.mqtt.is_connected():
                     self.mqtt.client.publish(topic, msg)

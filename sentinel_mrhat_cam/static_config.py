@@ -10,7 +10,6 @@ STATE_FILE_PATH = os.path.join(SCRIPT_DIR, 'state_file.json')
 
 # MQTT Configuration
 BROKER = "192.168.0.105"
-# BROKER = "192.168.59.13"
 PORT = 1883
 IMAGETOPIC = "mqtt/rpi/image"
 CONFIGACKTOPIC = "er-edge/confirm"
@@ -18,6 +17,16 @@ CONFIGSUBTOPIC = "config/er-edge"
 QOS = 2
 USERNAME = "er-edge"
 PASSWORD = "admin"
+
+# Prod topics
+""" PORT = 1883
+QOS = 2
+BROKER = "37.220.137.22"
+IMAGETOPIC = "sentinel/cam1"
+CONFIGACKTOPIC = "cam1/confirm"
+CONFIGSUBTOPIC = "settings/cam1"
+USERNAME = "cam1"
+PASSWORD = "rubin2024cam1" """
 
 # App configuration
 """

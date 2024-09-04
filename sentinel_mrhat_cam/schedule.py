@@ -120,7 +120,6 @@ class Schedule:
         current_time: time = utc_time.time()
 
         local_wake_up_time = self.adjust_time(wakeUpTime)
-        local_shut_down_time = self.adjust_time(shutDownTime)
 
         logging.info(
             f"wake up time is : {wake_up_time}, shutdown time is : {shut_down_time}, current time is : {current_time}"

@@ -145,7 +145,7 @@ class Transmit:
         """
         try:
             battery_info: Dict[str, Any] = System.get_battery_info()
-            hardware_info: Dict[str, Any] = System.gather_hardware_info()
+            # hardware_info: Dict[str, Any] = System.gather_hardware_info()
             cpu_temp: float = System.get_cpu_temperature()
 
             logging.info(
@@ -159,8 +159,8 @@ class Transmit:
             }
 
             # Log hardware info to a file for further analysis
-            if hardware_info:
-                self.log_hardware_info(hardware_info)
+            # if hardware_info:
+            #   self.log_hardware_info(hardware_info)
 
             return json.dumps(message)
 

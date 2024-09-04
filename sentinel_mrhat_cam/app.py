@@ -123,9 +123,7 @@ class App:
                 if self.schedule.should_shutdown(waiting_time):
                     shutdown_duration = self.schedule.calculate_shutdown_duration(waiting_time)
                     logging.info(f"Shutdown duration is: {shutdown_duration} seconds")
-                    # wake_time = self.schedule.get_wake_time(shutdown_time)
                     System.schedule_wakeup(int(shutdown_duration))
-                    # System.shutdown()
                     logging.info("We should shut down")
                 else:
                     logging.info(f"Sleeping for {waiting_time} seconds")
