@@ -1,25 +1,10 @@
 #!/bin/bash
 
-# Log file path
-LOG_FILE="/home/admin/bash_script.log"
-
-# Redirect all output to the log file
-exec > >(tee -a "$LOG_FILE") 2>&1
-
-echo "Starting bash script at $(date)"
-
 # Set the working directory
 cd /home/admin
-echo "Current working directory: $(pwd)"
 
 # Ensure the correct Python environment is used
 export PATH="/usr/local/bin:$PATH"
-echo "Python path: $(which python3)"
-echo "Python version: $(python3 --version)"
-
-# Print out environment variables
-echo "Environment variables:"
-env
 
 # Configuration
 RESTART_COUNT_FILE="/tmp/restart_count"
