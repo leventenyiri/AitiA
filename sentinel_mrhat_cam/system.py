@@ -65,11 +65,8 @@ class System:
 
             elif isinstance(wake_time, (int, float)):
                 logging.info("inside isinstance(wake_time, (int, float))")
-                cmd = [
-                    'sudo', 'mrhat-rtcwake',
-                    '-d', 'rtc0',  # Use RTC0 device
-                    '-s', str(wake_time)
-                ]
+
+                cmd = f"sudo mrhat-rtcwake -d rtc0 -s {str(wake_time)}"
             else:
                 raise ValueError("wake_time must be a str, int, or float")
 
