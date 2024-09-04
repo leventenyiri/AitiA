@@ -9,6 +9,7 @@ import pytz
 class Schedule:
     def __init__(self, period):
         self.period = period
+        self.time_offset = 2  # Budapest is UTC+2
 
     def should_shutdown(self, waiting_time) -> bool:
         """
@@ -92,6 +93,12 @@ class Schedule:
 
         return current_time + timedelta(seconds=shutdown_duration)
 
+    def adjust_time(self, time_str):
+        """Adjust the given UTC time string to local time."""
+        hours, minutes, seconds = map(int, time_str.split(':'))
+        hours = (hours + self.time_offset) % 24
+        return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+
     def working_time_check(self, wakeUpTime, shutDownTime) -> None:
         """
         Check if the current time is within the operational hours defined in the configuration.
@@ -112,6 +119,9 @@ class Schedule:
         utc_time: datetime = datetime.fromisoformat(RTC.get_time())
         current_time: time = utc_time.time()
 
+        local_wake_up_time = self.adjust_time(wakeUpTime)
+        local_shut_down_time = self.adjust_time(shutDownTime)
+
         logging.info(
             f"wake up time is : {wake_up_time}, shutdown time is : {shut_down_time}, current time is : {current_time}"
         )
@@ -119,11 +129,11 @@ class Schedule:
         # If e.g: wake up time = 6:00:00 and shutdown time = 20:00:00
         if (wake_up_time < shut_down_time) and (wake_up_time > current_time or current_time >= shut_down_time):
             logging.info("Starting shutdown")
-            System.schedule_wakeup(wake_up_time)
+            System.schedule_wakeup(local_wake_up_time)
             System.shutdown()
 
         # If e.g: wake up time = 20:00:00 and shutdown time = 6:00:00
         elif current_time >= shut_down_time and current_time < wake_up_time:
             logging.info("Starting shutdown")
-            System.schedule_wakeup(wake_up_time)
+            System.schedule_wakeup(local_wake_up_time)
             System.shutdown()

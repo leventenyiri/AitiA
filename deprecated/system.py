@@ -60,9 +60,11 @@ class System:
 
             if isinstance(wake_time, str):
                 logging.info("inside isinstance(wake_time, str)")
-
-                cmd = f"sudo mrhat-rtcwake -d rtc0 -t $(date +%s -d 'today {wake_time}')"
-
+                cmd = [
+                    'sudo', 'mrhat-rtcwake',
+                    '-d', 'rtc0',  # Use RTC0 device
+                    '-t', f"$(date +%s -d 'today {wake_time}')"
+                ]
             elif isinstance(wake_time, (int, float)):
                 logging.info("inside isinstance(wake_time, (int, float))")
                 cmd = [
@@ -511,3 +513,4 @@ class RTC:
         except Exception as e:
             logging.error(f"Error reading system time: {e}")
             return datetime.now(pytz.UTC).isoformat()
+
