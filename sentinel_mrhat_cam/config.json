@@ -1,7 +1,7 @@
 {
     "quality": "3K",
     "mode": "periodic",
-    "period": 70,
+    "period": 15,
     "wakeUpTime": "16:37:00",
     "shutDownTime": "16:35:00"
 }

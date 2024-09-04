@@ -4,7 +4,7 @@ from sentinel_mrhat_cam import BROKER
 
 broker = BROKER
 port = 1883
-topic = "settings/er-edge"
+topic = "config/er-edge"
 
 # Path to your config.json file
 config_path = "sentinel_mrhat_cam/config.json"
