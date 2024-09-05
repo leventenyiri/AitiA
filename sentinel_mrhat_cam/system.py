@@ -61,7 +61,7 @@ class System:
             if isinstance(wake_time, str):
                 logging.info("inside isinstance(wake_time, str)")
 
-                cmd = f"sudo mrhat-rtcwake -d rtc0 -t $(date +%s -d 'today {wake_time}')"
+                cmd = f"sudo mrhat-rtcwake -d rtc0 -t $(date +%s -d 'tomorrow {wake_time}')"
 
             elif isinstance(wake_time, (int, float)):
                 logging.info("inside isinstance(wake_time, (int, float))")

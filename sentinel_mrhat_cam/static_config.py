@@ -9,24 +9,26 @@ TEMP_CONFIG_PATH = os.path.join(SCRIPT_DIR, 'temp_config.json')
 STATE_FILE_PATH = os.path.join(SCRIPT_DIR, 'state_file.json')
 
 # MQTT Configuration
-BROKER = "192.168.0.105"
+""" BROKER = "192.168.0.105"
 PORT = 1883
 IMAGETOPIC = "mqtt/rpi/image"
 CONFIGACKTOPIC = "er-edge/confirm"
 CONFIGSUBTOPIC = "config/er-edge"
 QOS = 2
 USERNAME = "er-edge"
-PASSWORD = "admin"
+PASSWORD = "admin" """
 
 # Prod topics
-""" PORT = 1883
+PORT = 1883
 QOS = 2
 BROKER = "37.220.137.22"
-IMAGETOPIC = "sentinel/cam1"
-CONFIGACKTOPIC = "cam1/confirm"
-CONFIGSUBTOPIC = "settings/cam1"
-USERNAME = "cam1"
-PASSWORD = "rubin2024cam1" """
+IMAGETOPIC = "sentinel/cam4"
+CONFIGACKTOPIC = "cam4/confirm"
+CONFIGSUBTOPIC = "settings/cam4"
+USERNAME = "cam4"
+PASSWORD = "rubin2024cam4"
+LOGGING_TOPIC = "cam4/log"
+LOG_LEVEL = logging.WARNING
 
 # App configuration
 """
@@ -53,7 +55,3 @@ MINIMUM_WAIT_TIME = 5
 This is the maximum value for `period` in seconds.
 """
 MAXIMUM_WAIT_TIME = 10800
-
-# Log configuration
-LOGGING_TOPIC = "er-edge/logging"
-LOG_LEVEL = logging.DEBUG
