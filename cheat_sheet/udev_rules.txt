@@ -1,0 +1,21 @@
+sudo nano /etc/udev/rules.d/99-low-battery.rules
+
+SUBSYSTEM=="power_supply", ATTR{name}=="bq2562x-battery", ATTR{voltage_now}!="", RUN+="/usr/local/bin/check_battery_voltage.sh"
+
+sudo nano /usr/local/bin/check_battery_voltage.sh
+
+#!/bin/bash
+
+VOLTAGE=$(cat /sys/class/power_supply/bq2562x-battery/uevent | grep POWER_SUPPLY_VOLTAGE_AVG | cut -d'=' -f2)
+THRESHOLD=30000  # 3V in microvolts, adjust as needed
+
+if [ "$VOLTAGE" -lt "$THRESHOLD" ]; then
+    echo "Low battery detected! Voltage: $VOLTAGE" >> /var/log/battery.log
+    sudo mrhat-rtcwake -d rtc0 -s 3600
+fi
+
+sudo chmod +x /usr/local/bin/check_battery_voltage.sh
+
+Reload udev_rules:
+
+sudo udevadm control --reload-rules && sudo udevadm trigger

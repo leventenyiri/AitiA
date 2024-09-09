@@ -124,7 +124,6 @@ class App:
                     shutdown_duration = self.schedule.calculate_shutdown_duration(waiting_time)
                     logging.info(f"Shutdown duration is: {shutdown_duration} seconds")
                     System.schedule_wakeup(int(shutdown_duration))
-                    logging.info("We should shut down")
                 else:
                     logging.info(f"Sleeping for {waiting_time} seconds")
                     config_received = self.mqtt.config_received_event.wait(timeout=waiting_time)

@@ -4,4 +4,10 @@
 4. camera overlay: /boot/config.txt -> dtoverlay=imx519
 4. sudo nano /etc/systemd/system.conf -> DefaultTimeoutStopSec=20s
 5. moving the source code with scp
-6. create daemon
+6. create script running daemon
+7. create service and timer service for battery monitoring (battery_check_with_service.txt)
+8. wake-hez:
+    sudo touch /etc/adjtime
+    echo "0.0 0 0.0" | sudo tee /etc/adjtime
+    echo "0" | sudo tee -a /etc/adjtime
+    echo "UTC" | sudo tee -a /etc/adjtime

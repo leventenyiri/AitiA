@@ -1,0 +1,65 @@
+    check_battery_voltage.sh:
+
+sudo nano /usr/local/bin/check_battery_voltage.sh
+
+    bele:
+
+#!/bin/bash
+
+VOLTAGE=$(cat /sys/class/power_supply/bq2562x-battery/uevent | grep POWER_SUPPLY_VOLTAGE_AVG | cut -d'=' -f2)
+THRESHOLD=3000000  # 3V in microvolts, adjust as needed
+
+echo "$(date) In battery_voltage.sh" >> /var/log/battery.log
+echo "Voltage: $VOLTAGE" >> /var/log/battery.log
+
+if [ "$VOLTAGE" -lt "$THRESHOLD" ]; then
+    echo "Low battery detected! Voltage: $VOLTAGE" >> /var/log/battery.log
+    sudo mrhat-rtcwake -d rtc0 -s 3600
+fi
+
+    permission:
+
+sudo chmod +x /usr/local/bin/check_battery_voltage.sh
+
+
+sudo nano /etc/systemd/system/battery-check.service
+
+    Ebbe bele:
+
+[Unit]
+Description=Check Battery Voltage
+
+[Service]
+ExecStart=/usr/local/bin/check_battery_voltage.sh
+
+    Timer létrehozása hozzá(név alapján rendeli össze a timert és a service-t)
+
+sudo nano /etc/systemd/system/battery-check.timer
+
+    Bele:
+
+[Unit]
+Description=Run battery check every 5 seconds
+
+[Timer]
+OnBootSec=5s
+OnUnitActiveSec=5s
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target
+
+    Engedélyezés, indítás
+
+sudo systemctl enable battery-check.timer
+sudo systemctl start battery-check.timer
+
+
+   
+
+
+sudo systemctl daemon-reload
+
+sudo systemctl status battery-check.timer
+sudo systemctl status battery-check.service
+

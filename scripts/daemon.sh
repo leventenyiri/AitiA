@@ -25,6 +25,8 @@ sudo systemctl daemon-reload
 # Enable the service to start on boot
 sudo systemctl enable sentinel_mrhat_cam.service
 
+# sudo systemctl disable sentinel_mrhat_cam.service
+
 # Optional: Start the service immediately
 # sudo systemctl start sentinel_mrhat_cam.service
 

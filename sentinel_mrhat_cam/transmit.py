@@ -68,6 +68,13 @@ class Transmit:
         with open("hardware_log.txt", "a") as log_file:
             log_file.write(f"{log_entry}\n")
 
+        logging.info(f"battery_voltage_now: {hardware_info['battery_voltage_now']}")
+        logging.info(f"battery_voltage_avg: {hardware_info['battery_voltage_avg']}")
+        logging.info(f"battery_current_now: {hardware_info['battery_current_now']}")
+        logging.info(f"battery_current_avg: {hardware_info['battery_current_avg']}")
+        logging.info(f"charger_voltage_now: {hardware_info['charger_voltage_now']}")
+        logging.info(f"charger_current_now: {hardware_info['charger_current_now']}")
+
     def create_base64_image(self, image_array: np.ndarray) -> str:
         """
         Converts a numpy array representing an image into a base64-encoded JPEG string.
@@ -145,7 +152,7 @@ class Transmit:
         """
         try:
             battery_info: Dict[str, Any] = System.get_battery_info()
-            # hardware_info: Dict[str, Any] = System.gather_hardware_info()
+            hardware_info: Dict[str, Any] = System.gather_hardware_info()
             cpu_temp: float = System.get_cpu_temperature()
 
             logging.info(
@@ -159,8 +166,8 @@ class Transmit:
             }
 
             # Log hardware info to a file for further analysis
-            # if hardware_info:
-            #   self.log_hardware_info(hardware_info)
+            if hardware_info:
+                self.log_hardware_info(hardware_info)
 
             return json.dumps(message)
 

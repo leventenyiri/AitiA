@@ -56,7 +56,7 @@ class System:
         """
         try:
 
-            logging.info(f"type of wake_time: {type(wake_time)}")
+            logging.info(f"wake_time is: {wake_time}")
 
             if isinstance(wake_time, str):
                 logging.info("inside isinstance(wake_time, str)")
@@ -64,17 +64,12 @@ class System:
                 cmd = f"sudo mrhat-rtcwake -d rtc0 -t $(date +%s -d 'tomorrow {wake_time}')"
 
             elif isinstance(wake_time, (int, float)):
-                logging.info("inside isinstance(wake_time, (int, float))")
-
                 cmd = f"sudo mrhat-rtcwake -d rtc0 -s {str(wake_time)}"
             else:
                 raise ValueError("wake_time must be a str, int, or float")
 
             # Execute the command
             result = subprocess.run(cmd, shell=True, check=True, capture_output=True, text=True)
-
-            logging.info(f"Wake-up alarm set for {wake_time}")
-            logging.debug(f"rtcwake output: {result.stdout}")
 
         except subprocess.CalledProcessError as e:
             logging.error(f"Failed to set RTC wake-up alarm: {e}")
