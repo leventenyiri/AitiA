@@ -2,7 +2,6 @@
 2. pip packages install
 3. camera driver: https://docs.arducam.com/Raspberry-Pi-Camera/Native-camera/16MP-IMX519/
 4. camera overlay: /boot/config.txt -> dtoverlay=imx519
-4. sudo nano /etc/systemd/system.conf -> DefaultTimeoutStopSec=20s
 5. moving the source code with scp
 6. create script running daemon
 7. create service and timer service for battery monitoring (battery_check_with_service.txt)
