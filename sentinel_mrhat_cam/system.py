@@ -56,7 +56,7 @@ class System:
         """
         try:
 
-            logging.info(f"wake_time is: {wake_time}")
+            logging.info(f"wake_time is: {wake_time} seconds")
 
             if isinstance(wake_time, str):
                 logging.info("inside isinstance(wake_time, str)")

@@ -11,4 +11,5 @@
     echo "0" | sudo tee -a /etc/adjtime
     echo "UTC" | sudo tee -a /etc/adjtime
 9. sudo nano /etc/systemd/system.conf
-DefaultTimeoutStopSec=10s
+10. Rubin winery wifi setup
+DefaultTimeoutStopSec=15s

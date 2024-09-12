@@ -3,5 +3,5 @@
     "mode": "periodic",
     "period": 15,
     "wakeUpTime": "00:01:00",
-    "shutDownTime": "23:59:00"
+    "shutDownTime": "21:59:00"
 }
