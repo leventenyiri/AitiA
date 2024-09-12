@@ -3,3 +3,5 @@ sudo nano /etc/udev/rules.d/99-low-battery.rules
 SUBSYSTEM=="power_supply", ATTR{name}=="bq2562x-battery", ATTR{status}=="Discharging", ATTR{voltage_now}<="4100000", RUN+="/usr/bin/sudo /usr/bin/mrhat-rtcwake -d rtc0 -s 30"
 
 sudo udevadm control --reload-rules && sudo udevadm trigger
+
+udev rules-ba inkább azt nézzük, hogy egy adott értéknél nagyobb-e
