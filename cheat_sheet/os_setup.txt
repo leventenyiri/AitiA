@@ -1,8 +1,26 @@
 1. sudo apt update
 2. sudo apt upgrade
-3. pip packages install -> pip install -r requirements.txt
-4. moving the source code with scp
-5. create script running daemon
+3. moving the source code with scp
+4. pip packages install -> pip install -r requirements.txt
+5. create script running daemon ->
+
+    sudo nano /etc/systemd/system/sentinel_mrhat_cam.service
+
+[Unit]
+Description=Run Script Daemon
+
+[Service]
+Type=simple
+User=admin
+ExecStart=/bin/bash /home/admin/sentinel_mrhat_cam.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
+    sudo systemctl daemon-reload
+
 6. sudo nano /etc/systemd/system.conf -> DefaultTimeoutStopSec=15s
 7. Rubin winery wifi setup
 8. Check the static_config.py for every device
