@@ -64,7 +64,7 @@ class Transmit:
             A dictionary containing hardware information such as CPU temperature,
             battery temperature, and other system metrics.
         """
-        # log_entry = ", ".join(f"{k}={v}" for k, v in hardware_info.items())
+        # sudo nano /etc/systemd/system.conf log_entry = ", ".join(f"{k}={v}" for k, v in hardware_info.items())
         # with open("hardware_log.txt", "a") as log_file:
             # log_file.write(f"{log_entry}\n")
 
