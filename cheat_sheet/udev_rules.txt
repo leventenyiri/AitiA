@@ -1,7 +1,38 @@
 sudo nano /etc/udev/rules.d/99-low-battery.rules
 
-SUBSYSTEM=="power_supply", ATTR{name}=="bq2562x-battery", ATTR{status}=="Discharging", ATTR{voltage_now}<="4100000", RUN+="/usr/bin/sudo /usr/bin/mrhat-rtcwake -d rtc0 -s 30"
+SUBSYSTEM=="power_supply", KERNEL=="bq2562x-battery", ACTION=="change", RUN+="/usr/local/bin/low_battery_alert.sh"
 
-sudo udevadm control --reload-rules && sudo udevadm trigger
+bash: /usr/local/bin  low_battery_alert.sh
 
-udev rules-ba inkább azt nézzük, hogy egy adott értéknél nagyobb-e
+#!/bin/bash
+source /sys/class/power_supply/bq2562x-battery/uevent
+voltage_now=$(echo "$POWER_SUPPLY_VOLTAGE_NOW")
+threshold=4100000
+if [ -z "$voltage_now" ]; then
+    echo "Voltage information is not available."
+    exit 1
+fi
+if [ "$voltage_now" -le "$threshold" ]; then
+    echo "Battery voltage is below the threshold."
+    sudo mrhat-rtcwake -d rtc0 -s 30
+else
+    echo "Battery voltage is above the threshold."
+fi
+
+
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+
+
+errors:
+Sep 12 20:25:07 er-edge-eea82ebe systemd-udevd[5357]: vcsu3: Process '/usr/local/bin/low_battery_alert.sh' failed with exit code 16.
+Sep 12 20:25:07 er-edge-eea82ebe sudo[6352]: root : PWD=/ ; USER=root ; COMMAND=/usr/local/bin/mrhat-rtcwake -d rtc0 -s 30 
+Sep 12 20:25:07 er-edge-eea82ebe sudo[6352]: pam_unix(sudo:session): session opened for user root(uid=0) by (uid=0)
+Sep 12 20:25:07 er-edge-eea82ebe sudo[6344]: pam_unix(sudo:session): session closed for user root 
+Sep 12 20:25:07 er-edge-eea82ebe sudo[6360]: root : PWD=/ ; USER=root ; COMMAND=/usr/local/bin/mrhat-rtcwake -d rtc0 -s 30
+
+admin@er-edge-eea82ebe:/usr/local/bin $ bash low_battery_alert.sh                                                                                                                                                                                                                                                            
+Starting low_battery_alert.sh                                                                                                                                                                                                                                                                                                
+Battery voltage is below the threshold.                                                                                                                                                                                                                                                                                      
+mrhat-rtcwake: rtc0: Device or resource busy                                                                                                                                                                                                                                                                                 
+Finishing low_battery_alert.sh
