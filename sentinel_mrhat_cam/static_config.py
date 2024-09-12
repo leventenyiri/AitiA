@@ -9,17 +9,19 @@ TEMP_CONFIG_PATH = os.path.join(SCRIPT_DIR, 'temp_config.json')
 STATE_FILE_PATH = os.path.join(SCRIPT_DIR, 'state_file.json')
 
 # MQTT Configuration
-""" BROKER = "192.168.0.105"
+BROKER = "192.168.0.110"
 PORT = 1883
 IMAGETOPIC = "mqtt/rpi/image"
 CONFIGACKTOPIC = "er-edge/confirm"
 CONFIGSUBTOPIC = "config/er-edge"
 QOS = 2
 USERNAME = "er-edge"
-PASSWORD = "admin" """
+PASSWORD = "admin"
+LOGGING_TOPIC = "cam4/log"
+LOG_LEVEL = logging.INFO
 
 # Prod topics
-PORT = 1883
+""" PORT = 1883
 QOS = 2
 BROKER = "37.220.137.22"
 IMAGETOPIC = "sentinel/cam4"
@@ -28,7 +30,7 @@ CONFIGSUBTOPIC = "settings/cam4"
 USERNAME = "cam4"
 PASSWORD = "rubin2024cam4"
 LOGGING_TOPIC = "cam4/log"
-LOG_LEVEL = logging.WARNING
+LOG_LEVEL = logging.WARNING """
 
 # App configuration
 """
@@ -38,7 +40,7 @@ if  `period` < **SHUTDOWN_THRESHOLD** :
 if  `period` > **SHUTDOWN_THRESHOLD** :
     The device shuts down in between picture taking.
 """
-SHUTDOWN_THRESHOLD = 40
+SHUTDOWN_THRESHOLD = 60
 
 """
 This is the default time in seconds that, the he Pi takes to shutdown, and then to boot again.

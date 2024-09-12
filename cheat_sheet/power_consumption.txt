@@ -1,0 +1,24 @@
+Pi idling with camera connected: 230-260mA
+Pi with libcamera-hello running: 500-530mA
+Pi with mrhat-rtcwake halted state: 80mA
+
+
+Averages when shutting down and booting up (by eye):
+
+4.2V 400mA 40sec
+4.0V 450mA 40sec
+3.8V 450mA 40sec
+3.6V 500mA 40sec
+3.4V 600mA 40sec
+3.2V 650mA 40sec
+3.0V 700mA 40sec
+
+Averages when waiting in script(period smaller than shutdown treshold):
+
+4.2V 380mA
+4.0V 400mA
+3.8V 440mA
+3.6V 460mA
+3.4V 480mA
+3.2V 550mA
+3.0V 600mA
