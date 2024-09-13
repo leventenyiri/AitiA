@@ -9,7 +9,7 @@ TEMP_CONFIG_PATH = os.path.join(SCRIPT_DIR, 'temp_config.json')
 STATE_FILE_PATH = os.path.join(SCRIPT_DIR, 'state_file.json')
 
 # MQTT Configuration
-BROKER = "192.168.1.81"
+"""BROKER = "192.168.1.81"
 PORT = 1883
 IMAGETOPIC = "mqtt/rpi/image"
 CONFIGACKTOPIC = "er-edge/confirm"
@@ -18,10 +18,10 @@ QOS = 2
 USERNAME = "er-edge"
 PASSWORD = "admin"
 LOGGING_TOPIC = "cam4/log"
-LOG_LEVEL = logging.INFO
+LOG_LEVEL = logging.INFO"""
 
 # Prod topics
-""" PORT = 1883
+PORT = 1883
 QOS = 2
 BROKER = "37.220.137.22"
 IMAGETOPIC = "sentinel/cam4"
@@ -30,7 +30,7 @@ CONFIGSUBTOPIC = "settings/cam4"
 USERNAME = "cam4"
 PASSWORD = "rubin2024cam4"
 LOGGING_TOPIC = "cam4/log"
-LOG_LEVEL = logging.WARNING """
+LOG_LEVEL = logging.WARNING
 
 # App configuration
 """

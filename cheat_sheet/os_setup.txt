@@ -1,10 +1,15 @@
 1. sudo apt update
 2. sudo apt upgrade
 3. moving the source code with scp
+
+scp ~/AitiA/{setup.py,requirements.txt} admin@192.168.1.122:/home/admin/sentinel_mrhat_cam
+scp ~/AitiA/scripts/sentinel_mrhat_cam.sh admin@192.168.1.123:/home/admin
+scp ~/AitiA/sentinel_mrhat_cam/{app.py,app_config.py,main.py,mqtt.py,schedule.py,system.py,static_config.py,utils.py,__init__.py,config.json,log_config.yaml,logger.py,camera.py,transmit.py} admin@192.168.1.123:/home/admin/sentinel_mrhat_cam
+    
 4. pip packages install -> pip install -r requirements.txt
 5. create script running daemon ->
 
-    sudo nano /etc/systemd/system/sentinel_mrhat_cam.service
+sudo nano /etc/systemd/system/sentinel_mrhat_cam.service
 
 [Unit]
 Description=Run Script Daemon
@@ -19,10 +24,25 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
 
-    sudo systemctl daemon-reload
+sudo systemctl daemon-reload
 
 6. sudo nano /etc/systemd/system.conf -> DefaultTimeoutStopSec=15s
 7. Rubin winery wifi setup
+
+network={
+	ssid="Shrek"
+	psk="Rumpelstilskin64"
+}
+
+network={
+	ssid="Rubin-Agro Kft."
+	psk="Rubinkft2021"
+}
+network={
+	ssid="bordi-office"
+	psk="Samsung7525!"
+}
+
 8. Check the static_config.py for every device
 9. When confident, enable the daemon -> sudo systemctl enable sentinel_mrhat_cam.service
 10. Start running the sentinel_mrhat_cam.sh bash script
