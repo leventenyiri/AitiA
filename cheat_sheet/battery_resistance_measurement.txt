@@ -130,7 +130,7 @@ Ric = 0.0432327 Ohm
 
                     3.56V
 
-Discharging_
+    Discharging
 
 Ri_d = (Vbat1 - Vbat2)/(Ibat1 -Ibat2)
 
@@ -145,6 +145,83 @@ POWER_SUPPLY_VOLTAGE_AVG=3540210 (Vbat2)
 POWER_SUPPLY_CURRENT_AVG=-680000 (Ibat2)
 
 Ri_d = 0.049203 Ohm -> 49203 uOhm
+
+    Charging
+
+Ric = (Vbatd - Vbatc - Ibatd*Rid)/-(Ibatc)
+
+POWER_SUPPLY_VOLTAGE_AVG=3542200 (Vbatd)
+POWER_SUPPLY_CURRENT_AVG=-316000 (Ibatd)
+
+POWER_SUPPLY_VOLTAGE_AVG=3564090 (Vbatc)
+POWER_SUPPLY_CURRENT_AVG=1072000 (Ibatc)
+
+Ri_c = 5915 uOhm
+
+
+
+            4.0V
+
+Discharging
+
+Ri_d = (Vbat1 - Vbat2)/(Ibat1 -Ibat2)
+
+Idling:
+
+POWER_SUPPLY_VOLTAGE_AVG=4035720 (Vbat1)
+POWER_SUPPLY_CURRENT_AVG=-208000 (Ibat1)
+
+Stress testing:
+
+POWER_SUPPLY_VOLTAGE_AVG=4017810 (Vbat2)
+POWER_SUPPLY_CURRENT_AVG=-1056000 (Ibat2)
+
+Ri_d = 0.02112 Ohm -> 21120 uOhm
+
+Charging:
+
+Ric = (Vbatd - Vbatc - Ibatd*Rid)/-(Ibatc)
+
+POWER_SUPPLY_VOLTAGE_AVG=4033730 (Vbatd)
+POWER_SUPPLY_CURRENT_AVG=-240000 (Ibatd)
+
+POWER_SUPPLY_VOLTAGE_AVG=4157110 (Vbatc)
+POWER_SUPPLY_CURRENT_AVG=1292000 (Ibatc)
+
+Ri_c = 0.09157 Ohm -> 91570 uOhm
+
+
+        3.2V
+
+
+Discharging:
+
+Ri_d = (Vbat1 - Vbat2)/(Ibat1 -Ibat2)
+
+Idling:
+
+POWER_SUPPLY_VOLTAGE_AVG=3259620 (Vbat1)
+POWER_SUPPLY_CURRENT_AVG=-368000 (Ibat1)
+
+Stress testing:
+
+POWER_SUPPLY_VOLTAGE_AVG=3203900 (Vbat2)
+POWER_SUPPLY_CURRENT_AVG=-924000 (Ibat2)
+
+Ri_d = 0.10021 Ohm -> 100215 uOhm
+
+
+Charging:
+
+Ric = (Vbatd - Vbatc - Ibatd*Rid)/-(Ibatc)
+
+POWER_SUPPLY_VOLTAGE_AVG=3251660 (Vbatd)
+POWER_SUPPLY_CURRENT_AVG=-344000 (Ibatd)
+
+POWER_SUPPLY_VOLTAGE_AVG=3329270 (Vbatc)
+POWER_SUPPLY_CURRENT_AVG=1072000 (Ibatc)
+
+Ri_c = 0.04024 Ohm -> 40240 uOhm
 
 
 
