@@ -1,0 +1,128 @@
+@startuml classes
+
+' Main Application Class
+class App {
+    +acknowledge_config()
+    +check_config_received_event(config_received: bool)
+    +run()
+    +run_always()
+    +run_periodically()
+    +start()
+    +update_values()
+}
+
+' Core Components
+class Config {
+    +data: dict
+    +path: str
+    +get_default_config(): dict[str, Any]
+    +load()
+    +validate_config(new_config)
+    +validate_period(period)
+    +validate_time_format(new_config)
+}
+
+class Camera {
+    +cam: Picamera2
+    +height: int
+    +quality: int
+    +width: int
+    +capture(): Optional[np.ndarray]
+    +start()
+}
+
+class MQTT {
+    +broker: str
+    +broker_connect_counter: int
+    +client: paho.mqtt.Client()
+    +config_confirm_message: str
+    +config_received_event: threading.Event()
+    +port: int
+    +qos: int
+    +subtopic: str
+    +broker_check()
+    +connect(): Any
+    +disconnect()
+    +init_receive()
+    +is_broker_available(): bool
+    +is_connected(): bool
+    +publish(message: str, topic: str)
+    +reset_config_received_event()
+}
+
+' Utility Classes
+class Logger {
+    +filepath: str
+    +log_queue: Queue[str]
+    +pool: ThreadPool
+    +start_event: threading.Event()
+    +create_mqtt_handler()
+    +disconnect_mqtt()
+    +emit(record)
+    +publish_loop(msg: str, topic: str)
+    +start_logging()
+    +start_mqtt_logging()
+}
+
+class Schedule {
+    +period: float
+    +time_offset: int
+    +adjust_time(timestamp: str): str
+    +calculate_shutdown_duration(waiting_time: float): float
+    +get_wake_time(shutdown_duration: float): datetime
+    +should_shutdown(waiting_time: float): bool
+    +shutdown(waiting_time: float, current_time: datetime)
+    +working_time_check(wake_up_timestamp: str, shut_down_timestamp: str)
+}
+
+class Transmit {
+    +connect_mqtt()
+    +create_base64_image(image_array: Optional[np.ndarray]): str
+    +create_message(image_array: Optional[np.ndarray], timestamp: str): str
+    +get_message(): str
+    +log_hardware_info(hardware_info: Dict[str, Any])
+    +transmit_message()
+    +transmit_message_with_time_measure(): float
+}
+
+' System-related Classes
+class RTC {
+    +convert_timestamp(timestamp): str
+    +find_line(lines: str, target_string): str
+    +get_time(): str
+    +get_timedatectl(): List[str]
+    +sync_RTC_to_system()
+    +sync_system_to_ntp(max_retries: int, delay): bool
+}
+
+class System {
+    +gather_hardware_info(): Union[dict[str, Any], None]
+    +get_battery_info(): dict[str, Any]
+    +get_cpu_temperature(): float
+    +reboot()
+    +schedule_wakeup(wake_time)
+    +shutdown()
+}
+
+' Relationships
+App *-- Config : config
+App *-- Camera : camera
+App *-- MQTT : mqtt
+App *-- Schedule : "scheduling run"
+App *-- Transmit : "transmit message"
+App -- Logger
+
+Transmit -- Camera
+Transmit -- Logger : logger
+Transmit -- MQTT : transmit through mqtt
+Transmit -- Schedule
+
+Logger -- MQTT : "logging through mqtt"
+
+Schedule ..> RTC : "getting time"
+Transmit ..> RTC : "getting time"
+App ..> System : "setting wake up alarm"
+Schedule ..> System : "setting wake up alarm"
+Transmit ..> System : "gathering hardware information"
+
+@enduml
