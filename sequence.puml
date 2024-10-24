@@ -1,0 +1,58 @@
+@startuml sequence_diagram
+
+participant Main
+participant App
+participant Config
+participant Camera
+participant MQTT
+participant Logger
+participant Schedule
+participant Transmit
+participant RTC
+participant System
+
+Main -> Logger: start_logging()
+Main -> Config: load()
+Main -> App: start_app()
+
+loop
+    App -> Schedule: work_time_check()
+    Schedule -> RTC: get_time()
+    alt Should shutdown
+        Schedule -> System: schedule_wakeup(wake_time)
+        System --> Main: system shutting down
+    else No shutdown
+        Schedule --> App: continue operation
+    end
+
+    App -> Camera: start_camera()
+    App -> Camera: capture()
+    Camera --> App: image
+    App -> System: gather_hardware_info()
+    App -> Logger: log_hardware_info()
+    App -> Transmit: create_message(image)
+    Transmit -> RTC: get_time()
+
+    Transmit -> MQTT: connect()
+    note right: if not connected already
+    MQTT --> Transmit: successful connection
+    Transmit -> MQTT: transmit_message(message)
+    MQTT --> App: message transmitted
+
+    alt Shutdown before next image
+        App -> System: schedule_wakeup(wake_time)
+        System --> Main: system shutting down
+        note over RTC, Schedule
+        the Pi shuts down
+        in between taking the images
+        endnote
+    else No shutdown
+        Schedule --> App: continue operation
+        note over Config, Camera
+        sleeping in the application
+        to adhere to the waiting time period
+        end note
+    end
+end
+
+@enduml

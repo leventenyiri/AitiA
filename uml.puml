@@ -1,12 +1,9 @@
 @startuml classes
 
-' Main Application Class
+' Main Application
 class App {
     +acknowledge_config()
     +check_config_received_event(config_received: bool)
-    +run()
-    +run_always()
-    +run_periodically()
     +start()
     +update_values()
 }
@@ -82,7 +79,6 @@ class Transmit {
     +get_message(): str
     +log_hardware_info(hardware_info: Dict[str, Any])
     +transmit_message()
-    +transmit_message_with_time_measure(): float
 }
 
 ' System-related Classes
@@ -105,24 +101,24 @@ class System {
 }
 
 ' Relationships
-App *-- Config : config
-App *-- Camera : camera
-App *-- MQTT : mqtt
-App *-- Schedule : "scheduling run"
-App *-- Transmit : "transmit message"
+App *-- Config
+App *-- Camera
+App *-- MQTT
+App *-- Schedule
+App *-- Transmit
 App -- Logger
 
 Transmit -- Camera
-Transmit -- Logger : logger
-Transmit -- MQTT : transmit through mqtt
+Transmit -- Logger
+Transmit -- MQTT
 Transmit -- Schedule
 
-Logger -- MQTT : "logging through mqtt"
+Logger -- MQTT
 
-Schedule ..> RTC : "getting time"
-Transmit ..> RTC : "getting time"
-App ..> System : "setting wake up alarm"
-Schedule ..> System : "setting wake up alarm"
-Transmit ..> System : "gathering hardware information"
+Schedule ..> RTC
+Transmit ..> RTC
+App ..> System
+Schedule ..> System
+Transmit ..> System
 
 @enduml
